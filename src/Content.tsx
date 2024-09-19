@@ -36,6 +36,9 @@ const StyledContent = styled.div`
   overflow: hidden;
   touch-action: none;
   font-family: 'Lato', sans-serif; /* Added Lato font */
+  background: -webkit-linear-gradient(white, #38495a)
+  -webkit-background-clip: text
+  -webkit-text-fill-color: transparent
 `;
 
 const StartButton = styled.img<{ isClicked: boolean }>`
@@ -230,7 +233,9 @@ interface Stone {
   
     return (
       <StyledContent>
-        <ScoreBoard>Score: {score} | Difficulty: {difficulty.toFixed(1)}</ScoreBoard>
+        <ScoreBoard className="scoreboard">
+  Score: {score} | Difficulty: {difficulty.toFixed(1)}
+</ScoreBoard>
         {!isPlaying && (
           <StartButton
             src={startImage}
