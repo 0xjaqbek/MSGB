@@ -89,189 +89,172 @@ const GameOverScreen = styled.div`
 `;
 
 interface Stone {
-    id: number;
-    type: number;
-    speed: number;
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-  }
+  id: number;
+  type: number;
+  speed: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+}
+
+const Content = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [stones, setStones] = useState<Stone[]>([]);
+  const [difficulty, setDifficulty] = useState(1);
+  const [stoneIdCounter, setStoneIdCounter] = useState(0);
+
+  const handleStartClick = () => {
+    setIsPlaying(true);
+    setScore(0);
+    setGameOver(false);
+    setDifficulty(1);
+    setStones([]);
+    setStoneIdCounter(0);
+  };
+
+  const spawnStone = useCallback((): Stone => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    
+    const startPosition = Math.floor(Math.random() * 4);
+    let startX: number, startY: number, endX: number, endY: number;
   
-  const Content = () => {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [score, setScore] = useState(0);
-    const [gameOver, setGameOver] = useState(false);
-    const [stones, setStones] = useState<Stone[]>([]);
-    const [difficulty, setDifficulty] = useState(1);
-    const [stoneIdCounter, setStoneIdCounter] = useState(0);
+    switch (startPosition) {
+      case 0: // Top
+        startX = Math.random() * screenWidth;
+        startY = -50;
+        endX = Math.random() * screenWidth;
+        endY = screenHeight + 50;
+        break;
+      case 1: // Right
+        startX = screenWidth + 50;
+        startY = Math.random() * screenHeight;
+        endX = -50;
+        endY = Math.random() * screenHeight;
+        break;
+      case 2: // Bottom
+        startX = Math.random() * screenWidth;
+        startY = screenHeight + 50;
+        endX = Math.random() * screenWidth;
+        endY = -50;
+        break;
+      case 3: // Left
+        startX = -50;
+        startY = Math.random() * screenHeight;
+        endX = screenWidth + 50;
+        endY = Math.random() * screenHeight;
+        break;
+      default:
+        startX = 0;
+        startY = 0;
+        endX = screenWidth;
+        endY = screenHeight;
+    }
   
-    const handleStartClick = () => {
-      setIsPlaying(true);
-      setScore(0);
-      setGameOver(false);
-      setDifficulty(1);
-      setStones([]);
-      setStoneIdCounter(0);
+    // Randomize stone type with weighted probabilities
+    const typeRandom = Math.random();
+    let type;
+    if (typeRandom < 0.4) type = 0;
+    else if (typeRandom < 0.7) type = 1;
+    else if (typeRandom < 0.9) type = 2;
+    else type = 3;
+
+    // Randomize speed within a range based on difficulty
+    const baseSpeed = 5 - difficulty * 0.5;
+    const speedVariation = Math.random() * 2 - 1; // -1 to 1
+    const speed = baseSpeed + speedVariation;
+
+    const newStone: Stone = {
+      id: stoneIdCounter,
+      type,
+      speed: Math.max(1, speed), // Ensure minimum speed of 1
+      startX,
+      startY,
+      endX,
+      endY,
     };
   
-    const spawnStone = useCallback((): Stone => {
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-      
-        const startPosition = Math.floor(Math.random() * 4);
-        let startX: number, startY: number, endX: number, endY: number;
-      
-        switch (startPosition) {
-          case 0: // Top
-            startX = Math.random() * screenWidth;
-            startY = -50;
-            endX = Math.random() * screenWidth;
-            endY = screenHeight + 50;
-            break;
-          case 1: // Right
-            startX = screenWidth + 50;
-            startY = Math.random() * screenHeight;
-            endX = -50;
-            endY = Math.random() * screenHeight;
-            break;
-          case 2: // Bottom
-            startX = Math.random() * screenWidth;
-            startY = screenHeight + 50;
-            endX = Math.random() * screenWidth;
-            endY = -50;
-            break;
-          case 3: // Left
-            startX = -50;
-            startY = Math.random() * screenHeight;
-            endX = screenWidth + 50;
-            endY = Math.random() * screenHeight;
-            break;
-          default:
-            startX = 0;
-            startY = 0;
-            endX = screenWidth;
-            endY = screenHeight;
-        }
-      
-        const newStone: Stone = {
-            id: stoneIdCounter,
-            type: Math.random() < 0.1 ? 3 : Math.floor(Math.random() * 3),
-            speed: 5 - difficulty * 0.5,
-            startX,
-            startY,
-            endX,
-            endY,
-          };
-      
-          setStoneIdCounter(prev => prev + 1);
-          
-          return newStone;
-        }, [difficulty, stoneIdCounter]);
-  
-    const handleStoneTap = useCallback((id: number, type: number) => {
-      if (type === 3) { // Bomb (stone4)
-        setGameOver(true);
-      } else {
-        setScore(prev => prev + 1);
-        removeStone(id);
-      }
-    }, [removeStone]);
-  
-    useEffect(() => {
-      if (isPlaying && !gameOver) {
-        const spawnInterval = setInterval(() => {
-          if (stones.length < 10) {
-            spawnStone();
+    setStoneIdCounter(prev => prev + 1);
+    
+    return newStone;
+  }, [difficulty, stoneIdCounter]);
+
+  const handleStoneTap = useCallback((id: number, type: number) => {
+    if (type === 3) { // Bomb (stone4)
+      setGameOver(true);
+    } else {
+      setScore(prev => prev + 1);
+      setStones(prev => prev.filter(stone => stone.id !== id));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying && !gameOver) {
+      const spawnInterval = setInterval(() => {
+        setStones(prev => {
+          const maxStones = Math.floor(10 + difficulty * 2); // Increase max stones with difficulty
+          if (prev.length < maxStones) {
+            const stonesToAdd = Math.floor(Math.random() * 3) + 1; // Add 1-3 stones at a time
+            const newStones = Array.from({ length: stonesToAdd }, () => spawnStone());
+            return [...prev, ...newStones];
           }
-        }, 1000 / (difficulty * 2)); // Spawn faster as difficulty increases
-  
-        const difficultyInterval = setInterval(() => {
-          setDifficulty(prev => {
-            if (prev < 1.5) return 1.5; // Easy to Medium
-            if (prev < 2.5) return 2.5; // Medium to Hard
-            return 3; // Hard (max difficulty)
-          });
-        }, 20000); // Change difficulty every 20 seconds
-  
-        return () => {
-          clearInterval(spawnInterval);
-          clearInterval(difficultyInterval);
-        };
-      }
-    }, [isPlaying, gameOver, difficulty, spawnStone, stones.length]);
-  
-    useEffect(() => {
-        if (isPlaying && !gameOver) {
-          const spawnInterval = setInterval(() => {
-            setStones(prev => {
-              // Spawn enough stones to reach 10
-              if (prev.length < 10) {
-                const stonesToAdd = 10 - prev.length;
-                const newStones = Array.from({ length: stonesToAdd }, () => spawnStone());
-                return [...prev, ...newStones];
-              }
-              return prev;
-            });
-          }, 500); // Set spawn interval to check every 500ms if stones are missing
-      
-          const difficultyInterval = setInterval(() => {
-            setDifficulty(prev => {
-              if (prev < 1.5) return 1.5; // Easy to Medium
-              if (prev < 2.5) return 2.5; // Medium to Hard
-              return 3; // Hard (max difficulty)
-            });
-          }, 20000); // Change difficulty every 20 seconds
-      
-          return () => {
-            clearInterval(spawnInterval);
-            clearInterval(difficultyInterval);
-          };
-        }
-      }, [isPlaying, gameOver, difficulty, spawnStone]);
-      
-  
-    return (
-      <StyledContent>
-        <ScoreBoard className="scoreboard">
-  Score: {score}  Difficulty: {difficulty.toFixed(1)}
-</ScoreBoard>
-        {!isPlaying && (
-          <StartButton
-            src={startImage}
-            alt="Start"
-            onClick={handleStartClick}
-            isClicked={isPlaying}
-          />
-        )}
-{isPlaying && !gameOver && stones.map(stone => (
-  <Stone
-    key={`stone-${stone.id}-${Math.random()}`} // Ensure the key is always unique
-    id={`stone-${stone.id}`}
-    src={[stone1, stone2, stone3, stone4][stone.type]}
-    alt={`Stone ${stone.type + 1}`}
-    speed={stone.speed}
-    startX={stone.startX}
-    startY={stone.startY}
-    endX={stone.endX}
-    endY={stone.endY}
-    onClick={() => handleStoneTap(stone.id, stone.type)}
-  />
-))}
+          return prev;
+        });
+      }, 500 + Math.random() * 1000); // Random spawn interval between 500ms and 1500ms
 
-        {gameOver && (
-          <GameOverScreen>
-            <h2>Game Over</h2>
-            <p>Your score: {score}</p>
-            <button onClick={handleStartClick}>Play Again</button>
-          </GameOverScreen>
-        )}
-      </StyledContent>
-    );
-  };
-  
-  export default Content;
+      const difficultyInterval = setInterval(() => {
+        setDifficulty(prev => {
+          const increase = Math.random() * 0.2 + 0.1; // Random difficulty increase
+          return Math.min(3, prev + increase); // Cap at 3
+        });
+      }, 15000 + Math.random() * 10000); // Random difficulty change between 15-25 seconds
 
-function removeStone(id: number) {
-    throw new Error("Function not implemented.");
-}
+      return () => {
+        clearInterval(spawnInterval);
+        clearInterval(difficultyInterval);
+      };
+    }
+  }, [isPlaying, gameOver, difficulty, spawnStone]);
+
+  return (
+    <StyledContent>
+      <ScoreBoard className="scoreboard">
+        Score: {score}  Difficulty: {difficulty.toFixed(1)}
+      </ScoreBoard>
+      {!isPlaying && (
+        <StartButton
+          src={startImage}
+          alt="Start"
+          onClick={handleStartClick}
+          isClicked={isPlaying}
+        />
+      )}
+      {isPlaying && !gameOver && stones.map(stone => (
+        <Stone
+          key={`stone-${stone.id}-${Math.random()}`}
+          id={`stone-${stone.id}`}
+          src={[stone1, stone2, stone3, stone4][stone.type]}
+          alt={`Stone ${stone.type + 1}`}
+          speed={stone.speed}
+          startX={stone.startX}
+          startY={stone.startY}
+          endX={stone.endX}
+          endY={stone.endY}
+          onClick={() => handleStoneTap(stone.id, stone.type)}
+        />
+      ))}
+      {gameOver && (
+        <GameOverScreen>
+          <h2>Game Over</h2>
+          <p>Your score: {score}</p>
+          <button onClick={handleStartClick}>Play Again</button>
+        </GameOverScreen>
+      )}
+    </StyledContent>
+  );
+};
+
+export default Content;
