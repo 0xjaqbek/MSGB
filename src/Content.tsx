@@ -35,6 +35,7 @@ const StyledContent = styled.div`
   position: relative;
   overflow: hidden;
   touch-action: none;
+  font-family: 'Lato', sans-serif; /* Added Lato font */
 `;
 
 const StartButton = styled.img<{ isClicked: boolean }>`

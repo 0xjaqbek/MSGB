@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import styled from "styled-components";
 import { useTonConnect } from "./hooks/useTonConnect";
 import "@twa-dev/sdk";
