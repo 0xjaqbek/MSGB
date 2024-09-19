@@ -234,7 +234,7 @@ interface Stone {
     return (
       <StyledContent>
         <ScoreBoard className="scoreboard">
-  Score: {score} | Difficulty: {difficulty.toFixed(1)}
+  Score: {score}  Difficulty: {difficulty.toFixed(1)}
 </ScoreBoard>
         {!isPlaying && (
           <StartButton
