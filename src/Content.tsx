@@ -38,7 +38,7 @@ const StyledContent = styled.div`
   font-family: 'Lato', sans-serif;
   background: -webkit-linear-gradient(white, #38495a);
   -webkit-background-clip: text;
-
+  -webkit-text-fill-color: transparent;
 `;
 
 const StartButton = styled.img<{ isClicked: boolean }>`
@@ -56,8 +56,8 @@ const StartButton = styled.img<{ isClicked: boolean }>`
 
 const Stone = styled.img<{ speed: number; startX: number; endX: number; posY: number }>`
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 10vh;
+  height: 10vh;
   animation: ${moveAnimation} ${props => props.speed}s linear;
   animation-fill-mode: forwards;
   --startX: ${props => props.startX}px;
@@ -79,7 +79,7 @@ const GameOverScreen = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -132,14 +132,14 @@ const Content = () => {
     else type = 3;
 
     // Randomize speed within a range based on difficulty
-    const baseSpeed = 5 - difficulty * 0.5;
-    const speedVariation = Math.random() * 2 - 1; // -1 to 1
+    const baseSpeed = 2 - difficulty * 0.3; // Reduced base speed for faster movement
+    const speedVariation = Math.random() * 1.5 - 0.75; // -0.75 to 0.75
     const speed = baseSpeed + speedVariation;
 
     const newStone: Stone = {
       id: stoneIdCounter,
       type,
-      speed: Math.max(1, speed), // Ensure minimum speed of 1
+      speed: Math.max(0.5, speed), // Ensure minimum speed of 0.5 seconds
       startX,
       endX,
       posY,
@@ -163,7 +163,7 @@ const Content = () => {
     if (isPlaying && !gameOver && !currentStone) {
       const spawnTimeout = setTimeout(() => {
         setCurrentStone(spawnStone());
-      }, 500 + Math.random() * 100); // Random spawn delay between 500ms and 1500ms
+      }, 200 + Math.random() * 300); // Reduced spawn delay to 200-500ms
 
       return () => clearTimeout(spawnTimeout);
     }
@@ -173,10 +173,10 @@ const Content = () => {
     if (isPlaying && !gameOver) {
       const difficultyInterval = setInterval(() => {
         setDifficulty(prev => {
-          const increase = Math.random() * 0.2 + 0.2; // Random difficulty increase
-          return Math.min(3, prev + increase); // Cap at 3
+          const increase = Math.random() * 0.3 + 0.2; // Increased difficulty ramp-up
+          return Math.min(5, prev + increase); // Increased max difficulty to 5
         });
-      }, 5000 + Math.random() * 2000); // Random difficulty change between 15-25 seconds
+      }, 10000 + Math.random() * 5000); // Reduced interval to 10-15 seconds
 
       return () => clearInterval(difficultyInterval);
     }
@@ -185,7 +185,7 @@ const Content = () => {
   return (
     <StyledContent>
       <ScoreBoard className="scoreboard">
-        Score: {score}
+        Score: {score}  Difficulty: {difficulty.toFixed(1)}
       </ScoreBoard>
       {!isPlaying && (
         <StartButton
@@ -211,7 +211,7 @@ const Content = () => {
       )}
       {gameOver && (
         <GameOverScreen>
-          <h2>Game Over<br></br>Radioactive Rock!</h2>
+          <h2>Game Over</h2>
           <p>Your score: {score}</p>
           <button onClick={handleStartClick}>Play Again</button>
         </GameOverScreen>
