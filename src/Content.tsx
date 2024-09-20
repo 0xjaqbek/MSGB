@@ -8,10 +8,10 @@ import stone4 from './stone4.png';
 
 const moveAnimation = keyframes`
   0% {
-    transform: translate(var(--startX), var(--startY));
+    transform: translateX(var(--startX));
   }
   100% {
-    transform: translate(var(--endX), var(--endY));
+    transform: translateX(var(--endX));
   }
 `;
 
@@ -35,10 +35,10 @@ const StyledContent = styled.div`
   position: relative;
   overflow: hidden;
   touch-action: none;
-  font-family: 'Lato', sans-serif; /* Added Lato font */
-  background: -webkit-linear-gradient(white, #38495a)
-  -webkit-background-clip: text
-  -webkit-text-fill-color: transparent
+  font-family: 'Lato', sans-serif;
+  background: -webkit-linear-gradient(white, #38495a);
+  -webkit-background-clip: text;
+
 `;
 
 const StartButton = styled.img<{ isClicked: boolean }>`
@@ -54,16 +54,15 @@ const StartButton = styled.img<{ isClicked: boolean }>`
         `}
 `;
 
-const Stone = styled.img<{ speed: number; startX: number; startY: number; endX: number; endY: number }>`
+const Stone = styled.img<{ speed: number; startX: number; endX: number; posY: number }>`
   position: absolute;
   width: 50px;
   height: 50px;
   animation: ${moveAnimation} ${props => props.speed}s linear;
   animation-fill-mode: forwards;
   --startX: ${props => props.startX}px;
-  --startY: ${props => props.startY}px;
   --endX: ${props => props.endX}px;
-  --endY: ${props => props.endY}px;
+  top: ${props => props.posY}px;
 `;
 
 const ScoreBoard = styled.div`
@@ -80,7 +79,7 @@ const GameOverScreen = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -93,16 +92,15 @@ interface Stone {
   type: number;
   speed: number;
   startX: number;
-  startY: number;
   endX: number;
-  endY: number;
+  posY: number;
 }
 
 const Content = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [stones, setStones] = useState<Stone[]>([]);
+  const [currentStone, setCurrentStone] = useState<Stone | null>(null);
   const [difficulty, setDifficulty] = useState(1);
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
 
@@ -111,7 +109,7 @@ const Content = () => {
     setScore(0);
     setGameOver(false);
     setDifficulty(1);
-    setStones([]);
+    setCurrentStone(null);
     setStoneIdCounter(0);
   };
 
@@ -119,40 +117,11 @@ const Content = () => {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     
-    const startPosition = Math.floor(Math.random() * 4);
-    let startX: number, startY: number, endX: number, endY: number;
-  
-    switch (startPosition) {
-      case 0: // Top
-        startX = Math.random() * screenWidth;
-        startY = -50;
-        endX = Math.random() * screenWidth;
-        endY = screenHeight + 50;
-        break;
-      case 1: // Right
-        startX = screenWidth + 50;
-        startY = Math.random() * screenHeight;
-        endX = -50;
-        endY = Math.random() * screenHeight;
-        break;
-      case 2: // Bottom
-        startX = Math.random() * screenWidth;
-        startY = screenHeight + 50;
-        endX = Math.random() * screenWidth;
-        endY = -50;
-        break;
-      case 3: // Left
-        startX = -50;
-        startY = Math.random() * screenHeight;
-        endX = screenWidth + 50;
-        endY = Math.random() * screenHeight;
-        break;
-      default:
-        startX = 0;
-        startY = 0;
-        endX = screenWidth;
-        endY = screenHeight;
-    }
+    const startLeft = Math.random() < 0.5;
+    const startX = startLeft ? -50 : screenWidth;
+    const endX = startLeft ? screenWidth : -50;
+    
+    const posY = Math.random() * (screenHeight - 50);
   
     // Randomize stone type with weighted probabilities
     const typeRandom = Math.random();
@@ -172,9 +141,8 @@ const Content = () => {
       type,
       speed: Math.max(1, speed), // Ensure minimum speed of 1
       startX,
-      startY,
       endX,
-      endY,
+      posY,
     };
   
     setStoneIdCounter(prev => prev + 1);
@@ -182,47 +150,42 @@ const Content = () => {
     return newStone;
   }, [difficulty, stoneIdCounter]);
 
-  const handleStoneTap = useCallback((id: number, type: number) => {
+  const handleStoneTap = useCallback((type: number) => {
     if (type === 3) { // Bomb (stone4)
       setGameOver(true);
     } else {
       setScore(prev => prev + 1);
-      setStones(prev => prev.filter(stone => stone.id !== id));
+      setCurrentStone(null);
     }
   }, []);
 
   useEffect(() => {
-    if (isPlaying && !gameOver) {
-      const spawnInterval = setInterval(() => {
-        setStones(prev => {
-          const maxStones = Math.floor(10 + difficulty * 2); // Increase max stones with difficulty
-          if (prev.length < maxStones) {
-            const stonesToAdd = Math.floor(Math.random() * 3) + 1; // Add 1-3 stones at a time
-            const newStones = Array.from({ length: stonesToAdd }, () => spawnStone());
-            return [...prev, ...newStones];
-          }
-          return prev;
-        });
-      }, 500 + Math.random() * 1000); // Random spawn interval between 500ms and 1500ms
+    if (isPlaying && !gameOver && !currentStone) {
+      const spawnTimeout = setTimeout(() => {
+        setCurrentStone(spawnStone());
+      }, 500 + Math.random() * 100); // Random spawn delay between 500ms and 1500ms
 
+      return () => clearTimeout(spawnTimeout);
+    }
+  }, [isPlaying, gameOver, currentStone, spawnStone]);
+
+  useEffect(() => {
+    if (isPlaying && !gameOver) {
       const difficultyInterval = setInterval(() => {
         setDifficulty(prev => {
-          const increase = Math.random() * 0.2 + 0.1; // Random difficulty increase
+          const increase = Math.random() * 0.2 + 0.2; // Random difficulty increase
           return Math.min(3, prev + increase); // Cap at 3
         });
-      }, 15000 + Math.random() * 10000); // Random difficulty change between 15-25 seconds
+      }, 5000 + Math.random() * 2000); // Random difficulty change between 15-25 seconds
 
-      return () => {
-        clearInterval(spawnInterval);
-        clearInterval(difficultyInterval);
-      };
+      return () => clearInterval(difficultyInterval);
     }
-  }, [isPlaying, gameOver, difficulty, spawnStone]);
+  }, [isPlaying, gameOver]);
 
   return (
     <StyledContent>
       <ScoreBoard className="scoreboard">
-        Score: {score}  Difficulty: {difficulty.toFixed(1)}
+        Score: {score}
       </ScoreBoard>
       {!isPlaying && (
         <StartButton
@@ -232,23 +195,23 @@ const Content = () => {
           isClicked={isPlaying}
         />
       )}
-      {isPlaying && !gameOver && stones.map(stone => (
+      {isPlaying && !gameOver && currentStone && (
         <Stone
-          key={`stone-${stone.id}-${Math.random()}`}
-          id={`stone-${stone.id}`}
-          src={[stone1, stone2, stone3, stone4][stone.type]}
-          alt={`Stone ${stone.type + 1}`}
-          speed={stone.speed}
-          startX={stone.startX}
-          startY={stone.startY}
-          endX={stone.endX}
-          endY={stone.endY}
-          onClick={() => handleStoneTap(stone.id, stone.type)}
+          key={`stone-${currentStone.id}`}
+          id={`stone-${currentStone.id}`}
+          src={[stone1, stone2, stone3, stone4][currentStone.type]}
+          alt={`Stone ${currentStone.type + 1}`}
+          speed={currentStone.speed}
+          startX={currentStone.startX}
+          endX={currentStone.endX}
+          posY={currentStone.posY}
+          onClick={() => handleStoneTap(currentStone.type)}
+          onAnimationEnd={() => setCurrentStone(null)}
         />
-      ))}
+      )}
       {gameOver && (
         <GameOverScreen>
-          <h2>Game Over</h2>
+          <h2>Game Over<br></br>Radioactive Rock!</h2>
           <p>Your score: {score}</p>
           <button onClick={handleStartClick}>Play Again</button>
         </GameOverScreen>
