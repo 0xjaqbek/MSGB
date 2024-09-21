@@ -35,7 +35,7 @@ const StyledContent = styled.div`
   position: relative;
   overflow: hidden;
   touch-action: none;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Lato';
   background: -webkit-linear-gradient(white, #38495a);
   -webkit-background-clip: text;
 
@@ -80,9 +80,7 @@ const GameOverScreen = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
+  padding: 5px;
   text-align: center;
   z-index: 400;
 `;
@@ -98,6 +96,31 @@ const GameOverScreen1 = styled.div`
   border-radius: 10px;
   text-align: center;
   z-index: 400;
+`;
+
+const FlatButton = styled.button`
+  background-color: grey;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-family: 'Lato';
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #2980b9;
+  }
+
+  &:active {
+    background-color: #2473a7;
+    transform: translateY(1px);
+  }
 `;
 
 interface Stone {
@@ -225,7 +248,7 @@ const Content = () => {
             <h2>Game Over</h2>
           </GameOverScreen>
           <GameOverScreen1>
-            <button className="button" onClick={handleStartClick}>Play Again</button>
+          <FlatButton onClick={handleStartClick}>Play Again</FlatButton>
           </GameOverScreen1>
         </>
       )}
