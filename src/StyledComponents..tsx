@@ -73,8 +73,8 @@ export const Stone = styled.img<{
   position: absolute;
 
   // Generate a random size factor between 0.5 and 1.5
-  width: ${() => `${Math.random() + 0.5} * 1vh`};
-  height: ${() => `${Math.random() + 0.5} * 1vh`};
+  width: ${() => `${Math.random() } * 0.1vh`};
+  height: ${() => `${Math.random() } * 0.1vh`};
 
   animation: ${props =>
     props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation}
