@@ -180,7 +180,7 @@ declare global {
       WebApp: {
         ready: () => void;
         expand: () => void;
-        disableSwipeBack: () => void;
+        disableVerticalSwipes: () => void;
         initDataUnsafe?: {
           user?: TelegramUser;
         };
@@ -213,7 +213,7 @@ const Content: React.FC = () => {
     if (tg) {
       tg.ready();
       tg.expand();
-      tg.disableSwipeBack();
+      tg.disableVerticalSwipes();
       const user = tg.initDataUnsafe?.user;
       
       if (user) {
