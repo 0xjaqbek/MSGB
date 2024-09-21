@@ -7,6 +7,34 @@ import stone3 from './stone3.png';
 import stone4 from './stone4.png';
 import blastImage from './blast.png'; 
 
+const blinkAnimation = keyframes`
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+`;
+
+const BlinkScreen = styled.div<{ isVisible: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 500; // Make sure it appears above everything else
+  ${({ isVisible }) =>
+    isVisible &&
+    css`
+      animation: ${blinkAnimation} 0.8s ease-out;
+    `}
+`;
 
 const moveHorizontalAnimation = keyframes`
   0% {
@@ -187,6 +215,7 @@ declare global {
 
 
 const Content: React.FC = () => {
+  const [showBlink, setShowBlink] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -287,17 +316,17 @@ const Content: React.FC = () => {
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (type === 3) {
-      setGameOver(true);
+      setShowBlink(true);  // Trigger the blink effect
+      setTimeout(() => {
+        setGameOver(true);
+      }, 800); // Wait for the blink animation to finish before setting game over
     } else {
-      // Show the blast at the rock's position
       setBlastPosition({ posX, posY });
       setShowBlast(true);
-
-      // Hide the blast after 0.1 seconds
       setTimeout(() => {
         setShowBlast(false);
       }, 100);
-
+  
       setScore((prev) => {
         const newScore = prev + 1;
         setRocksToNextLevel((prevRocks) => {
@@ -344,63 +373,65 @@ const Content: React.FC = () => {
     }
   }, [gameOver, score]);
 
-  return (
-    <StyledContent>
-      {/* Blast effect */}
-      {showBlast && blastPosition && (
-        <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
-      )}
+return (
+  <StyledContent>
+    {/* Blast effect */}
+    {showBlast && blastPosition && (
+      <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
+    )}
 
-      {!isPlaying && telegramUser && (
-        <WelcomeInfo className="scoreboard">
-          Welcome, {telegramUser.first_name}!<br />in<br />
-        </WelcomeInfo>
-      )}
-      {!isPlaying && !telegramUser && (
-        <WelcomeInfo className="scoreboard">
-          Welcome<br></br>in
-        </WelcomeInfo>
-      )}
-      {!isPlaying && (
-        <StartButton
-          src={startImage}
-          alt="Start"
-          onClick={handleStartClick}
-          isClicked={isPlaying}
-        />
-      )}
-      {isPlaying && (
-        <ScoreBoard className="scoreboard">
-          Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
-        </ScoreBoard>
-      )}
-      {isPlaying && !gameOver && currentStones.map((stone) => (
-        <Stone
-          key={`stone-${stone.id}`}
-          id={`stone-${stone.id}`}
-          src={[stone1, stone2, stone3, stone4][stone.type]}
-          alt={`Stone ${stone.type + 1}`}
-          speed={stone.speed}
-          startX={stone.startX}
-          endX={stone.endX}
-          startY={stone.startY}
-          endY={stone.endY}
-          posX={stone.posX}
-          posY={stone.posY}
-          direction={stone.direction}
-          onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
-          onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-        />
-      ))}
-      {gameOver && (
-        <>
-          <GameOverScreen className="scoreboard1">
-            <h2>Game Over</h2>
-          </GameOverScreen>
-        </>
-      )}
-    </StyledContent>
-  );
-};
+    {/* Blink effect */}
+    <BlinkScreen isVisible={showBlink} />
+
+    {!isPlaying && telegramUser && (
+      <WelcomeInfo className="scoreboard">
+        Welcome, {telegramUser.first_name}!<br />in<br />
+      </WelcomeInfo>
+    )}
+    {!isPlaying && !telegramUser && (
+      <WelcomeInfo className="scoreboard">
+        Welcome<br></br>in
+      </WelcomeInfo>
+    )}
+    {!isPlaying && (
+      <StartButton
+        src={startImage}
+        alt="Start"
+        onClick={handleStartClick}
+        isClicked={isPlaying}
+      />
+    )}
+    {isPlaying && (
+      <ScoreBoard className="scoreboard">
+        Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
+      </ScoreBoard>
+    )}
+    {isPlaying && !gameOver && currentStones.map((stone) => (
+      <Stone
+        key={`stone-${stone.id}`}
+        id={`stone-${stone.id}`}
+        src={[stone1, stone2, stone3, stone4][stone.type]}
+        alt={`Stone ${stone.type + 1}`}
+        speed={stone.speed}
+        startX={stone.startX}
+        endX={stone.endX}
+        startY={stone.startY}
+        endY={stone.endY}
+        posX={stone.posX}
+        posY={stone.posY}
+        direction={stone.direction}
+        onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
+        onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+      />
+    ))}
+    {gameOver && (
+      <>
+        <GameOverScreen className="scoreboard1">
+          <h2>Game Over</h2>
+        </GameOverScreen>
+      </>
+    )}
+  </StyledContent>
+)};
 
 export default Content;
