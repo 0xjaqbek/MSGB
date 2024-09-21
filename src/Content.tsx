@@ -56,8 +56,8 @@ const StartButton = styled.img<{ isClicked: boolean }>`
 
 const Stone = styled.img<{ speed: number; startX: number; endX: number; posY: number }>`
   position: absolute;
-  width: 10vh;
-  height: 10vh;
+  width: 20vh;
+  height: 20vh;
   animation: ${moveAnimation} ${props => props.speed}s linear;
   animation-fill-mode: forwards;
   --startX: ${props => props.startX}px;
@@ -118,8 +118,8 @@ const Content = () => {
     const screenHeight = window.innerHeight;
     
     const startLeft = Math.random() < 0.5;
-    const startX = startLeft ? -50 : screenWidth;
-    const endX = startLeft ? screenWidth : -50;
+    const startX = startLeft ? -500 : screenWidth;
+    const endX = startLeft ? screenWidth : -screenWidth;
     
     const posY = Math.random() * (screenHeight - 50);
   
@@ -133,7 +133,7 @@ const Content = () => {
 
     // Randomize speed within a range based on difficulty
     const baseSpeed = 2 - difficulty * 0.3; // Reduced base speed for faster movement
-    const speedVariation = Math.random() * 1.5 - 0.75; // -0.75 to 0.75
+    const speedVariation = Math.random() * 2 - 0.75; // -0.75 to 0.75
     const speed = baseSpeed + speedVariation;
 
     const newStone: Stone = {
