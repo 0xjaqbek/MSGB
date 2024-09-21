@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import styled, { keyframes, css } from 'styled-components';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './styledComponents';
 import startImage from './start.png';
 import stone1 from './stone1.png';
