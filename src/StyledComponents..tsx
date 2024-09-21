@@ -72,9 +72,9 @@ export const Stone = styled.img<{
 }>`
   position: absolute;
 
-  // Generate a random size factor between 0.5 and 1.5
-  width: ${() => `${Math.random() * (1.5 - 0.5) + 0.5} * 1vh`};
-  height: ${() => `${Math.random() * (1.5 - 0.5) + 0.5} * 1vh`};
+  // Generate a random size between 10vw and 15vw
+  width: calc(${() => Math.random() * (15 - 10) + 10}vw);
+  height: calc(${() => Math.random() * (15 - 10) + 10}vw);
 
   animation: ${props =>
     props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation}
@@ -94,6 +94,7 @@ export const Stone = styled.img<{
           left: ${props.posX}px;
         `}
 `;
+
 
 export const Blast = styled.img<{ posX: number; posY: number }>`
   position: absolute;
