@@ -1156,8 +1156,8 @@ PERFORMANCE OF THIS SOFTWARE.
         `}
 `,rT=Pa.img`
   position: absolute;
-  width: 10vh;
-  height: 10vh;
+  width: 20vh;
+  height: 20vh;
   animation: ${XB} ${e=>e.speed}s linear;
   animation-fill-mode: forwards;
   --startX: ${e=>e.startX}px;
@@ -1181,7 +1181,7 @@ PERFORMANCE OF THIS SOFTWARE.
   border-radius: 10px;
   text-align: center;
   z-index: 20;
-`,oT=()=>{const[e,t]=Ut.useState(!1),[r,n]=Ut.useState(0),[o,i]=Ut.useState(!1),[a,f]=Ut.useState(null),[u,c]=Ut.useState(1),[l,v]=Ut.useState(0),d=()=>{t(!0),n(0),i(!1),c(1),f(null),v(0)},m=Ut.useCallback(()=>{const b=window.innerWidth,A=window.innerHeight,S=Math.random()<.5,k=S?-50:b,T=S?b:-50,L=Math.random()*(A-50),N=Math.random();let q;N<.4?q=0:N<.7?q=1:N<.9?q=2:q=3;const W=2-u*.3,V=Math.random()*1.5-.75,Z=W+V,ne={id:l,type:q,speed:Math.max(.5,Z),startX:k,endX:T,posY:L};return v(D=>D+1),ne},[u,l]),y=Ut.useCallback(b=>{b===3?i(!0):(n(A=>A+1),f(null))},[]);return Ut.useEffect(()=>{if(e&&!o&&!a){const b=setTimeout(()=>{f(m())},200+Math.random()*300);return()=>clearTimeout(b)}},[e,o,a,m]),Ut.useEffect(()=>{if(e&&!o){const b=setInterval(()=>{c(A=>{const S=Math.random()*.3+.2;return Math.min(5,A+S)})},1e4+Math.random()*5e3);return()=>clearInterval(b)}},[e,o]),Uo(eT,{children:[Uo(nT,{className:"scoreboard",children:["Score: ",r,"  Difficulty: ",u.toFixed(1)]}),!e&&bn(tT,{src:VB,alt:"Start",onClick:d,isClicked:e}),e&&!o&&a&&bn(rT,{id:`stone-${a.id}`,src:[GB,ZB,YB,QB][a.type],alt:`Stone ${a.type+1}`,speed:a.speed,startX:a.startX,endX:a.endX,posY:a.posY,onClick:()=>y(a.type),onAnimationEnd:()=>f(null)},`stone-${a.id}`),o&&Uo(iT,{children:[bn("h2",{children:"Game Over"}),Uo("p",{children:["Your score: ",r]}),bn("button",{onClick:d,children:"Play Again"})]})]})},aT=Pa.div`
+`,oT=()=>{const[e,t]=Ut.useState(!1),[r,n]=Ut.useState(0),[o,i]=Ut.useState(!1),[a,f]=Ut.useState(null),[u,c]=Ut.useState(1),[l,v]=Ut.useState(0),d=()=>{t(!0),n(0),i(!1),c(1),f(null),v(0)},m=Ut.useCallback(()=>{const b=window.innerWidth,A=window.innerHeight,S=Math.random()<.5,k=S?-500:b,T=S?b:-b,L=Math.random()*(A-50),N=Math.random();let q;N<.4?q=0:N<.7?q=1:N<.9?q=2:q=3;const W=2-u*.3,V=Math.random()*2-.75,Z=W+V,ne={id:l,type:q,speed:Math.max(.5,Z),startX:k,endX:T,posY:L};return v(D=>D+1),ne},[u,l]),y=Ut.useCallback(b=>{b===3?i(!0):(n(A=>A+1),f(null))},[]);return Ut.useEffect(()=>{if(e&&!o&&!a){const b=setTimeout(()=>{f(m())},200+Math.random()*300);return()=>clearTimeout(b)}},[e,o,a,m]),Ut.useEffect(()=>{if(e&&!o){const b=setInterval(()=>{c(A=>{const S=Math.random()*.3+.2;return Math.min(5,A+S)})},1e4+Math.random()*5e3);return()=>clearInterval(b)}},[e,o]),Uo(eT,{children:[Uo(nT,{className:"scoreboard",children:["Score: ",r,"  Difficulty: ",u.toFixed(1)]}),!e&&bn(tT,{src:VB,alt:"Start",onClick:d,isClicked:e}),e&&!o&&a&&bn(rT,{id:`stone-${a.id}`,src:[GB,ZB,YB,QB][a.type],alt:`Stone ${a.type+1}`,speed:a.speed,startX:a.startX,endX:a.endX,posY:a.posY,onClick:()=>y(a.type),onAnimationEnd:()=>f(null)},`stone-${a.id}`),o&&Uo(iT,{children:[bn("h2",{children:"Game Over"}),Uo("p",{children:["Your score: ",r]}),bn("button",{onClick:d,children:"Play Again"})]})]})},aT=Pa.div`
   max-width: 100vw;
   min-height: 100vh;
 
