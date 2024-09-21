@@ -315,6 +315,10 @@ const Content: React.FC = () => {
   }, [difficulty, stoneIdCounter]);
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
+    if (navigator.vibrate) {
+      navigator.vibrate(100); // Vibrate for 100 milliseconds when a rock is tapped
+    }
+  
     if (type === 3) {
       setGameOver(true);  // Immediately set the game over
       setShowBlink(true); // Trigger the blink effect
@@ -345,6 +349,7 @@ const Content: React.FC = () => {
       setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
     }
   }, []);
+  
   
 
   useEffect(() => {
