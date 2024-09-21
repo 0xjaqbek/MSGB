@@ -181,6 +181,7 @@ declare global {
         ready: () => void;
         expand: () => void;
         disableVerticalSwipes: () => void;
+        setHeaderColor: (color: string) => void;
         initDataUnsafe?: {
           user?: TelegramUser;
         };
@@ -214,6 +215,7 @@ const Content: React.FC = () => {
       tg.ready();
       tg.expand();
       tg.disableVerticalSwipes();
+      tg.setHeaderColor("#000000");
       const user = tg.initDataUnsafe?.user;
       
       if (user) {

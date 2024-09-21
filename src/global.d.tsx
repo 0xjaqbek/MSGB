@@ -8,6 +8,7 @@ declare global {
         ready: () => void;
         expand: () => void;
         disableVerticalSwipes: () => void;
+        setHeaderColor: (color: string) => void;
         initDataUnsafe?: {
           user?: TelegramUser;
         };
