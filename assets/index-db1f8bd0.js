@@ -1121,7 +1121,7 @@ PERFORMANCE OF THIS SOFTWARE.
   0% {
     opacity: 0;
   }
-  50% {
+  20% {
     opacity: 1;
   }
   100% {
@@ -1138,7 +1138,7 @@ PERFORMANCE OF THIS SOFTWARE.
   pointer-events: none;
   z-index: 500; // Make sure it appears above everything else
   ${({isVisible:e})=>e&&Bo`
-      animation: ${tT} 0.8s ease-out;
+      animation: ${tT} 0.5s ease-out;
     `}
 `,nT=r0`
   0% {
