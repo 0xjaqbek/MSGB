@@ -7,6 +7,7 @@ declare global {
       WebApp: {
         ready: () => void;
         expand: () => void;
+        disableSwipeBack: () => void;
         initDataUnsafe?: {
           user?: TelegramUser;
         };
