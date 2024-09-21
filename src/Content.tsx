@@ -165,7 +165,35 @@ interface Stone {
   direction: 'horizontal' | 'vertical';
 }
 
-type TelegramUser = TelegramWebAppUser;
+type TelegramUser = {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  is_premium?: boolean;
+};
+
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: {
+        ready: () => void;
+        initDataUnsafe?: {
+          user?: TelegramUser;
+        };
+        MainButton: {
+          text: string;
+          onClick: (callback: () => void) => void;
+          show: () => void;
+          hide: () => void;
+        };
+        sendData: (data: string) => void;
+      };
+    };
+  }
+}
+
 
 const Content: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -224,9 +252,9 @@ const Content: React.FC = () => {
       endX = startLeft ? screenWidth : -screenWidth;
       posY = Math.random() * (screenHeight - 50);
     } else {
-      const startTop = Math.random() < 0.5;
-      startY = startTop ? -500 : screenHeight;
-      endY = startTop ? screenHeight : -screenHeight;
+      // Only allow stones to move from top to bottom
+      startY = -500;
+      endY = screenHeight;
       posX = Math.random() * (screenWidth - 50);
     }
   

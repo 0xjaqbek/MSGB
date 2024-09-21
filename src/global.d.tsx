@@ -1,32 +1,33 @@
-// src/types/global.d.ts
-interface TelegramWebAppUser {
-    id: number;
-    first_name: string;
-    last_name?: string;
-    username?: string;
-    photo_url?: string;
-    language_code?: string;
-  }
-  
-  interface TelegramWebApp {
-    sendData(arg0: string): unknown;
-    initDataUnsafe: {
-      user?: TelegramWebAppUser;
-    };
-    ready(): void;
-    close(): void;
-    setHeaderColor(color: string): void;
-    MainButton: {
-      text: string;
-      show(): void;
-      hide(): void;
-      onClick(callback: () => void): void;
-    };
-  }
-  
+// Ensure this file is treated as a module
+export {};
+
+declare global {
   interface Window {
     Telegram?: {
-      WebApp: TelegramWebApp;
+      WebApp: {
+        ready: () => void;
+        initDataUnsafe?: {
+          user?: TelegramUser;
+        };
+        MainButton: {
+          text: string;
+          onClick: (callback: () => void) => void;
+          show: () => void;
+          hide: () => void;
+        };
+        sendData: (data: string) => void;
+      };
     };
   }
-  
+}
+
+interface TelegramUser {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  language_code?: string;
+  is_premium?: boolean;
+}
+
+// If you need to declare any additional global types or interfaces, add them here
