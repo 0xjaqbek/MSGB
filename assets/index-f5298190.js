@@ -1161,8 +1161,8 @@ PERFORMANCE OF THIS SOFTWARE.
   position: absolute;
 
   // Generate a random size factor between 0.5 and 1.5
-  width: ${()=>`${Math.random()*(1.5-.5)+.5} * 15vh`};
-  height: ${()=>`${Math.random()*(1.5-.5)+.5} * 15vh`};
+  width: ${()=>`${Math.random()*(1.5-.5)+.5} * 5vh`};
+  height: ${()=>`${Math.random()*(1.5-.5)+.5} * 5vh`};
 
   animation: ${e=>e.direction==="horizontal"?ZB:QB}
     ${e=>e.speed}s linear;
