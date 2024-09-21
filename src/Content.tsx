@@ -11,7 +11,7 @@ const blinkAnimation = keyframes`
   0% {
     opacity: 0;
   }
-  50% {
+  20% {
     opacity: 1;
   }
   100% {
@@ -32,7 +32,7 @@ const BlinkScreen = styled.div<{ isVisible: boolean }>`
   ${({ isVisible }) =>
     isVisible &&
     css`
-      animation: ${blinkAnimation} 0.8s ease-out;
+      animation: ${blinkAnimation} 0.5s ease-out;
     `}
 `;
 
