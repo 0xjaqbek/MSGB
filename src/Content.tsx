@@ -179,6 +179,7 @@ declare global {
     Telegram?: {
       WebApp: {
         ready: () => void;
+        expand: () => void;
         initDataUnsafe?: {
           user?: TelegramUser;
         };
@@ -340,14 +341,14 @@ const Content: React.FC = () => {
 
   return (
     <StyledContent>
-      {telegramUser && (
-        <WelcomeInfo className="scoreboard">
-          Welcome, {telegramUser.first_name}!
-        </WelcomeInfo>
-      )}
+    {!isPlaying && telegramUser && (
+      <WelcomeInfo className="scoreboard">
+        Welcome, {telegramUser.first_name}!<br />in<br />
+      </WelcomeInfo>
+    )}
       {!isPlaying && !telegramUser && (
         <WelcomeInfo className="scoreboard">
-          Welcome to MoonStone
+          Welcome<br></br>in
         </WelcomeInfo>
       )}
             {!isPlaying && (
@@ -386,9 +387,6 @@ const Content: React.FC = () => {
           <GameOverScreen className="scoreboard1">
             <h2>Game Over</h2>
           </GameOverScreen>
-          <GameOverScreen1>
-            <FlatButton onClick={handleStartClick}>Play Again</FlatButton>
-          </GameOverScreen1>
         </>
       )}
     </StyledContent>
