@@ -5,6 +5,8 @@ import stone1 from './stone1.png';
 import stone2 from './stone2.png';
 import stone3 from './stone3.png';
 import stone4 from './stone4.png';
+import blastImage from './blast.png'; 
+
 
 const moveHorizontalAnimation = keyframes`
   0% {
@@ -127,30 +129,15 @@ const GameOverScreen1 = styled.div`
   z-index: 400;
 `;
 
-const FlatButton = styled.button`
-  background-color: grey;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-family: 'Lato';
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: #2980b9;
-  }
-
-  &:active {
-    background-color: #2473a7;
-    transform: translateY(1px);
-  }
+const Blast = styled.img<{ posX: number; posY: number }>`
+  position: absolute;
+  width: 15vh;
+  height: 15vh;
+  left: ${(props) => props.posX}px;
+  top: ${(props) => props.posY}px;
+  pointer-events: none;  // Prevent interaction
 `;
+
 
 interface Stone {
   id: number;
@@ -207,6 +194,8 @@ const Content: React.FC = () => {
   const [difficulty, setDifficulty] = useState(1);
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
   const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
+  const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null); // Track blast position
+  const [showBlast, setShowBlast] = useState(false);  // Track if blast should be shown
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
@@ -296,22 +285,31 @@ const Content: React.FC = () => {
     return newStone;
   }, [difficulty, stoneIdCounter]);
 
-  const handleStoneTap = useCallback((id: number, type: number) => {
+  const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (type === 3) {
       setGameOver(true);
     } else {
-      setScore(prev => {
+      // Show the blast at the rock's position
+      setBlastPosition({ posX, posY });
+      setShowBlast(true);
+
+      // Hide the blast after 0.1 seconds
+      setTimeout(() => {
+        setShowBlast(false);
+      }, 100);
+
+      setScore((prev) => {
         const newScore = prev + 1;
-        setRocksToNextLevel(prevRocks => {
+        setRocksToNextLevel((prevRocks) => {
           if (prevRocks === 1) {
-            setDifficulty(prevDifficulty => Math.min(5, prevDifficulty + 0.1));
+            setDifficulty((prevDifficulty) => Math.min(5, prevDifficulty + 0.1));
             return 5;
           }
           return prevRocks - 1;
         });
         return newScore;
       });
-      setCurrentStones(prevStones => prevStones.filter(stone => stone.id !== id));
+      setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
     }
   }, []);
 
@@ -348,17 +346,22 @@ const Content: React.FC = () => {
 
   return (
     <StyledContent>
-    {!isPlaying && telegramUser && (
-      <WelcomeInfo className="scoreboard">
-        Welcome, {telegramUser.first_name}!<br />in<br />
-      </WelcomeInfo>
-    )}
+      {/* Blast effect */}
+      {showBlast && blastPosition && (
+        <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
+      )}
+
+      {!isPlaying && telegramUser && (
+        <WelcomeInfo className="scoreboard">
+          Welcome, {telegramUser.first_name}!<br />in<br />
+        </WelcomeInfo>
+      )}
       {!isPlaying && !telegramUser && (
         <WelcomeInfo className="scoreboard">
           Welcome<br></br>in
         </WelcomeInfo>
       )}
-            {!isPlaying && (
+      {!isPlaying && (
         <StartButton
           src={startImage}
           alt="Start"
@@ -371,7 +374,7 @@ const Content: React.FC = () => {
           Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
         </ScoreBoard>
       )}
-      {isPlaying && !gameOver && currentStones.map(stone => (
+      {isPlaying && !gameOver && currentStones.map((stone) => (
         <Stone
           key={`stone-${stone.id}`}
           id={`stone-${stone.id}`}
@@ -385,8 +388,8 @@ const Content: React.FC = () => {
           posX={stone.posX}
           posY={stone.posY}
           direction={stone.direction}
-          onClick={() => handleStoneTap(stone.id, stone.type)}
-          onAnimationEnd={() => setCurrentStones(prev => prev.filter(s => s.id !== stone.id))}
+          onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
+          onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
         />
       ))}
       {gameOver && (
