@@ -6,12 +6,21 @@ import stone2 from './stone2.png';
 import stone3 from './stone3.png';
 import stone4 from './stone4.png';
 
-const moveAnimation = keyframes`
+const moveHorizontalAnimation = keyframes`
   0% {
     transform: translateX(var(--startX));
   }
   100% {
     transform: translateX(var(--endX));
+  }
+`;
+
+const moveVerticalAnimation = keyframes`
+  0% {
+    transform: translateY(var(--startY));
+  }
+  100% {
+    transform: translateY(var(--endY));
   }
 `;
 
@@ -38,7 +47,6 @@ const StyledContent = styled.div`
   font-family: 'Lato';
   background: -webkit-linear-gradient(white, #38495a);
   -webkit-background-clip: text;
-
 `;
 
 const StartButton = styled.img<{ isClicked: boolean }>`
@@ -54,15 +62,24 @@ const StartButton = styled.img<{ isClicked: boolean }>`
         `}
 `;
 
-const Stone = styled.img<{ speed: number; startX: number; endX: number; posY: number }>`
+const Stone = styled.img<{ speed: number; startX?: number; endX?: number; startY?: number; endY?: number; posX?: number; posY?: number; direction: 'horizontal' | 'vertical' }>`
   position: absolute;
-  width: 20vh;
-  height: 20vh;
-  animation: ${moveAnimation} ${props => props.speed}s linear;
+  width: 15vh;
+  height: 15vh;
+  animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s linear;
   animation-fill-mode: forwards;
-  --startX: ${props => props.startX}px;
-  --endX: ${props => props.endX}px;
-  top: ${props => props.posY}px;
+  ${props => props.direction === 'horizontal'
+    ? css`
+        --startX: ${props.startX}px;
+        --endX: ${props.endX}px;
+        top: ${props.posY}px;
+      `
+    : css`
+        --startY: ${props.startY}px;
+        --endY: ${props.endY}px;
+        left: ${props.posX}px;
+      `
+  }
 `;
 
 const ScoreBoard = styled.div`
@@ -71,6 +88,18 @@ const ScoreBoard = styled.div`
   left: 10px;
   font-size: 14px;
   color: white;
+  z-index: 10;
+`;
+
+const WelcomeInfo = styled.div`
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  font-family: 'Lato';
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: white;
+  text-align: center;
   z-index: 10;
 `;
 
@@ -127,58 +156,103 @@ interface Stone {
   id: number;
   type: number;
   speed: number;
-  startX: number;
-  endX: number;
-  posY: number;
+  startX?: number;
+  endX?: number;
+  startY?: number;
+  endY?: number;
+  posX?: number;
+  posY?: number;
+  direction: 'horizontal' | 'vertical';
 }
 
-const Content = () => {
+type TelegramUser = TelegramWebAppUser;
+
+const Content: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [currentStone, setCurrentStone] = useState<Stone | null>(null);
+  const [currentStones, setCurrentStones] = useState<Stone[]>([]);
   const [difficulty, setDifficulty] = useState(1);
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
   const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
+  const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+
+  useEffect(() => {
+    // Initialize Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      const user = tg.initDataUnsafe?.user;
+      
+      if (user) {
+        setTelegramUser(user);
+      }
+
+      // Set up Telegram's main button
+      tg.MainButton.text = "Start Game";
+      tg.MainButton.onClick(() => handleStartClick());
+      tg.MainButton.show();
+    }
+  }, []);
 
   const handleStartClick = () => {
     setIsPlaying(true);
     setScore(0);
     setGameOver(false);
     setDifficulty(1);
-    setCurrentStone(null);
+    setCurrentStones([]);
     setStoneIdCounter(0);
     setRocksToNextLevel(5);
+
+    // Hide Telegram's main button when the game starts
+    window.Telegram?.WebApp?.MainButton.hide();
+
+    // Notify Telegram that the game has started
+    window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
   };
 
-  const spawnStone = useCallback((): Stone => {
+
+  const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     
-    const startLeft = Math.random() < 0.5;
-    const startX = startLeft ? -500 : screenWidth;
-    const endX = startLeft ? screenWidth : -screenWidth;
-    
-    const posY = Math.random() * (screenHeight - 50);
+    let startX, endX, startY, endY, posX, posY;
+
+    if (direction === 'horizontal') {
+      const startLeft = Math.random() < 0.5;
+      startX = startLeft ? -500 : screenWidth;
+      endX = startLeft ? screenWidth : -screenWidth;
+      posY = Math.random() * (screenHeight - 50);
+    } else {
+      const startTop = Math.random() < 0.5;
+      startY = startTop ? -500 : screenHeight;
+      endY = startTop ? screenHeight : -screenHeight;
+      posX = Math.random() * (screenWidth - 50);
+    }
   
     const typeRandom = Math.random();
     let type;
-    if (typeRandom < 0.4) type = 0;
-    else if (typeRandom < 0.7) type = 1;
-    else if (typeRandom < 0.9) type = 2;
-    else type = 3;
+    // Adjusted probabilities to make stone4 more frequent
+    if (typeRandom < 0.3) type = 0;      // 30% chance
+    else if (typeRandom < 0.55) type = 1; // 25% chance
+    else if (typeRandom < 0.75) type = 2; // 20% chance
+    else type = 3;                        // 25% chance (game over stone)
 
-    const baseSpeed = 5 - difficulty * 0.3;
-    const speedVariation = Math.random() * 0.5;
-    const speed = baseSpeed + speedVariation;
+    const baseSpeed = 3 - difficulty * 0.2;
+    const speedVariation = Math.random() * 1 - 0.5;
+    const speed = Math.max(0.3, baseSpeed + speedVariation);
 
     const newStone: Stone = {
       id: stoneIdCounter,
       type,
-      speed: Math.max(0.5, speed),
+      speed,
       startX,
       endX,
+      startY,
+      endY,
+      posX,
       posY,
+      direction,
     };
   
     setStoneIdCounter(prev => prev + 1);
@@ -186,7 +260,7 @@ const Content = () => {
     return newStone;
   }, [difficulty, stoneIdCounter]);
 
-  const handleStoneTap = useCallback((type: number) => {
+  const handleStoneTap = useCallback((id: number, type: number) => {
     if (type === 3) {
       setGameOver(true);
     } else {
@@ -201,26 +275,54 @@ const Content = () => {
         });
         return newScore;
       });
-      setCurrentStone(null);
+      setCurrentStones(prevStones => prevStones.filter(stone => stone.id !== id));
     }
   }, []);
 
   useEffect(() => {
-    if (isPlaying && !gameOver && !currentStone) {
-      const spawnTimeout = setTimeout(() => {
-        setCurrentStone(spawnStone());
-      }, 200 + Math.random() * 300);
+    if (isPlaying && !gameOver) {
+      const spawnNewStone = () => {
+        const isVertical = Math.random() < 0.5; // 70% chance for vertical stones
+        const newStone = spawnStone(isVertical ? 'vertical' : 'horizontal');
+        setCurrentStones(prev => [...prev, newStone]);
+      };
 
-      return () => clearTimeout(spawnTimeout);
+      const spawnInterval = setInterval(spawnNewStone, 500); // Spawn a stone every 500ms
+      
+
+      return () => {
+        clearInterval(spawnInterval);
+      };
     }
-  }, [isPlaying, gameOver, currentStone, spawnStone]);
+  }, [isPlaying, gameOver, spawnStone]);
+
+  useEffect(() => {
+    if (gameOver) {
+      // Show Telegram's main button when the game is over
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.MainButton.text = "Play Again";
+        tg.MainButton.show();
+
+        // Send the final score to Telegram
+        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+      }
+    }
+  }, [gameOver, score]);
 
   return (
     <StyledContent>
-      <ScoreBoard className="scoreboard">
-        Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
-      </ScoreBoard>
-      {!isPlaying && (
+      {telegramUser && (
+        <WelcomeInfo className="scoreboard">
+          Welcome, {telegramUser.first_name}!
+        </WelcomeInfo>
+      )}
+      {!isPlaying && !telegramUser && (
+        <WelcomeInfo className="scoreboard">
+          Welcome to MoonStone
+        </WelcomeInfo>
+      )}
+            {!isPlaying && (
         <StartButton
           src={startImage}
           alt="Start"
@@ -228,27 +330,36 @@ const Content = () => {
           isClicked={isPlaying}
         />
       )}
-      {isPlaying && !gameOver && currentStone && (
-        <Stone
-          key={`stone-${currentStone.id}`}
-          id={`stone-${currentStone.id}`}
-          src={[stone1, stone2, stone3, stone4][currentStone.type]}
-          alt={`Stone ${currentStone.type + 1}`}
-          speed={currentStone.speed}
-          startX={currentStone.startX}
-          endX={currentStone.endX}
-          posY={currentStone.posY}
-          onClick={() => handleStoneTap(currentStone.type)}
-          onAnimationEnd={() => setCurrentStone(null)}
-        />
+      {isPlaying && (
+        <ScoreBoard className="scoreboard">
+          Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
+        </ScoreBoard>
       )}
+      {isPlaying && !gameOver && currentStones.map(stone => (
+        <Stone
+          key={`stone-${stone.id}`}
+          id={`stone-${stone.id}`}
+          src={[stone1, stone2, stone3, stone4][stone.type]}
+          alt={`Stone ${stone.type + 1}`}
+          speed={stone.speed}
+          startX={stone.startX}
+          endX={stone.endX}
+          startY={stone.startY}
+          endY={stone.endY}
+          posX={stone.posX}
+          posY={stone.posY}
+          direction={stone.direction}
+          onClick={() => handleStoneTap(stone.id, stone.type)}
+          onAnimationEnd={() => setCurrentStones(prev => prev.filter(s => s.id !== stone.id))}
+        />
+      ))}
       {gameOver && (
         <>
           <GameOverScreen className="scoreboard1">
             <h2>Game Over</h2>
           </GameOverScreen>
           <GameOverScreen1>
-          <FlatButton onClick={handleStartClick}>Play Again</FlatButton>
+            <FlatButton onClick={handleStartClick}>Play Again</FlatButton>
           </GameOverScreen1>
         </>
       )}
