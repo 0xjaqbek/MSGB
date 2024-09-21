@@ -316,7 +316,7 @@ const Content: React.FC = () => {
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (navigator.vibrate) {
-      navigator.vibrate(100); // Vibrate for 100 milliseconds when a rock is tapped
+      navigator.vibrate(50); // Vibrate for 100 milliseconds when a rock is tapped
     }
   
     if (type === 3) {
