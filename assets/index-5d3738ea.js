@@ -1159,24 +1159,11 @@ PERFORMANCE OF THIS SOFTWARE.
   ${({isClicked:e})=>e?Bo`display: none;`:Bo`animation: ${XB} 2s infinite;`}
 `,rT=Mi.img`
   position: absolute;
-
-  // Generate a random size factor between 0.5 and 1.5
-  width: ${()=>`${Math.random()} * 0.1vh`};
-  height: ${()=>`${Math.random()} * 0.1vh`};
-
-  animation: ${e=>e.direction==="horizontal"?ZB:QB}
-    ${e=>e.speed}s linear;
+  width: 15vh;
+  height: 15vh;
+  animation: ${e=>e.direction==="horizontal"?ZB:QB} ${e=>e.speed}s linear;
   animation-fill-mode: forwards;
-
-  ${e=>e.direction==="horizontal"?Bo`
-          --startX: ${e.startX}px;
-          --endX: ${e.endX}px;
-          top: ${e.posY}px;
-        `:Bo`
-          --startY: ${e.startY}px;
-          --endY: ${e.endY}px;
-          left: ${e.posX}px;
-        `}
+  ${e=>e.direction==="horizontal"?Bo`--startX: ${e.startX}px; --endX: ${e.endX}px; top: ${e.posY}px;`:Bo`--startY: ${e.startY}px; --endY: ${e.endY}px; left: ${e.posX}px;`}
 `,nT=Mi.img`
   position: absolute;
   width: 15vh;
