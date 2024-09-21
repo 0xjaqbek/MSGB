@@ -316,10 +316,14 @@ const Content: React.FC = () => {
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (type === 3) {
-      setShowBlink(true);  // Trigger the blink effect
+      setGameOver(true);  // Immediately set the game over
+      setShowBlink(true); // Trigger the blink effect
+  
+      // Hide the blink after 0.8 seconds (duration of the animation)
       setTimeout(() => {
-        setGameOver(true);
-      }, 800); // Wait for the blink animation to finish before setting game over
+        setShowBlink(false);
+        // Optionally trigger any additional logic here if needed
+      }, 800); // Adjust this based on your blink animation timing
     } else {
       setBlastPosition({ posX, posY });
       setShowBlast(true);
@@ -341,6 +345,7 @@ const Content: React.FC = () => {
       setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
     }
   }, []);
+  
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
@@ -406,24 +411,25 @@ return (
         Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
       </ScoreBoard>
     )}
-    {isPlaying && !gameOver && currentStones.map((stone) => (
-      <Stone
-        key={`stone-${stone.id}`}
-        id={`stone-${stone.id}`}
-        src={[stone1, stone2, stone3, stone4][stone.type]}
-        alt={`Stone ${stone.type + 1}`}
-        speed={stone.speed}
-        startX={stone.startX}
-        endX={stone.endX}
-        startY={stone.startY}
-        endY={stone.endY}
-        posX={stone.posX}
-        posY={stone.posY}
-        direction={stone.direction}
-        onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
-        onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-      />
-    ))}
+{isPlaying && !gameOver && currentStones.map((stone) => (
+    <Stone
+      key={`stone-${stone.id}`}
+      id={`stone-${stone.id}`}
+      src={[stone1, stone2, stone3, stone4][stone.type]}
+      alt={`Stone ${stone.type + 1}`}
+      speed={stone.speed}
+      startX={stone.startX}
+      endX={stone.endX}
+      startY={stone.startY}
+      endY={stone.endY}
+      posX={stone.posX}
+      posY={stone.posY}
+      direction={stone.direction}
+      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
+      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+    />
+  ))}
+
     {gameOver && (
       <>
         <GameOverScreen className="scoreboard1">
