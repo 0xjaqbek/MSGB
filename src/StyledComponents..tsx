@@ -60,15 +60,39 @@ export const StartButton = styled.img<{ isClicked: boolean }>`
     : css`animation: ${imageAnimation} 2s infinite;`}
 `;
 
-export const Stone = styled.img<{ speed: number; direction: 'horizontal' | 'vertical'; startX?: number; startY?: number; endX?: number; endY?: number; posX?: number; posY?: number; }>`
+export const Stone = styled.img<{
+  speed: number;
+  direction: 'horizontal' | 'vertical';
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  posX?: number;
+  posY?: number;
+}>`
   position: absolute;
-  width: 15vh;
-  height: 15vh;
-  animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s linear;
+
+  // Generate a random size factor between 0.5 and 1.5
+  width: ${() => `${Math.random() * (1.5 - 0.5) + 0.5} * 15vh`};
+  height: ${() => `${Math.random() * (1.5 - 0.5) + 0.5} * 15vh`};
+
+  animation: ${props =>
+    props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation}
+    ${props => props.speed}s linear;
   animation-fill-mode: forwards;
-  ${props => props.direction === 'horizontal'
-    ? css`--startX: ${props.startX}px; --endX: ${props.endX}px; top: ${props.posY}px;`
-    : css`--startY: ${props.startY}px; --endY: ${props.endY}px; left: ${props.posX}px;`}
+
+  ${props =>
+    props.direction === 'horizontal'
+      ? css`
+          --startX: ${props.startX}px;
+          --endX: ${props.endX}px;
+          top: ${props.posY}px;
+        `
+      : css`
+          --startY: ${props.startY}px;
+          --endY: ${props.endY}px;
+          left: ${props.posX}px;
+        `}
 `;
 
 export const Blast = styled.img<{ posX: number; posY: number }>`
