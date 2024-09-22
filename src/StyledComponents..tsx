@@ -27,7 +27,7 @@ export const imageAnimation = keyframes`
 
 // Styled components
 export const StyledContent = styled.div`
-  display: flex;
+  
   justify-content: center;
   align-items: center;
   height: 100vh;
