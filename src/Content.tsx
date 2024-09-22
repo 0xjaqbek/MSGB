@@ -9,6 +9,7 @@ import stone3 from './stone3.png';
 import stone4 from './stone4.png';
 import blastImage0 from './blast0.png'; 
 import blastImage1 from './blast1.png'; 
+import { getDatabase, ref, set, onValue, push, update } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -268,26 +269,30 @@ useEffect(() => {
     }
 }, [gameOver, score]);
 
-const db = getFirestore(app); 
-
+const database = getDatabase(app);
+// Function to update the score in Realtime Database
 const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
-    const timestamp = serverTimestamp();
+    const scoresRef = ref(database, 'scores'); // Reference to the 'scores' node
 
-    // Use the modular SDK's methods
-    const scoreRef = doc(db, 'scores', playerId); // Create a reference to the 'scores' collection
-    await setDoc(scoreRef, {
+    // Create a new score entry under the 'scores' node
+    const newScoreRef = push(scoresRef); 
+
+    // Set the score data
+    await set(newScoreRef, {
       score,
       remainingTime,
-      timestamp,
-    }, { merge: true }); // Merge the new score with any existing data
+      timestamp: Date.now(), // Use Date.now() for timestamp in Realtime Database
+      playerId, // Add playerId to the score data
+    });
 
     console.log('Score updated successfully!');
   } catch (error) {
     console.error('Error updating score:', error);
   }
-}, [score, remainingTime, telegramUser, db]);
+}, [score, remainingTime, telegramUser, database]);
+
 
 return (
   <StyledContent>
