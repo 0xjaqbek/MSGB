@@ -174,16 +174,18 @@ const Content: React.FC = () => {
     } else {
       // Set the initial blast image and position
       setBlastPosition({ posX, posY });
+      setBlastImage(blastImage0); // Start with blastImage0
       setShowBlast(true);
   
-      // Show `blastImage0` for the first half of the display duration (e.g., 50ms)
+      // Switch to `blastImage1` after 50ms
       setTimeout(() => {
-        setBlastImage(blastImage1);  // Switch to `blastImage1` for the second half
+        setBlastImage(blastImage1);  // Switch to `blastImage1`
       }, 50);
   
       // Hide the blast after the full duration (e.g., 100ms)
       setTimeout(() => {
         setShowBlast(false);
+        setBlastImage(blastImage0);  // Reset to `blastImage0`
       }, 100);
   
       setScore((prev) => {
@@ -200,6 +202,7 @@ const Content: React.FC = () => {
       setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
     }
   }, []);
+  
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
