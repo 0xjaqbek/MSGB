@@ -1132,7 +1132,7 @@ PERFORMANCE OF THIS SOFTWARE.
   50% { transform: scale(0.95) translateY(3%); }
   100% { transform: scale(1) translateY(0); }
 `,wD=oo.div`
-  display: flex;
+  
   justify-content: center;
   align-items: center;
   height: 100vh;
