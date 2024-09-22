@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes, css } from 'styled-components';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './StyledComponents.';
 import startImage from './start.png';
@@ -66,9 +66,12 @@ const Content: React.FC = () => {
   const [difficulty, setDifficulty] = useState(1);
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
   const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
-  const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null); // Track blast position
-  const [blastImage, setBlastImage] = useState(blastImage0); // Default to blastImage0
-  const [showBlast, setShowBlast] = useState(false); // Track if the blast effect is visible
+  const [showBlast, setShowBlast] = useState(false);
+  const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
+  const [blastImage, setBlastImage] = useState(blastImage0);
+  const blastImageRef = useRef(blastImage0);
+  const blastPositionRef = useRef<{ posX: number; posY: number } | null>(null);
+  const [blastKey, setBlastKey] = useState(0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
@@ -172,21 +175,20 @@ const Content: React.FC = () => {
         setShowBlink(false);
       }, 800); // Adjust this based on your blink animation timing
     } else {
-      // Set the initial blast image and position
-      setBlastPosition({ posX, posY });
-      setBlastImage(blastImage0); // Start with blastImage0
-      setShowBlast(true);
+        blastPositionRef.current = { posX, posY };
+        blastImageRef.current = blastImage0;
+        setShowBlast(true);
+        setBlastKey(prev => prev + 1);
   
-      // Switch to `blastImage1` after 50ms
-      setTimeout(() => {
-        setBlastImage(blastImage1);  // Switch to `blastImage1`
-      }, 50);
+        setTimeout(() => {
+          blastImageRef.current = blastImage1;
+          setBlastKey(prev => prev + 1);
+        }, 50);
   
-      // Hide the blast after the full duration (e.g., 100ms)
-      setTimeout(() => {
-        setShowBlast(false);
-        setBlastImage(blastImage0);  // Reset to `blastImage0`
-      }, 100);
+        setTimeout(() => {
+          setShowBlast(false);
+          blastImageRef.current = blastImage0;
+        }, 100);
   
       setScore((prev) => {
         const newScore = prev + 1;
@@ -238,9 +240,13 @@ const Content: React.FC = () => {
 return (
   <StyledContent>
 {/* Blast effect */}
-{showBlast && blastPosition && (
-  <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
-)}
+{showBlast && blastPositionRef.current && (
+        <Blast 
+          src={blastImageRef.current} 
+          posX={blastPositionRef.current.posX} 
+          posY={blastPositionRef.current.posY} 
+        />
+      )}
 
     {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
