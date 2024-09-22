@@ -15,6 +15,7 @@ function App() {
 
   return (
     <StyledApp>
+      <div className="top-bar"></div>
       {/* Background animation */}
       <div className="bg-animation">
         <div id="stars"></div>
@@ -22,7 +23,7 @@ function App() {
         <div id="stars3"></div>
         <div id="stars4"></div>
       </div>
-
+      <div className="bottom-bar"></div>
       {/* Foreground content */}
       <Content />
     </StyledApp>
