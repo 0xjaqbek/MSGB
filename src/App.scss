@@ -125,8 +125,8 @@ z-index: 20;
 .top-bar {
   z-index: 90;
   position: absolute;
-  top: 0;
-  width: 100%;
+  top: -10;
+  width: 100vw;
   height: 50px;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 }
@@ -134,8 +134,8 @@ z-index: 20;
 .bottom-bar {
   z-index: 90;
   position: absolute;
-  bottom: 0;
-  width: 100%;
+  bottom: -10;
+  width: 100vw;
   height: 50px;
   background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 }
