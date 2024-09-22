@@ -134,9 +134,9 @@ const Content: React.FC = () => {
     else if (typeRandom < 0.75) type = 2; // 20% chance
     else type = 3;                        // 25% chance (game over stone)
 
-    const baseSpeed = 3 - difficulty * 0.2;
-    const speedVariation = Math.random() * 1 - 0.5;
-    const speed = Math.max(0.3, baseSpeed + speedVariation);
+    // Adjust speed calculation based on difficulty
+    const baseSpeed = 4 - difficulty * 0.3; // Adjust this factor to control speed increase
+    const speed = Math.max(0.5, baseSpeed); // Ensure speed doesn't go below a minimum value
 
     const newStone: Stone = {
       id: stoneIdCounter,
@@ -237,7 +237,7 @@ return (
 
     {!isPlaying && telegramUser && (
       <WelcomeInfo className="scoreboard">
-        Welcome, {telegramUser.first_name}!<br />in<br />
+        Welcome<br></br> {telegramUser.first_name}<br />in<br />
       </WelcomeInfo>
     )}
     {!isPlaying && !telegramUser && (
