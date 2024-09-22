@@ -56,6 +56,7 @@ declare global {
   }
 }
 
+const GAME_DURATION = 60; // 60 seconds for the game
 
 const Content: React.FC = () => {
   const [showBlink, setShowBlink] = useState(false);
@@ -65,7 +66,7 @@ const Content: React.FC = () => {
   const [currentStones, setCurrentStones] = useState<Stone[]>([]);
   const [difficulty, setDifficulty] = useState(1);
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
-  const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
+  const [remainingTime, setRemainingTime] = useState(GAME_DURATION); // Time remaining in seconds
   const [showBlast, setShowBlast] = useState(false);
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
   const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
@@ -100,15 +101,38 @@ const Content: React.FC = () => {
     setDifficulty(1);
     setCurrentStones([]);
     setStoneIdCounter(0);
-    setRocksToNextLevel(5);
-
-    // Hide Telegram's main button when the game starts
+    setRemainingTime(GAME_DURATION); // Reset time to 60 seconds
     window.Telegram?.WebApp?.MainButton.hide();
-
-    // Notify Telegram that the game has started
     window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
   };
 
+  // Timer logic to reduce time by 1 second every interval
+  useEffect(() => {
+    if (isPlaying && !gameOver) {
+      const timer = setInterval(() => {
+        setRemainingTime((prevTime) => {
+          if (prevTime <= 1) {
+            setGameOver(true); // End game if time is up
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000); // Reduce time every second
+
+      return () => clearInterval(timer);
+    }
+  }, [isPlaying, gameOver]);
+
+  useEffect(() => {
+    if (gameOver) {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.MainButton.text = "Play Again";
+        tg.MainButton.show();
+        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+      }
+    }
+  }, [gameOver, score]);
 
   const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
@@ -184,13 +208,6 @@ const Content: React.FC = () => {
   
       setScore((prev) => {
         const newScore = prev + 1;
-        setRocksToNextLevel((prevRocks) => {
-          if (prevRocks === 1) {
-            setDifficulty((prevDifficulty) => Math.min(5, prevDifficulty + 0.1));
-            return 5;
-          }
-          return prevRocks - 1;
-        });
         return newScore;
       });
       setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
@@ -261,11 +278,11 @@ return (
         isClicked={isPlaying}
       />
     )}
-    {isPlaying && (
-      <ScoreBoard className="scoreboard">
-        Score: {score}  LVL: {difficulty.toFixed(1)}  Next: {rocksToNextLevel}
-      </ScoreBoard>
-    )}
+      {isPlaying && (
+        <ScoreBoard className="scoreboard">
+          Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+        </ScoreBoard>
+      )}
 {isPlaying && !gameOver && currentStones.map((stone) => (
     <Stone
       key={`stone-${stone.id}`}
