@@ -5,7 +5,7 @@ import styled, { keyframes, css } from "styled-components";
 // Animations
 export const blinkAnimation = keyframes`
   0% { opacity: 0; }
-  20% { opacity: 1; }
+  10% { opacity: 1; }
   100% { opacity: 0; }
 `;
 

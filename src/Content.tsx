@@ -166,7 +166,7 @@ const Content: React.FC = () => {
     if (type === 3) {
       setGameOver(true);
       setShowBlink(true);
-      setTimeout(() => setShowBlink(false), 1800);
+      setTimeout(() => setShowBlink(false), 2500);
     } else {
       setBlastPosition({ posX, posY });
       setCurrentBlastImage(blastImage0);
