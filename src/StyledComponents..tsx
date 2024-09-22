@@ -116,7 +116,7 @@ export const GameOverScreen = styled.div`
 // TopBar styled component
 export const TopBar = styled.div`
   z-index: 90;
-  position: absolute;
+  position: relative;
   top: 0;
   width: 100vw;
   height: 50px;
@@ -126,7 +126,7 @@ export const TopBar = styled.div`
 // BottomBar styled component
 export const BottomBar = styled.div`
   z-index: 90;
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100vw;
   height: 50px;
