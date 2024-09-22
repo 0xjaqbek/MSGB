@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes, css } from 'styled-components';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './StyledComponents.';
@@ -8,6 +9,25 @@ import stone3 from './stone3.png';
 import stone4 from './stone4.png';
 import blastImage0 from './blast0.png'; 
 import blastImage1 from './blast1.png'; 
+import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
+  authDomain: "moonstones-8e2e4.firebaseapp.com",
+  databaseURL: "https://moonstones-8e2e4-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "moonstones-8e2e4",
+  storageBucket: "moonstones-8e2e4.appspot.com",
+  messagingSenderId: "645616414210",
+  appId: "1:645616414210:web:236885687711d65c45011b",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
 
 
 interface Stone {
@@ -246,7 +266,28 @@ useEffect(() => {
         tg.sendData(JSON.stringify({ action: 'gameOver', score }));
       }
     }
-  }, [gameOver, score]);
+}, [gameOver, score]);
+
+const db = getFirestore(app); 
+
+const updateScore = useCallback(async () => {
+  try {
+    const playerId = telegramUser?.id.toString() || 'anonymous'; 
+    const timestamp = serverTimestamp();
+
+    // Use the modular SDK's methods
+    const scoreRef = doc(db, 'scores', playerId); // Create a reference to the 'scores' collection
+    await setDoc(scoreRef, {
+      score,
+      remainingTime,
+      timestamp,
+    }, { merge: true }); // Merge the new score with any existing data
+
+    console.log('Score updated successfully!');
+  } catch (error) {
+    console.error('Error updating score:', error);
+  }
+}, [score, remainingTime, telegramUser, db]);
 
 return (
   <StyledContent>
