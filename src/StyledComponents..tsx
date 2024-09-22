@@ -27,7 +27,7 @@ export const imageAnimation = keyframes`
 
 // Styled components
 export const StyledContent = styled.div`
-  
+  display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -111,4 +111,26 @@ export const GameOverScreen = styled.div`
   padding: 5px;
   text-align: center;
   z-index: 400;
+`;
+
+// TopBar styled component
+export const TopBar = styled.div`
+  z-index: 90;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+`;
+
+// BottomBar styled component
+export const BottomBar = styled.div`
+  z-index: 90;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `;
