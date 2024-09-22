@@ -68,10 +68,7 @@ const Content: React.FC = () => {
   const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
   const [showBlast, setShowBlast] = useState(false);
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
-  const [blastImage, setBlastImage] = useState(blastImage0);
-  const blastImageRef = useRef(blastImage0);
-  const blastPositionRef = useRef<{ posX: number; posY: number } | null>(null);
-  const [blastKey, setBlastKey] = useState(0);
+  const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
@@ -163,32 +160,26 @@ const Content: React.FC = () => {
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (navigator.vibrate) {
-      navigator.vibrate(50); // Vibrate for 50 milliseconds when a rock is tapped
+      navigator.vibrate(50);
     }
   
     if (type === 3) {
-      setGameOver(true);  // Immediately set the game over
-      setShowBlink(true); // Trigger the blink effect
-  
-      // Hide the blink after 0.8 seconds (duration of the animation)
-      setTimeout(() => {
-        setShowBlink(false);
-      }, 800); // Adjust this based on your blink animation timing
+      setGameOver(true);
+      setShowBlink(true);
+      setTimeout(() => setShowBlink(false), 800);
     } else {
-        blastPositionRef.current = { posX, posY };
-        blastImageRef.current = blastImage0;
-        setShowBlast(true);
-        setBlastKey(prev => prev + 1);
-  
-        setTimeout(() => {
-          blastImageRef.current = blastImage1;
-          setBlastKey(prev => prev + 1);
-        }, 50);
-  
-        setTimeout(() => {
-          setShowBlast(false);
-          blastImageRef.current = blastImage0;
-        }, 100);
+      setBlastPosition({ posX, posY });
+      setCurrentBlastImage(blastImage0);
+      setShowBlast(true);
+
+      setTimeout(() => {
+        setCurrentBlastImage(blastImage1);
+      }, 50);
+
+      setTimeout(() => {
+        setShowBlast(false);
+      }, 100);
+
   
       setScore((prev) => {
         const newScore = prev + 1;
@@ -240,14 +231,14 @@ const Content: React.FC = () => {
 return (
   <StyledContent>
 {/* Blast effect */}
-{showBlast && blastPositionRef.current && (
+{showBlast && blastPosition && (
         <Blast 
-          src={blastImageRef.current} 
-          posX={blastPositionRef.current.posX} 
-          posY={blastPositionRef.current.posY} 
+          key={currentBlastImage} // Force re-render when image changes
+          src={currentBlastImage} 
+          posX={blastPosition.posX} 
+          posY={blastPosition.posY} 
         />
       )}
-
     {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
 
