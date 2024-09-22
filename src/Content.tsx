@@ -274,17 +274,15 @@ const database = getDatabase(app);
 const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
-    const scoresRef = ref(database, 'scores'); // Reference to the 'scores' node
+    const playerScoresRef = ref(database, `scores/${playerId}`);
 
-    // Create a new score entry under the 'scores' node
-    const newScoreRef = push(scoresRef); 
-
-    // Set the score data
-    await set(newScoreRef, {
-      score,
-      remainingTime,
-      timestamp: Date.now(), // Use Date.now() for timestamp in Realtime Database
-      playerId, // Add playerId to the score data
+    // Add the new score to the array
+    await update(playerScoresRef, {
+      [Date.now()]: { // Use timestamp as key for each score
+        score,
+        remainingTime,
+        timestamp: Date.now(),
+      }
     });
 
     console.log('Score updated successfully!');
@@ -292,6 +290,8 @@ const updateScore = useCallback(async () => {
     console.error('Error updating score:', error);
   }
 }, [score, remainingTime, telegramUser, database]);
+
+
 
 
 return (
