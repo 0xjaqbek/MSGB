@@ -106,22 +106,26 @@ const Content: React.FC = () => {
     window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
   };
 
-  // Timer logic to reduce time by 1 second every interval
-  useEffect(() => {
-    if (isPlaying && !gameOver) {
-      const timer = setInterval(() => {
-        setRemainingTime((prevTime) => {
-          if (prevTime <= 1) {
-            setGameOver(true); // End game if time is up
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000); // Reduce time every second
+// Timer logic to reduce time by 1 second every interval and increase difficulty
+useEffect(() => {
+  if (isPlaying && !gameOver) {
+    const timer = setInterval(() => {
+      setRemainingTime((prevTime) => {
+        if (prevTime <= 1) {
+          setGameOver(true); // End game if time is up
+          return 0;
+        }
+        return prevTime - 1;
+      });
 
-      return () => clearInterval(timer);
-    }
-  }, [isPlaying, gameOver]);
+      // Increase difficulty over time
+      setDifficulty((prevDifficulty) => prevDifficulty + 0.01); // Gradually increase difficulty
+    }, 1000); // Reduce time every second
+
+    return () => clearInterval(timer);
+  }
+}, [isPlaying, gameOver]);
+
 
   useEffect(() => {
     if (gameOver) {
@@ -137,16 +141,15 @@ const Content: React.FC = () => {
   const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    
+  
     let startX, endX, startY, endY, posX, posY;
-
+  
     if (direction === 'horizontal') {
       const startLeft = Math.random() < 0.5;
       startX = startLeft ? -500 : screenWidth;
       endX = startLeft ? screenWidth : -screenWidth;
       posY = Math.random() * (screenHeight - 50);
     } else {
-      // Only allow stones to move from top to bottom
       startY = -500;
       endY = screenHeight;
       posX = Math.random() * (screenWidth - 50);
@@ -154,16 +157,15 @@ const Content: React.FC = () => {
   
     const typeRandom = Math.random();
     let type;
-    // Adjusted probabilities to make stone4 more frequent
-    if (typeRandom < 0.3) type = 0;      // 30% chance
-    else if (typeRandom < 0.55) type = 1; // 25% chance
-    else if (typeRandom < 0.75) type = 2; // 20% chance
-    else type = 3;                        // 25% chance (game over stone)
-
-    // Adjust speed calculation based on difficulty
-    const baseSpeed = 4 - difficulty * 0.5; // Adjust this factor to control speed increase
-    const speed = Math.max(0.5, baseSpeed); // Ensure speed doesn't go below a minimum value
-
+    if (typeRandom < 0.3) type = 0;      
+    else if (typeRandom < 0.55) type = 1; 
+    else if (typeRandom < 0.75) type = 2; 
+    else type = 3;
+  
+    // Adjust speed calculation based on increasing difficulty
+    const baseSpeed = 4 - difficulty * 0.2;  // Increase speed as difficulty increases
+    const speed = Math.max(0.5, baseSpeed);  // Ensure minimum speed limit
+  
     const newStone: Stone = {
       id: stoneIdCounter,
       type,
@@ -177,8 +179,8 @@ const Content: React.FC = () => {
       direction,
     };
   
-    setStoneIdCounter(prev => prev + 1);
-    
+    setStoneIdCounter((prev) => prev + 1);
+  
     return newStone;
   }, [difficulty, stoneIdCounter]);
 
