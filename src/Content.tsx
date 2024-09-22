@@ -261,7 +261,7 @@ useEffect(() => {
       if (tg) {
         tg.MainButton.text = "Play Again";
         tg.MainButton.show();
-
+        updateScore();
         // Send the final score to Telegram
         tg.sendData(JSON.stringify({ action: 'gameOver', score }));
       }
