@@ -137,7 +137,7 @@ const Content: React.FC = () => {
     else type = 3;                        // 25% chance (game over stone)
 
     // Adjust speed calculation based on difficulty
-    const baseSpeed = 4 - difficulty * 0.3; // Adjust this factor to control speed increase
+    const baseSpeed = 4 - difficulty * 0.5; // Adjust this factor to control speed increase
     const speed = Math.max(0.5, baseSpeed); // Ensure speed doesn't go below a minimum value
 
     const newStone: Stone = {
