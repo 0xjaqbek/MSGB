@@ -116,19 +116,19 @@ export const GameOverScreen = styled.div`
 // TopBar styled component
 export const TopBar = styled.div`
   z-index: 90;
-
+  position: absolute;
   top: 0;
   width: 100vw;
-  height: 50px;
+  height: 5px;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `;
 
 // BottomBar styled component
 export const BottomBar = styled.div`
   z-index: 90;
-
+  position: absolute;
   bottom: 0;
   width: 100vw;
-  height: 50px;
+  height: 5px;
   background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `;
