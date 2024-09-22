@@ -174,11 +174,11 @@ const Content: React.FC = () => {
 
       setTimeout(() => {
         setCurrentBlastImage(blastImage1);
-      }, 50);
+      }, 100);
 
       setTimeout(() => {
         setShowBlast(false);
-      }, 100);
+      }, 150);
 
   
       setScore((prev) => {
