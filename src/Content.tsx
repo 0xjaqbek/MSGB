@@ -67,7 +67,7 @@ const Content: React.FC = () => {
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
   const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null); // Track blast position
-  const [blastImage, setBlastImage] = useState(blastImage0); // Default to blastImage0
+  const [blastImage1, setBlastImage] = useState(blastImage0); // Default to blastImage0
   const [showBlast, setShowBlast] = useState(false); // Track if the blast effect is visible
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
 
@@ -184,7 +184,7 @@ const Content: React.FC = () => {
       // Hide the blast after the full duration (e.g., 100ms)
       setTimeout(() => {
         setShowBlast(false);
-      }, 150);
+      }, 100);
   
       setScore((prev) => {
         const newScore = prev + 1;
