@@ -6,7 +6,8 @@ import stone1 from './stone1.png';
 import stone2 from './stone2.png';
 import stone3 from './stone3.png';
 import stone4 from './stone4.png';
-import blastImage from './blast.png'; 
+import blastImage0 from './blast0.png'; 
+import blastImage1 from './blast1.png'; 
 
 
 interface Stone {
@@ -66,7 +67,8 @@ const Content: React.FC = () => {
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
   const [rocksToNextLevel, setRocksToNextLevel] = useState(5);
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null); // Track blast position
-  const [showBlast, setShowBlast] = useState(false);  // Track if blast should be shown
+  const [blastImage, setBlastImage] = useState(blastImage0); // Default to blastImage0
+  const [showBlast, setShowBlast] = useState(false); // Track if the blast effect is visible
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
 
   useEffect(() => {
@@ -158,7 +160,7 @@ const Content: React.FC = () => {
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (navigator.vibrate) {
-      navigator.vibrate(50); // Vibrate for 100 milliseconds when a rock is tapped
+      navigator.vibrate(50); // Vibrate for 50 milliseconds when a rock is tapped
     }
   
     if (type === 3) {
@@ -168,11 +170,18 @@ const Content: React.FC = () => {
       // Hide the blink after 0.8 seconds (duration of the animation)
       setTimeout(() => {
         setShowBlink(false);
-        // Optionally trigger any additional logic here if needed
       }, 800); // Adjust this based on your blink animation timing
     } else {
+      // Set the initial blast image and position
       setBlastPosition({ posX, posY });
       setShowBlast(true);
+  
+      // Show `blastImage0` for the first half of the display duration (e.g., 50ms)
+      setTimeout(() => {
+        setBlastImage(blastImage1);  // Switch to `blastImage1` for the second half
+      }, 50);
+  
+      // Hide the blast after the full duration (e.g., 100ms)
       setTimeout(() => {
         setShowBlast(false);
       }, 100);
@@ -191,8 +200,6 @@ const Content: React.FC = () => {
       setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
     }
   }, []);
-  
-  
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
@@ -227,10 +234,10 @@ const Content: React.FC = () => {
 
 return (
   <StyledContent>
-    {/* Blast effect */}
-    {showBlast && blastPosition && (
-      <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
-    )}
+{/* Blast effect */}
+{showBlast && blastPosition && (
+  <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
+)}
 
     {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
