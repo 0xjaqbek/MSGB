@@ -1200,14 +1200,14 @@ PERFORMANCE OF THIS SOFTWARE.
   z-index: 400;
 `,AD=hi.div`
   z-index: 90;
-  position: relative;
+
   top: 0;
   width: 100vw;
   height: 50px;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `,kD=hi.div`
   z-index: 90;
-  position: relative;
+
   bottom: 0;
   width: 100vw;
   height: 50px;
