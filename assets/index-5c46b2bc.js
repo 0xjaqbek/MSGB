@@ -1200,17 +1200,17 @@ PERFORMANCE OF THIS SOFTWARE.
   z-index: 400;
 `,AD=hi.div`
   z-index: 90;
-
+  position: absolute;
   top: 0;
   width: 100vw;
-  height: 50px;
+  height: 5px;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `,kD=hi.div`
   z-index: 90;
-
+  position: absolute;
   bottom: 0;
   width: 100vw;
-  height: 50px;
+  height: 5px;
   background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `,ID="/MSGB/assets/start-c100645f.png",RD="/MSGB/assets/stone1-a61bb693.png",TD="/MSGB/assets/stone2-0d684d9c.png",BD="/MSGB/assets/stone3-b50bbf3d.png",PD="/MSGB/assets/stone4-f442b767.png",P8="/MSGB/assets/blast0-463f4228.png",OD="/MSGB/assets/blast1-a591eac8.png";/**
  * @license
