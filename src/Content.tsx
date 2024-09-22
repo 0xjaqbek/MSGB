@@ -296,6 +296,7 @@ const updateScore = useCallback(async () => {
 
 return (
   <StyledContent>
+          <div className="top-bar"></div>
 {/* Blast effect */}
 {showBlast && blastPosition && (
         <Blast 
@@ -357,6 +358,7 @@ return (
         </GameOverScreen>
       </>
     )}
+          <div className="bottom-bar"></div>
   </StyledContent>
 )};
 
