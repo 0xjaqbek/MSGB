@@ -179,12 +179,12 @@ const Content: React.FC = () => {
       // Show `blastImage0` for the first half of the display duration (e.g., 50ms)
       setTimeout(() => {
         setBlastImage(blastImage1);  // Switch to `blastImage1` for the second half
-      }, 100);
+      }, 50);
   
       // Hide the blast after the full duration (e.g., 100ms)
       setTimeout(() => {
         setShowBlast(false);
-      }, 200);
+      }, 150);
   
       setScore((prev) => {
         const newScore = prev + 1;
