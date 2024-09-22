@@ -30,7 +30,8 @@ export const StyledContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
   position: relative;
   overflow: hidden;
   touch-action: none;
