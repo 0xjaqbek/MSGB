@@ -118,8 +118,7 @@ export const TopBar = styled.div`
   z-index: 90;
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  width: 100vw;
   height: 50px;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `;
@@ -129,8 +128,7 @@ export const BottomBar = styled.div`
   z-index: 90;
   position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
+  width: 100vw;
   height: 50px;
   background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 `;
