@@ -167,6 +167,7 @@ const Content: React.FC = () => {
       setGameOver(true);
       setShowBlink(true);
       setTimeout(() => setShowBlink(false), 5000);
+      navigator.vibrate(200);
     } else {
       setBlastPosition({ posX, posY });
       setCurrentBlastImage(blastImage0);
