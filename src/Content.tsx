@@ -179,12 +179,12 @@ const Content: React.FC = () => {
       // Show `blastImage0` for the first half of the display duration (e.g., 50ms)
       setTimeout(() => {
         setBlastImage(blastImage1);  // Switch to `blastImage1` for the second half
-      }, 50);
+      }, 100);
   
       // Hide the blast after the full duration (e.g., 100ms)
       setTimeout(() => {
         setShowBlast(false);
-      }, 100);
+      }, 200);
   
       setScore((prev) => {
         const newScore = prev + 1;
@@ -236,7 +236,7 @@ return (
   <StyledContent>
 {/* Blast effect */}
 {showBlast && blastPosition && (
-  <Blast src={blastImage} posX={blastPosition.posX} posY={blastPosition.posY} />
+  <Blast src={blastImage0} posX={blastPosition.posX} posY={blastPosition.posY} />
 )}
 
     {/* Blink effect */}
