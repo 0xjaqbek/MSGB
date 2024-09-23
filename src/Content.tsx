@@ -12,8 +12,6 @@ import blastImage1 from './blast1.png';
 import { getDatabase, ref, set, onValue, push, update } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -27,9 +25,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-
 
 interface Stone {
   id: number;
@@ -92,6 +87,7 @@ const Content: React.FC = () => {
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
   const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const playerIdRef = useRef(telegramUser?.id.toString() || 'anonymous');
 
   useEffect(() => {
     // Initialize Telegram WebApp
@@ -270,11 +266,11 @@ useEffect(() => {
 }, [gameOver, score]);
 
 const database = getDatabase(app);
+
 // Function to update the score in Realtime Database
 const updateScore = useCallback(async () => {
   try {
-    const playerId = telegramUser?.id.toString() || 'anonymous'; 
-    const playerScoresRef = ref(database, `scores/${playerId}`);
+    const playerScoresRef = ref(database, `scores/${playerIdRef.current}`);
 
     // Add the new score to the array
     await update(playerScoresRef, {
@@ -282,17 +278,14 @@ const updateScore = useCallback(async () => {
         score,
         remainingTime,
         timestamp: Date.now(),
-      }
+      },
     });
 
     console.log('Score updated successfully!');
   } catch (error) {
     console.error('Error updating score:', error);
   }
-}, [score, remainingTime, telegramUser, database]);
-
-
-
+}, [score, remainingTime, database]);
 
 return (
   <StyledContent>
