@@ -87,7 +87,6 @@ const Content: React.FC = () => {
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
   const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
-  const playerIdRef = useRef(telegramUser?.id.toString() || 'anonymous');
 
   useEffect(() => {
     // Initialize Telegram WebApp
@@ -266,11 +265,11 @@ useEffect(() => {
 }, [gameOver, score]);
 
 const database = getDatabase(app);
-
 // Function to update the score in Realtime Database
 const updateScore = useCallback(async () => {
   try {
-    const playerScoresRef = ref(database, `scores/${playerIdRef.current}`);
+    const playerId = telegramUser?.id.toString() || 'anonymous'; 
+    const playerScoresRef = ref(database, `/${playerId}`);
 
     // Add the new score to the array
     await update(playerScoresRef, {
@@ -278,14 +277,17 @@ const updateScore = useCallback(async () => {
         score,
         remainingTime,
         timestamp: Date.now(),
-      },
+      }
     });
 
     console.log('Score updated successfully!');
   } catch (error) {
     console.error('Error updating score:', error);
   }
-}, [score, remainingTime, database]);
+}, [score, remainingTime, telegramUser, database]);
+
+
+
 
 return (
   <StyledContent>
