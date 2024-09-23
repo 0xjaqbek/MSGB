@@ -279,7 +279,7 @@ const updateScore = useCallback(async () => {
     const formattedTimestamp = formatDate(Date.now());
 
     // Add the new score to the array
-    await update(playerScoresRef, {
+    await push(playerScoresRef, {
       userName,
       score,
       remainingTime,
