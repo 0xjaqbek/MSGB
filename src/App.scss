@@ -122,24 +122,6 @@ z-index: 20;
 
 }
 
-.top-bar {
-  z-index: 90;
- align-items: top;
-  top: 0;
-  width: 100vw;
-  height: 50px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
-}
-
-.bottom-bar {
-  z-index: 90;
- align-items: bottom;
-  bottom: 0;
-  width: 100vw;
-  height: 50px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
-}
-
 @keyframes animStar {
   from {
     transform: translateY(0px);
