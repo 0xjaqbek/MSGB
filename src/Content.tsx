@@ -280,6 +280,7 @@ const updateScore = useCallback(async () => {
 
     // Add the new score to the array
     await push(playerScoresRef, {
+      [formattedTimestamp]:
       userName,
       score,
       remainingTime,
