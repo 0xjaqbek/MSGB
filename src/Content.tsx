@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes, css } from 'styled-components';
-import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen, TopBar, BottomBar } from './StyledComponents.';
+import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './StyledComponents.';
 import startImage from './start.png';
 import stone1 from './stone1.png';
 import stone2 from './stone2.png';
@@ -296,7 +296,6 @@ const updateScore = useCallback(async () => {
 
 return (
   <StyledContent>
-          <TopBar />
 {/* Blast effect */}
 {showBlast && blastPosition && (
         <Blast 
@@ -358,7 +357,6 @@ return (
         </GameOverScreen>
       </>
     )}
-          <BottomBar />
   </StyledContent>
 )};
 
