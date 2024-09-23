@@ -124,7 +124,7 @@ z-index: 20;
 
 .top-bar {
   z-index: 90;
-
+ align-items: top;
   top: 0;
   width: 100vw;
   height: 50px;
@@ -133,7 +133,7 @@ z-index: 20;
 
 .bottom-bar {
   z-index: 90;
-
+ align-items: bottom;
   bottom: 0;
   width: 100vw;
   height: 50px;
