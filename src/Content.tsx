@@ -269,11 +269,13 @@ const database = getDatabase(app);
 const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
+    const userName = telegramUser?.first_name.toString() || 'anonymous'; 
     const playerScoresRef = ref(database, `/${playerId}`);
 
     // Add the new score to the array
     await update(playerScoresRef, {
       [Date.now()]: { // Use timestamp as key for each score
+        userName,
         score,
         remainingTime,
         timestamp: Date.now(),
