@@ -275,16 +275,18 @@ const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
-    const playerScoresRef = ref(database, `/${playerId}`);
-    const formattedTimestamp = formatDate(Date.now());
+    const playerScoresRef = ref(database, `/${playerId}/scores`);
+    const timestamp = Date.now(); // Use Date.now() as the key
+    const formattedTimestamp = formatDate(timestamp); // Store formatted timestamp in the data
 
     // Add the new score to the array
-    await push(playerScoresRef, {
-      [formattedTimestamp]:
-      userName,
-      score,
-      remainingTime,
-      timestamp: formattedTimestamp,
+    await update(playerScoresRef, {
+      [timestamp]: {  // Use timestamp (number) as key, not the formatted string
+        userName,
+        score,
+        remainingTime,
+        timestamp: formattedTimestamp,  // Store the human-readable timestamp
+      }
     });
 
     console.log('Score updated successfully!');
@@ -292,6 +294,7 @@ const updateScore = useCallback(async () => {
     console.error('Error updating score:', error);
   }
 }, [score, remainingTime, telegramUser, database]);
+
 
 
 
