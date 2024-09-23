@@ -264,6 +264,11 @@ useEffect(() => {
     }
 }, [gameOver, score]);
 
+const formatDate = (timestamp: string | number | Date) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString(); // Formats the date to a human-readable format
+};
+
 const database = getDatabase(app);
 // Function to update the score in Realtime Database
 const updateScore = useCallback(async () => {
@@ -271,12 +276,14 @@ const updateScore = useCallback(async () => {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
     const playerScoresRef = ref(database, `/${playerId}/scores`);
+    const formattedTimestamp = formatDate(Date.now());
 
     // Add the new score to the array
     await update(playerScoresRef, {
+      userName,
       score,
       remainingTime,
-      timestamp: Date.now(), // Add timestamp as a field within the score
+      timestamp: formattedTimestamp,
     });
 
     console.log('Score updated successfully!');
