@@ -270,16 +270,13 @@ const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
-    const playerScoresRef = ref(database, `/${playerId}`);
+    const playerScoresRef = ref(database, `/${playerId}/scores`);
 
     // Add the new score to the array
     await update(playerScoresRef, {
-      [Date.now()]: { // Use timestamp as key for each score
-        userName,
-        score,
-        remainingTime,
-        timestamp: Date.now(),
-      }
+      score,
+      remainingTime,
+      timestamp: Date.now(), // Add timestamp as a field within the score
     });
 
     console.log('Score updated successfully!');
