@@ -275,7 +275,7 @@ const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
-    const playerScoresRef = ref(database, `/${playerId}/scores`);
+    const playerScoresRef = ref(database, `/${playerId}`);
     const formattedTimestamp = formatDate(Date.now());
 
     // Add the new score to the array
