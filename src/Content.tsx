@@ -179,7 +179,7 @@ useEffect(() => {
     else type = 3;
   
     // Adjust speed calculation based on increasing difficulty
-    const baseSpeed = 4 - difficulty * 0.2;  // Increase speed as difficulty increases
+    const baseSpeed = 4 - difficulty * 0.6;  // Increase speed as difficulty increases
     const speed = Math.max(0.5, baseSpeed);  // Ensure minimum speed limit
   
     const newStone: Stone = {
@@ -236,7 +236,7 @@ useEffect(() => {
   useEffect(() => {
     if (isPlaying && !gameOver) {
       const spawnNewStone = () => {
-        const isVertical = Math.random() < 0.5; // 70% chance for vertical stones
+        const isVertical = Math.random() < 0.5; // 50% chance for vertical stones
         const newStone = spawnStone(isVertical ? 'vertical' : 'horizontal');
         setCurrentStones(prev => [...prev, newStone]);
       };
