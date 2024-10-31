@@ -200,8 +200,6 @@ useEffect(() => {
     return newStone;
   }, [difficulty, stoneIdCounter]);
 
-  
-
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (navigator.vibrate) {
       navigator.vibrate(50);
