@@ -8,14 +8,29 @@ export const blinkAnimation = keyframes`
   100% { opacity: 0; }
 `;
 
+// Modified animations with curved paths
 export const moveHorizontalAnimation = keyframes`
-  0% { transform: translateX(var(--startX)) rotate(0deg); }
-  100% { transform: translateX(var(--endX)) rotate(360deg); }
+  0% { 
+    transform: translate(var(--startX), 0) rotate(0deg); 
+  }
+  50% { 
+    transform: translate(calc((var(--startX) + var(--endX)) / 2), var(--curveHeight)) rotate(180deg); 
+  }
+  100% { 
+    transform: translate(var(--endX), 0) rotate(360deg); 
+  }
 `;
 
 export const moveVerticalAnimation = keyframes`
-  0% { transform: translateY(var(--startY)) rotate(0deg); }
-  100% { transform: translateY(var(--endY)) rotate(360deg); }
+  0% { 
+    transform: translate(0, var(--startY)) rotate(0deg); 
+  }
+  50% { 
+    transform: translate(var(--curveWidth), calc((var(--startY) + var(--endY)) / 2)) rotate(180deg); 
+  }
+  100% { 
+    transform: translate(0, var(--endY)) rotate(360deg); 
+  }
 `;
 
 export const imageAnimation = keyframes`
@@ -69,22 +84,26 @@ export const Stone = styled.img<{
   endY?: number;
   posX?: number;
   posY?: number;
+  curveHeight?: number;
+  curveWidth?: number;
 }>`
   position: absolute;
   width: 15vh;
   height: 15vh;
-  animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s linear;
+  animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s cubic-bezier(0.4, 0, 0.6, 1);
   animation-fill-mode: forwards;
   transform-origin: center center;
   ${props => props.direction === 'horizontal'
     ? css`
         --startX: ${props.startX}px;
         --endX: ${props.endX}px;
+        --curveHeight: ${props.curveHeight || 100}px;
         top: ${props.posY}px;
       `
     : css`
         --startY: ${props.startY}px;
         --endY: ${props.endY}px;
+        --curveWidth: ${props.curveWidth || 100}px;
         left: ${props.posX}px;
       `}
 `;
