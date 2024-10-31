@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Stone, TelegramUser } from '../types';
+import { Stone, TelegramUser } from '../types/types';
 import { GAME_DURATION, BLAST_IMAGES } from '../constants/constants';
 import { database } from '../config/firebaseConfig';
 import { ref, update } from 'firebase/database';

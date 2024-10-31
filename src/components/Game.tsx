@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { useGameLogic } from '../hooks/useGameLogic';
-import { GAME_DURATION, STONE_IMAGES, BLAST_IMAGES, START_IMAGE } from '../constants/constants';
+import { useGameLogic } from '@hooks/useGameLogic';
+import { GAME_DURATION, STONE_IMAGES, BLAST_IMAGES, START_IMAGE } from '@constants/constants';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './StyledComponents';
+import { Stone as StoneType, TelegramUser } from '../types/types';
 
 const Game: React.FC = () => {
   const {
