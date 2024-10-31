@@ -1,6 +1,7 @@
+// StyledComponents.ts
 import styled, { keyframes, css } from "styled-components";
 
-// Existing animations
+// Animations
 export const blinkAnimation = keyframes`
   0% { opacity: 0; }
   10% { opacity: 1; }
@@ -8,40 +9,19 @@ export const blinkAnimation = keyframes`
 `;
 
 export const moveHorizontalAnimation = keyframes`
-  0% { 
-    transform: translateX(var(--startX)) rotate(0deg);
-  }
-  100% { 
-    transform: translateX(var(--endX)) rotate(360deg);
-  }
+  0% { transform: translateX(var(--startX)) rotate(0deg); }
+  100% { transform: translateX(var(--endX)) rotate(360deg); }
 `;
 
 export const moveVerticalAnimation = keyframes`
-  0% { 
-    transform: translateY(var(--startY)) rotate(0deg);
-  }
-  100% { 
-    transform: translateY(var(--endY)) rotate(360deg);
-  }
+  0% { transform: translateY(var(--startY)) rotate(0deg); }
+  100% { transform: translateY(var(--endY)) rotate(360deg); }
 `;
 
 export const imageAnimation = keyframes`
   0% { transform: scale(1) translateY(0); }
   50% { transform: scale(0.95) translateY(3%); }
   100% { transform: scale(1) translateY(0); }
-`;
-
-// Enhanced stone rotation animation
-export const rotateAnimation = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
-// Combined movement and rotation animations
-const createCombinedAnimation = (direction: 'horizontal' | 'vertical') => css`
-  animation: 
-    ${direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} var(--duration) linear,
-    ${rotateAnimation} var(--rotation-duration) linear infinite;
 `;
 
 // Styled components
@@ -93,16 +73,9 @@ export const Stone = styled.img<{
   position: absolute;
   width: 15vh;
   height: 15vh;
-  ${props => {
-    const duration = `${props.speed}s`;
-    const rotationDuration = `${props.speed * 0.75}s`; // Rotation is slightly faster than movement
-    return css`
-      --duration: ${duration};
-      --rotation-duration: ${rotationDuration};
-      ${createCombinedAnimation(props.direction)}
-    `;
-  }}
+  animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s linear;
   animation-fill-mode: forwards;
+  transform-origin: center center;
   ${props => props.direction === 'horizontal'
     ? css`
         --startX: ${props.startX}px;
@@ -114,8 +87,6 @@ export const Stone = styled.img<{
         --endY: ${props.endY}px;
         left: ${props.posX}px;
       `}
-  transform-origin: center center;
-  will-change: transform;
 `;
 
 export const Blast = styled.img<{ posX: number; posY: number }>`
