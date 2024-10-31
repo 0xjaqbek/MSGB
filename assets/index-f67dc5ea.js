@@ -1123,23 +1123,23 @@ PERFORMANCE OF THIS SOFTWARE.
   100% { opacity: 0; }
 `,vL=U0`
   0% { 
-    transform: translate(var(--startX), 0) rotate(0deg); 
+    transform: translate(var(--startX), 0) rotate(0deg);
   }
-  50% { 
-    transform: translate(calc((var(--startX) + var(--endX)) / 2), var(--curveHeight)) rotate(180deg); 
+  50% {
+    transform: translate(calc((var(--startX) + var(--endX)) / 2), calc(0px - var(--curve-height))) rotate(180deg);
   }
   100% { 
-    transform: translate(var(--endX), 0) rotate(360deg); 
+    transform: translate(var(--endX), 0) rotate(360deg);
   }
 `,gL=U0`
   0% { 
-    transform: translate(0, var(--startY)) rotate(0deg); 
+    transform: translate(0, var(--startY)) rotate(0deg);
   }
-  50% { 
-    transform: translate(var(--curveWidth), calc((var(--startY) + var(--endY)) / 2)) rotate(180deg); 
+  50% {
+    transform: translate(calc(0px - var(--curve-height)), calc((var(--startY) + var(--endY)) / 2)) rotate(180deg);
   }
   100% { 
-    transform: translate(0, var(--endY)) rotate(360deg); 
+    transform: translate(0, var(--endY)) rotate(360deg);
   }
 `,mL=U0`
   0% { transform: scale(1) translateY(0); }
@@ -1176,20 +1176,20 @@ PERFORMANCE OF THIS SOFTWARE.
   position: absolute;
   width: 15vh;
   height: 15vh;
-  animation: ${e=>e.direction==="horizontal"?vL:gL} ${e=>e.speed}s cubic-bezier(0.4, 0, 0.6, 1);
+  animation: ${e=>e.direction==="horizontal"?vL:gL} ${e=>e.speed}s linear;
   animation-fill-mode: forwards;
   transform-origin: center center;
-  ${e=>e.direction==="horizontal"?gs`
-        --startX: ${e.startX}px;
-        --endX: ${e.endX}px;
-        --curveHeight: ${e.curveHeight||100}px;
-        top: ${e.posY}px;
-      `:gs`
-        --startY: ${e.startY}px;
-        --endY: ${e.endY}px;
-        --curveWidth: ${e.curveWidth||100}px;
-        left: ${e.posX}px;
-      `}
+  ${e=>{const t=e.curveHeight||Math.random()*200+100;return e.direction==="horizontal"?gs`
+          --startX: ${e.startX}px;
+          --endX: ${e.endX}px;
+          --curve-height: ${t}px;
+          top: ${e.posY}px;
+        `:gs`
+          --startY: ${e.startY}px;
+          --endY: ${e.endY}px;
+          --curve-height: ${t}px;
+          left: ${e.posX}px;
+        `}}
 `,xL=to.img`
   position: absolute;
   width: 15vh;
