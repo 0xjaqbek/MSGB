@@ -135,7 +135,7 @@ useEffect(() => {
       });
 
       // Increase difficulty over time
-      setDifficulty((prevDifficulty) => prevDifficulty + 0.05); // Gradually increase difficulty
+      setDifficulty((prevDifficulty) => prevDifficulty + 0.03); // Gradually increase difficulty
     }, 1000); // Reduce time every second
 
     return () => clearInterval(timer);
