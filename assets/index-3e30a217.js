@@ -1179,17 +1179,15 @@ PERFORMANCE OF THIS SOFTWARE.
   animation: ${e=>e.direction==="horizontal"?vL:gL} ${e=>e.speed}s linear;
   animation-fill-mode: forwards;
   transform-origin: center center;
-  ${e=>{const t=e.curveHeight||Math.random()*200+100;return e.direction==="horizontal"?gs`
-          --startX: ${e.startX}px;
-          --endX: ${e.endX}px;
-          --curve-height: ${t}px;
-          top: ${e.posY}px;
-        `:gs`
-          --startY: ${e.startY}px;
-          --endY: ${e.endY}px;
-          --curve-height: ${t}px;
-          left: ${e.posX}px;
-        `}}
+  ${e=>e.direction==="horizontal"?gs`
+        --startX: ${e.startX}px;
+        --endX: ${e.endX}px;
+        top: ${e.posY}px;
+      `:gs`
+        --startY: ${e.startY}px;
+        --endY: ${e.endY}px;
+        left: ${e.posX}px;
+      `}
 `,xL=to.img`
   position: absolute;
   width: 15vh;
