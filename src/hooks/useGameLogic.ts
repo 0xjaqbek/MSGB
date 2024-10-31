@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Stone, TelegramUser } from './types';
-import { BLAST_IMAGES, GAME_DURATION } from './constants';
-import { database } from './firebaseConfig';
+import { Stone, TelegramUser } from '../types';
+import { GAME_DURATION, BLAST_IMAGES } from '../constants/constants';
+import { database } from '../config/firebaseConfig';
 import { ref, update } from 'firebase/database';
-import { formatDate } from './firebaseConfig';
+import { formatDate } from '../config/firebaseConfig';
 
 export const useGameLogic = () => {
     const [showBlink, setShowBlink] = useState(false);

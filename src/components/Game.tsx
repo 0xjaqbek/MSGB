@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useGameLogic } from './useGameLogic';
-import { GAME_DURATION, STONE_IMAGES, START_IMAGE } from './constants';
+import { useGameLogic } from '../hooks/useGameLogic';
+import { GAME_DURATION, STONE_IMAGES, BLAST_IMAGES, START_IMAGE } from '../constants/constants';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './StyledComponents';
 
 const Game: React.FC = () => {
@@ -130,24 +130,24 @@ const Game: React.FC = () => {
         </ScoreBoard>
       )}
 
-{isPlaying && !gameOver && currentStones.map((stone) => (
-    <Stone
-      key={`stone-${stone.id}`}
-      id={`stone-${stone.id}`}
-      src={STONE_IMAGES[`stone${stone.type + 1}` as keyof typeof STONE_IMAGES]}
-      alt={`Stone ${stone.type + 1}`}
-      speed={stone.speed}
-      startX={stone.startX}
-      endX={stone.endX}
-      startY={stone.startY}
-      endY={stone.endY}
-      posX={stone.posX}
-      posY={stone.posY}
-      direction={stone.direction}
-      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
-      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-    />
-  ))}
+      {isPlaying && !gameOver && currentStones.map((stone) => (
+        <Stone
+          key={`stone-${stone.id}`}
+          id={`stone-${stone.id}`}
+          src={STONE_IMAGES[`stone${stone.type + 1}` as keyof typeof STONE_IMAGES]}
+          alt={`Stone ${stone.type + 1}`}
+          speed={stone.speed}
+          startX={stone.startX}
+          endX={stone.endX}
+          startY={stone.startY}
+          endY={stone.endY}
+          posX={stone.posX}
+          posY={stone.posY}
+          direction={stone.direction}
+          onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+          onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+        />
+      ))}
 
       {gameOver && (
         <GameOverScreen>

@@ -1,8 +1,6 @@
-// StyledComponents.ts
 import styled, { keyframes, css } from "styled-components";
 
-
-// Animations
+// Existing animations
 export const blinkAnimation = keyframes`
   0% { opacity: 0; }
   10% { opacity: 1; }
@@ -10,19 +8,40 @@ export const blinkAnimation = keyframes`
 `;
 
 export const moveHorizontalAnimation = keyframes`
-  0% { transform: translateX(var(--startX)); }
-  100% { transform: translateX(var(--endX)); }
+  0% { 
+    transform: translateX(var(--startX)) rotate(0deg);
+  }
+  100% { 
+    transform: translateX(var(--endX)) rotate(360deg);
+  }
 `;
 
 export const moveVerticalAnimation = keyframes`
-  0% { transform: translateY(var(--startY)); }
-  100% { transform: translateY(var(--endY)); }
+  0% { 
+    transform: translateY(var(--startY)) rotate(0deg);
+  }
+  100% { 
+    transform: translateY(var(--endY)) rotate(360deg);
+  }
 `;
 
 export const imageAnimation = keyframes`
   0% { transform: scale(1) translateY(0); }
   50% { transform: scale(0.95) translateY(3%); }
   100% { transform: scale(1) translateY(0); }
+`;
+
+// Enhanced stone rotation animation
+export const rotateAnimation = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+// Combined movement and rotation animations
+const createCombinedAnimation = (direction: 'horizontal' | 'vertical') => css`
+  animation: 
+    ${direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} var(--duration) linear,
+    ${rotateAnimation} var(--rotation-duration) linear infinite;
 `;
 
 // Styled components
@@ -61,15 +80,42 @@ export const StartButton = styled.img<{ isClicked: boolean }>`
     : css`animation: ${imageAnimation} 2s infinite;`}
 `;
 
-export const Stone = styled.img<{ speed: number; direction: 'horizontal' | 'vertical'; startX?: number; startY?: number; endX?: number; endY?: number; posX?: number; posY?: number; }>`
+export const Stone = styled.img<{
+  speed: number;
+  direction: 'horizontal' | 'vertical';
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  posX?: number;
+  posY?: number;
+}>`
   position: absolute;
   width: 15vh;
   height: 15vh;
-  animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s linear;
+  ${props => {
+    const duration = `${props.speed}s`;
+    const rotationDuration = `${props.speed * 0.75}s`; // Rotation is slightly faster than movement
+    return css`
+      --duration: ${duration};
+      --rotation-duration: ${rotationDuration};
+      ${createCombinedAnimation(props.direction)}
+    `;
+  }}
   animation-fill-mode: forwards;
   ${props => props.direction === 'horizontal'
-    ? css`--startX: ${props.startX}px; --endX: ${props.endX}px; top: ${props.posY}px;`
-    : css`--startY: ${props.startY}px; --endY: ${props.endY}px; left: ${props.posX}px;`}
+    ? css`
+        --startX: ${props.startX}px;
+        --endX: ${props.endX}px;
+        top: ${props.posY}px;
+      `
+    : css`
+        --startY: ${props.startY}px;
+        --endY: ${props.endY}px;
+        left: ${props.posX}px;
+      `}
+  transform-origin: center center;
+  will-change: transform;
 `;
 
 export const Blast = styled.img<{ posX: number; posY: number }>`

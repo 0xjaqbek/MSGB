@@ -2,7 +2,7 @@ import "./App.scss";
 import styled from "styled-components";
 import { useTonConnect } from "./hooks/useTonConnect";
 import "@twa-dev/sdk";
-import Content from "./Game"; 
+import Content from "./components/Game"; 
 
 const StyledApp = styled.div`
   max-width: 100vw;
