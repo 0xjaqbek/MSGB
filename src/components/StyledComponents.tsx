@@ -8,29 +8,14 @@ export const blinkAnimation = keyframes`
   100% { opacity: 0; }
 `;
 
-// Modified to create parabolic motion
 export const moveHorizontalAnimation = keyframes`
-  0% { 
-    transform: translate(var(--startX), 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(calc((var(--startX) + var(--endX)) / 2), calc(0px - var(--curve-height))) rotate(180deg);
-  }
-  100% { 
-    transform: translate(var(--endX), 0) rotate(360deg);
-  }
+  0% { transform: translateX(var(--startX)) rotate(0deg); }
+  100% { transform: translateX(var(--endX)) rotate(360deg); }
 `;
 
 export const moveVerticalAnimation = keyframes`
-  0% { 
-    transform: translate(0, var(--startY)) rotate(0deg);
-  }
-  50% {
-    transform: translate(calc(0px - var(--curve-height)), calc((var(--startY) + var(--endY)) / 2)) rotate(180deg);
-  }
-  100% { 
-    transform: translate(0, var(--endY)) rotate(360deg);
-  }
+  0% { transform: translateY(var(--startY)) rotate(0deg); }
+  100% { transform: translateY(var(--endY)) rotate(360deg); }
 `;
 
 export const imageAnimation = keyframes`
