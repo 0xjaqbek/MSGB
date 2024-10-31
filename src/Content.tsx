@@ -23,6 +23,41 @@ const firebaseConfig = {
   appId: "1:645616414210:web:236885687711d65c45011b",
 };
 
+// Define the rotation keyframes
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+// Define the curved path keyframes for both directions
+const curvedPathHorizontal = keyframes`
+  0% {
+    transform: translate(var(--startX), var(--startY)) rotate(0deg);
+  }
+  50% {
+    transform: translate(calc((var(--startX) + var(--endX)) / 2), calc(var(--startY) + var(--amplitude))) rotate(180deg);
+  }
+  100% {
+    transform: translate(var(--endX), var(--startY)) rotate(360deg);
+  }
+`;
+
+const curvedPathVertical = keyframes`
+  0% {
+    transform: translate(var(--posX), var(--startY)) rotate(0deg);
+  }
+  50% {
+    transform: translate(calc(var(--posX) + var(--amplitude)), calc((var(--startY) + var(--endY)) / 2)) rotate(180deg);
+  }
+  100% {
+    transform: translate(var(--posX), var(--endY)) rotate(360deg);
+  }
+`;
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -37,6 +72,7 @@ interface Stone {
   posX?: number;
   posY?: number;
   direction: 'horizontal' | 'vertical';
+  amplitude: number; // Added for curved trajectory
 }
 
 type TelegramUser = {
@@ -154,51 +190,80 @@ useEffect(() => {
     }
   }, [gameOver, score]);
 
-  const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+  // Enhanced Stone component with rotation and curved path
+const StoneImage = styled.img<{
+  speed: number;
+  startX?: number;
+  endX?: number;
+  startY?: number;
+  endY?: number;
+  posX?: number;
+  posY?: number;
+  direction: 'horizontal' | 'vertical';
+  amplitude: number;
+}>`
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  ${({ direction, speed, startX, endX, startY, endY, posX, posY, amplitude }) => {
+    const animationName = direction === 'horizontal' ? curvedPathHorizontal : curvedPathVertical;
+    const duration = `${speed}s`;
+    
+    return css`
+      --startX: ${startX}px;
+      --endX: ${endX}px;
+      --startY: ${startY}px;
+      --endY: ${endY}px;
+      --posX: ${posX}px;
+      --amplitude: ${amplitude}px;
+      animation: ${animationName} ${duration} linear;
+    `;
+  }}
+`;
+
+const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
   
-    let startX, endX, startY, endY, posX, posY;
+  let startX, endX, startY, endY, posX, posY;
+  const amplitude = Math.random() * 200 - 100; // Random amplitude between -100 and 100 pixels
   
-    if (direction === 'horizontal') {
-      const startLeft = Math.random() < 0.5;
-      startX = startLeft ? -500 : screenWidth;
-      endX = startLeft ? screenWidth : -screenWidth;
-      posY = Math.random() * (screenHeight - 50);
-    } else {
-      startY = -500;
-      endY = screenHeight;
-      posX = Math.random() * (screenWidth - 50);
-    }
+  if (direction === 'horizontal') {
+    const startLeft = Math.random() < 0.5;
+    startX = startLeft ? -50 : screenWidth;
+    endX = startLeft ? screenWidth : -50;
+    posY = Math.random() * (screenHeight - 50);
+  } else {
+    startY = -50;
+    endY = screenHeight;
+    posX = Math.random() * (screenWidth - 50);
+  }
   
-    const typeRandom = Math.random();
-    let type;
-    if (typeRandom < 0.3) type = 0;      
-    else if (typeRandom < 0.55) type = 1; 
-    else if (typeRandom < 0.75) type = 2; 
-    else type = 3;
+  const typeRandom = Math.random();
+  let type;
+  if (typeRandom < 0.3) type = 0;      
+  else if (typeRandom < 0.55) type = 1; 
+  else if (typeRandom < 0.75) type = 2; 
+  else type = 3;
   
-    // Adjust speed calculation based on increasing difficulty
-    const baseSpeed = 4 - difficulty * 0.3;  // Increase speed as difficulty increases
-    const speed = Math.max(0.5, baseSpeed);  // Ensure minimum speed limit
+  const baseSpeed = 4 - difficulty * 0.3;
+  const speed = Math.max(0.5, baseSpeed);
   
-    const newStone: Stone = {
-      id: stoneIdCounter,
-      type,
-      speed,
-      startX,
-      endX,
-      startY,
-      endY,
-      posX,
-      posY,
-      direction,
-    };
-  
-    setStoneIdCounter((prev) => prev + 1);
-  
-    return newStone;
-  }, [difficulty, stoneIdCounter]);
+  return {
+    id: stoneIdCounter,
+    type,
+    speed,
+    startX,
+    endX,
+    startY,
+    endY,
+    posX,
+    posY,
+    direction,
+    amplitude,
+  };
+}, [difficulty, stoneIdCounter]);
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
     if (navigator.vibrate) {
@@ -337,23 +402,24 @@ return (
         </ScoreBoard>
       )}
 {isPlaying && !gameOver && currentStones.map((stone) => (
-    <Stone
-      key={`stone-${stone.id}`}
-      id={`stone-${stone.id}`}
-      src={[stone1, stone2, stone3, stone4][stone.type]}
-      alt={`Stone ${stone.type + 1}`}
-      speed={stone.speed}
-      startX={stone.startX}
-      endX={stone.endX}
-      startY={stone.startY}
-      endY={stone.endY}
-      posX={stone.posX}
-      posY={stone.posY}
-      direction={stone.direction}
-      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
-      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-    />
-  ))}
+  <StoneImage
+    key={`stone-${stone.id}`}
+    id={`stone-${stone.id}`}
+    src={[stone1, stone2, stone3, stone4][stone.type]}
+    alt={`Stone ${stone.type + 1}`}
+    speed={stone.speed}
+    startX={stone.startX}
+    endX={stone.endX}
+    startY={stone.startY}
+    endY={stone.endY}
+    posX={stone.posX}
+    posY={stone.posY}
+    direction={stone.direction}
+    amplitude={stone.amplitude}
+    onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+    onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+  />
+))}
 
     {gameOver && (
       <>
