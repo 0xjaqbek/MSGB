@@ -84,7 +84,6 @@ export const Stone = styled.img<{
   endY?: number;
   posX?: number;
   posY?: number;
-  curveHeight?: number;
 }>`
   position: absolute;
   width: 15vh;
@@ -92,22 +91,17 @@ export const Stone = styled.img<{
   animation: ${props => props.direction === 'horizontal' ? moveHorizontalAnimation : moveVerticalAnimation} ${props => props.speed}s linear;
   animation-fill-mode: forwards;
   transform-origin: center center;
-  ${props => {
-    const curveHeight = props.curveHeight || Math.random() * 200 + 100; // Random curve height between 100 and 300
-    return props.direction === 'horizontal'
-      ? css`
-          --startX: ${props.startX}px;
-          --endX: ${props.endX}px;
-          --curve-height: ${curveHeight}px;
-          top: ${props.posY}px;
-        `
-      : css`
-          --startY: ${props.startY}px;
-          --endY: ${props.endY}px;
-          --curve-height: ${curveHeight}px;
-          left: ${props.posX}px;
-        `
-  }}
+  ${props => props.direction === 'horizontal'
+    ? css`
+        --startX: ${props.startX}px;
+        --endX: ${props.endX}px;
+        top: ${props.posY}px;
+      `
+    : css`
+        --startY: ${props.startY}px;
+        --endY: ${props.endY}px;
+        left: ${props.posX}px;
+      `}
 `;
 
 export const Blast = styled.img<{ posX: number; posY: number }>`
