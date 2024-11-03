@@ -54,7 +54,7 @@ const StyledLanding = styled.div<StyledLandingProps>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0);
   z-index: 1000;
   transition: opacity 0.5s ease-in-out;
   opacity: ${props => props.$show ? 1 : 0};
