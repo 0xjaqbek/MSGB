@@ -103,6 +103,7 @@ function App() {
       {showLanding && (
         <LandingPage $fadeOut={fadeOut} $hidden={hidden}>
           <h1>Welcome to MoonStones</h1>
+          <h2>Daily check in info</h2>
           <p>Enter to explore the amazing cosmic space.</p>
           <button onClick={handleEnterClick}>Enter App</button>
         </LandingPage>
