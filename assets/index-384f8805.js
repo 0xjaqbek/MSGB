@@ -2694,7 +2694,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0);
   z-index: 1000;
   transition: opacity 0.5s ease-in-out;
   opacity: ${e=>e.$show?1:0};
