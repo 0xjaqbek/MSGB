@@ -109,13 +109,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart }) => {
   return (
     <StyledLanding $show={show}>
       <WelcomeText>
-        Welcome to
+        Welcome back/to
         <span>MoonStones</span>
         {telegramUser && (
           <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
             {telegramUser.first_name}
           </div>
+          
         )}
+        in day X 
       </WelcomeText>
       <StartButton onClick={handleStart}>
         Start Journey
