@@ -315,7 +315,7 @@ return (
 
     {!isPlaying && telegramUser && (
       <WelcomeInfo className="scoreboard">
-        Welcome<br></br> {telegramUser.first_name}<br />in<br />
+
       </WelcomeInfo>
     )}
     {!isPlaying && !telegramUser && (
