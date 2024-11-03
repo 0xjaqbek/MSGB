@@ -2730,7 +2730,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     transform: scale(1.05);
     box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);
   }
-`,cj=({telegramUser:e,onStart:t})=>{const[r,n]=vt.useState(!0),o=()=>{n(!1),setTimeout(()=>{t()},500)};return is(lj,{$show:r,children:[is(uj,{children:["Welcome to",Cr("span",{children:"MoonStones"}),e&&Cr("div",{style:{fontSize:"1.8rem",marginTop:"1rem"},children:e.first_name})]}),Cr(fj,{onClick:o,children:"Start Journey"})]})},hj=Zn.div`
+`,cj=({telegramUser:e,onStart:t})=>{const[r,n]=vt.useState(!0),o=()=>{n(!1),setTimeout(()=>{t()},500)};return is(lj,{$show:r,children:[is(uj,{children:["Welcome back/to",Cr("span",{children:"MoonStones"}),e&&Cr("div",{style:{fontSize:"1.8rem",marginTop:"1rem"},children:e.first_name}),"in day X"]}),Cr(fj,{onClick:o,children:"Start Journey"})]})},hj=Zn.div`
   max-width: 100vw;
   min-height: 100vh;
 `;function dj(){pL();const[e,t]=vt.useState(!0),[r,n]=vt.useState(null);return vt.useEffect(()=>{var s,a;const i=(s=window.Telegram)==null?void 0:s.WebApp;if(i){i.ready(),i.expand();const u=(a=i.initDataUnsafe)==null?void 0:a.user;u&&n(u)}},[]),is(hj,{children:[is("div",{className:"bg-animation",children:[Cr("div",{id:"stars"}),Cr("div",{id:"stars2"}),Cr("div",{id:"stars3"}),Cr("div",{id:"stars4"})]}),e&&Cr(cj,{telegramUser:r,onStart:()=>{t(!1)}}),!e&&Cr(sj,{})]})}const pj="https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/tonconnect-manifest.json",vj=new zS({defaultOptions:{queries:{refetchOnWindowFocus:!1}}});D2.createRoot(document.getElementById("root")).render(Cr(pN,{manifestUrl:pj,children:Cr(XE,{client:vj,children:Cr(dj,{})})}));
