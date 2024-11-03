@@ -104,9 +104,9 @@ const Content: React.FC = () => {
       }
 
       // Set up Telegram's main button
-     // tg.MainButton.text = "Start Game";
-     // tg.MainButton.onClick(() => handleStartClick());
-     // tg.MainButton.show();
+      tg.MainButton.text = "Start Game";
+      tg.MainButton.onClick(() => handleStartClick());
+      tg.MainButton.show();
     }
   }, []);
 
