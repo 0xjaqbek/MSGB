@@ -7,33 +7,32 @@ export interface UserVisit {
   totalVisits: number;
   dailyVisits: { [key: string]: number };
   firstVisitComplete: boolean;
-  playsToday: number;  // Number of plays used today
-  maxPlaysToday: number;  // Max plays allowed today
+}
+
+export interface VisitHistoryEntry {
+  timestamp: string;
+  userName: string;
+  streak: number;
 }
 
 export interface VisitStats extends UserVisit {
   isNewDay: boolean;
   isFirstVisit: boolean;
   todayVisits: number;
-  playsRemaining: number;  // Remaining plays for today
 }
-
-export const calculateMaxPlays = (streak: number): number => {
-  return 5 + (streak - 1); // 5 plays for day 1, +1 for each streak day
-};
 
 export const trackUserVisit = async (userId: string, userName: string): Promise<VisitStats> => {
   const db = getDatabase();
   const userVisitsRef = ref(db, `users/${userId}/visits`);
   
   try {
+    // Get current visit data
     const snapshot = await get(userVisitsRef);
     const now = new Date();
-    const today = now.toISOString().split('T')[0];
+    const today = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
     
     if (!snapshot.exists()) {
       // First time user ever
-      const maxPlays = calculateMaxPlays(1);
       const initialVisit: UserVisit = {
         lastVisit: today,
         currentStreak: 1,
@@ -42,9 +41,7 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
         dailyVisits: {
           [today]: 1
         },
-        firstVisitComplete: false,
-        playsToday: 0,
-        maxPlaysToday: maxPlays
+        firstVisitComplete: false
       };
       
       await set(userVisitsRef, initialVisit);
@@ -52,14 +49,15 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
         ...initialVisit, 
         isNewDay: true, 
         isFirstVisit: true,
-        todayVisits: 1,
-        playsRemaining: maxPlays
+        todayVisits: 1
       };
     }
     
     const userData = snapshot.val() as UserVisit;
     const lastVisitDate = new Date(userData.lastVisit);
     const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
+    
+    // Check if this is a new day
     const isNewDay = today !== lastVisitDay;
     
     // Calculate days between visits for streak
@@ -70,18 +68,15 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     let newStreak = userData.currentStreak;
     
     if (isNewDay) {
+      // If last visit was yesterday, increment streak
       if (daysSinceLastVisit === 1) {
         newStreak = userData.currentStreak + 1;
-      } else if (daysSinceLastVisit > 1) {
+      } 
+      // If more than 1 day has passed, reset streak
+      else if (daysSinceLastVisit > 1) {
         newStreak = 1;
       }
     }
-    
-    // Calculate new max plays based on streak
-    const maxPlays = calculateMaxPlays(newStreak);
-    
-    // Reset plays for new day or keep current count
-    const playsToday = isNewDay ? 0 : userData.playsToday;
     
     // Update daily visits count
     const dailyVisits = { ...userData.dailyVisits };
@@ -91,20 +86,19 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       lastVisit: today,
       currentStreak: newStreak,
       highestStreak: Math.max(newStreak, userData.highestStreak),
-      totalVisits: userData.totalVisits + 1,
+      totalVisits: userData.totalVisits + 1, // Increment on every visit
       dailyVisits,
-      firstVisitComplete: true,
-      playsToday,
-      maxPlaysToday: maxPlays
+      firstVisitComplete: true
     };
     
     // Update visit history
     const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${now.getTime()}`);
-    await set(visitHistoryRef, {
+    const historyEntry: VisitHistoryEntry = {
       timestamp: now.toISOString(),
       userName: userName,
       streak: newStreak
-    });
+    };
+    await set(visitHistoryRef, historyEntry);
     
     await set(userVisitsRef, updatedVisit);
     
@@ -112,36 +106,10 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       ...updatedVisit,
       isNewDay,
       isFirstVisit: !userData.firstVisitComplete,
-      todayVisits: dailyVisits[today],
-      playsRemaining: maxPlays - playsToday
+      todayVisits: dailyVisits[today]
     };
   } catch (error) {
     console.error('Error tracking user visit:', error);
-    throw error;
-  }
-};
-
-export const updatePlaysCount = async (userId: string): Promise<number> => {
-  const db = getDatabase();
-  const userVisitsRef = ref(db, `users/${userId}/visits`);
-  
-  try {
-    const snapshot = await get(userVisitsRef);
-    if (!snapshot.exists()) {
-      throw new Error('User not found');
-    }
-    
-    const userData = snapshot.val() as UserVisit;
-    const newPlaysCount = userData.playsToday + 1;
-    
-    await set(userVisitsRef, {
-      ...userData,
-      playsToday: newPlaysCount
-    });
-    
-    return userData.maxPlaysToday - newPlaysCount;
-  } catch (error) {
-    console.error('Error updating plays count:', error);
     throw error;
   }
 };
@@ -162,8 +130,7 @@ export const getUserVisitStats = async (userId: string): Promise<VisitStats | nu
       ...userData,
       isNewDay: today !== userData.lastVisit,
       isFirstVisit: !userData.firstVisitComplete,
-      todayVisits: userData.dailyVisits[today] || 0,
-      playsRemaining: userData.maxPlaysToday - userData.playsToday
+      todayVisits: userData.dailyVisits[today] || 0
     };
   } catch (error) {
     console.error('Error getting user visit stats:', error);
