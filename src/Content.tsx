@@ -77,7 +77,15 @@ interface UserVisit {
   lastVisit: string;
   currentStreak: number;
   highestStreak: number;
-  visits: number;
+  totalVisits: number;  // Renamed from visits to be more clear
+  dailyVisits: { [key: string]: number };  // Track visits per day
+  firstVisitComplete: boolean;
+}
+
+interface VisitHistoryEntry {
+  timestamp: string;
+  userName: string;
+  streak: number;
 }
 
 export const trackUserVisit = async (userId: string, userName: string) => {
@@ -91,57 +99,77 @@ export const trackUserVisit = async (userId: string, userName: string) => {
     const today = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
     
     if (!snapshot.exists()) {
-      // First time user
+      // First time user ever
       const initialVisit: UserVisit = {
         lastVisit: today,
         currentStreak: 1,
         highestStreak: 1,
-        visits: 1
+        totalVisits: 1,
+        dailyVisits: {
+          [today]: 1
+        },
+        firstVisitComplete: false
       };
       
       await set(userVisitsRef, initialVisit);
-      return initialVisit;
+      return { ...initialVisit, isNewDay: true, isFirstVisit: true };
     }
     
     const userData = snapshot.val() as UserVisit;
     const lastVisitDate = new Date(userData.lastVisit);
+    const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
+    
+    // Check if this is a new day
+    const isNewDay = today !== lastVisitDay;
+    
+    // Calculate days between visits for streak
     const daysSinceLastVisit = Math.floor(
       (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
     );
     
     let newStreak = userData.currentStreak;
     
-    // If last visit was yesterday, increment streak
-    if (daysSinceLastVisit === 1) {
-      newStreak = userData.currentStreak + 1;
-    } 
-    // If last visit was today, don't change streak
-    else if (daysSinceLastVisit === 0) {
-      newStreak = userData.currentStreak;
+    if (isNewDay) {
+      // If last visit was yesterday, increment streak
+      if (daysSinceLastVisit === 1) {
+        newStreak = userData.currentStreak + 1;
+      } 
+      // If more than 1 day has passed, reset streak
+      else if (daysSinceLastVisit > 1) {
+        newStreak = 1;
+      }
     }
-    // If more than 1 day has passed, reset streak
-    else {
-      newStreak = 1;
-    }
+    
+    // Update daily visits count
+    const dailyVisits = { ...userData.dailyVisits };
+    dailyVisits[today] = (dailyVisits[today] || 0) + 1;
     
     const updatedVisit: UserVisit = {
       lastVisit: today,
       currentStreak: newStreak,
       highestStreak: Math.max(newStreak, userData.highestStreak),
-      visits: userData.visits + (daysSinceLastVisit === 0 ? 0 : 1)
+      totalVisits: userData.totalVisits + 1, // Increment on every visit
+      dailyVisits,
+      firstVisitComplete: true
     };
     
-    await set(userVisitsRef, updatedVisit);
-    
-    // Store visit history
-    const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${today}`);
-    await set(visitHistoryRef, {
+    // Update visit history
+    const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${now.getTime()}`);
+    const historyEntry: VisitHistoryEntry = {
       timestamp: now.toISOString(),
       userName: userName,
       streak: newStreak
-    });
+    };
+    await set(visitHistoryRef, historyEntry);
     
-    return updatedVisit;
+    await set(userVisitsRef, updatedVisit);
+    
+    return {
+      ...updatedVisit,
+      isNewDay,
+      isFirstVisit: !userData.firstVisitComplete,
+      todayVisits: dailyVisits[today]
+    };
   } catch (error) {
     console.error('Error tracking user visit:', error);
     throw error;
