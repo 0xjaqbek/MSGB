@@ -475,17 +475,29 @@ return (
     <BlinkScreen isVisible={showBlink} />
 
     {!isPlaying && telegramUser && userVisitStats && (
-        <WelcomeInfo className="scoreboard">
-          <PlaysInfoContainer>
-            <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
-            {userStreak > 1 && (
-              <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-                +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-              </div>
-            )}
-          </PlaysInfoContainer>
-        </WelcomeInfo>
+  <WelcomeInfo className="scoreboard">
+    <div style={{ 
+      position: 'absolute', 
+      top: '-60px', 
+      left: '50%', 
+      transform: 'translateX(-50%)',
+      color: '#88c8ff',
+      textAlign: 'center',
+      fontSize: '1.2rem',
+      textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
+      background: 'rgba(0, 0, 0, 0.6)',
+      padding: '0.5rem 1rem',
+      borderRadius: '15px',
+    }}>
+      <div>🎮 {userVisitStats.playsRemaining} of {userVisitStats.maxPlaysToday} plays remaining</div>
+      {userVisitStats.currentStreak > 1 && (
+        <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+          +{userVisitStats.currentStreak - 1} bonus {userVisitStats.currentStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+        </div>
       )}
+    </div>
+  </WelcomeInfo>
+)}
 
     {/* Rest of your existing JSX */}
     {!isPlaying && !telegramUser && (
