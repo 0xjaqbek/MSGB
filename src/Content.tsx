@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styled, { keyframes, css } from 'styled-components';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './components/StyledComponents';
 import startImage from './assets/start.png';
@@ -91,7 +90,7 @@ interface VisitHistoryEntry {
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
-  top: 40%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -102,6 +101,7 @@ const PlaysInfoContainer = styled.div`
   padding: 0.5rem 1rem;
   border-radius: 15px;
   z-index: 1000;
+  pointer-events: none;
 `;
 
 // New interfaces for plays tracking
@@ -461,7 +461,6 @@ const updateScore = useCallback(async () => {
 
 return (
   <StyledContent>
-    {/* Existing blast effect */}
     {showBlast && blastPosition && (
       <Blast 
         key={currentBlastImage}
@@ -471,7 +470,6 @@ return (
       />
     )}
     
-    {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
 
     {!isPlaying && telegramUser && (
@@ -496,31 +494,12 @@ return (
         />
       </>
     )}
-// Update your WelcomeInfo rendering to show plays info:
-{!isPlaying && telegramUser && userVisitStats && (
-  <WelcomeInfo className="scoreboard">
-    <div style={{ 
-      position: 'absolute', 
-      top: '-60px', 
-      left: '50%', 
-      transform: 'translateX(-50%)',
-      color: '#88c8ff',
-      textAlign: 'center',
-      fontSize: '1.2rem',
-      textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
-      background: 'rgba(0, 0, 0, 0.6)',
-      padding: '0.5rem 1rem',
-      borderRadius: '15px',
-    }}>
-      <div>🎮 {userVisitStats.playsRemaining} of {userVisitStats.maxPlaysToday} plays remaining</div>
-      {userVisitStats.currentStreak > 1 && (
-        <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-          +{userVisitStats.currentStreak - 1} bonus {userVisitStats.currentStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-        </div>
-      )}
-    </div>
-  </WelcomeInfo>
-)}
+
+    {!isPlaying && !telegramUser && (
+      <WelcomeInfo className="scoreboard">
+        Welcome<br/>in
+      </WelcomeInfo>
+    )}
     {!isPlaying && (
       <StartButton
         src={startImage}
