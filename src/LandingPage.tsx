@@ -1,29 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { keyframes } from 'styled-components';
-
-// Type definitions
-type TelegramUser = {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-  is_premium?: boolean;
-};
+import React, { useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { TelegramUser } from './types';
 
 interface LandingPageProps {
-    telegramUser: TelegramUser | null;
-    onStart: () => void;
-    userStats: {
-      currentStreak: number;
-      highestStreak: number;
-      visits: number;
-    } | null;
-  }
-
-interface StyledLandingProps {
-  $show: boolean;
+  telegramUser: TelegramUser | null;
+  onStart: () => void;
+  userStats: {
+    currentStreak: number;
+    highestStreak: number;
+    visits: number;
+  } | null;
 }
 
 const fadeIn = keyframes`
@@ -38,18 +24,12 @@ const fadeIn = keyframes`
 `;
 
 const float = keyframes`
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
 `;
 
-const StyledLanding = styled.div<StyledLandingProps>`
+const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -82,6 +62,29 @@ const WelcomeText = styled.div`
   }
 `;
 
+const FirstVisitInfo = styled.div`
+  color: #fff;
+  font-size: 1.2rem;
+  text-align: center;
+  max-width: 80%;
+  margin: 1rem auto;
+  animation: ${fadeIn} 1s ease-out 0.3s backwards;
+  line-height: 1.5;
+
+  .highlight {
+    color: #88c8ff;
+    font-weight: bold;
+  }
+`;
+
+const StatsContainer = styled.div`
+  color: #88c8ff;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  text-align: center;
+  animation: ${fadeIn} 1s ease-out 0.7s backwards;
+`;
+
 const StartButton = styled.button`
   background: transparent;
   border: 2px solid #88c8ff;
@@ -92,6 +95,7 @@ const StartButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   animation: ${fadeIn} 1s ease-out 0.5s backwards;
+  margin-top: 2rem;
 
   &:hover {
     background: #88c8ff;
@@ -101,50 +105,67 @@ const StartButton = styled.button`
   }
 `;
 
-  
-const StatsContainer = styled.div`
-color: #88c8ff;
-font-size: 1.2rem;
-margin-top: 1rem;
-text-align: center;
-animation: ${fadeIn} 1s ease-out 0.7s backwards;
-`;
-
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userStats }) => {
-    const [show, setShow] = useState(true);
-  
-    const handleStart = () => {
-      setShow(false);
-      setTimeout(() => {
-        onStart();
-      }, 500);
-    };
-  
-    return (
-      <StyledLanding $show={show}>
-        <WelcomeText>
-          Welcome back to
-          <span>MoonStones</span>
-          {telegramUser && (
-            <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
-              {telegramUser.first_name}
-            </div>
-          )}
-        </WelcomeText>
-        
-        {userStats && (
-          <StatsContainer>
-            <div>🔥 Current Streak: {userStats.currentStreak} days</div>
-            <div>⭐ Highest Streak: {userStats.highestStreak} days</div>
-            <div>🎮 Total Visits: {userStats.visits}</div>
-          </StatsContainer>
-        )}
-        
-        <StartButton onClick={handleStart}>
-          Start Journey
-        </StartButton>
-      </StyledLanding>
-    );
+  const [show, setShow] = useState(true);
+  const isFirstVisit = userStats?.visits === 1;
+
+  const handleStart = () => {
+    setShow(false);
+    setTimeout(() => {
+      onStart();
+    }, 500);
   };
-  
-  export default LandingPage;
+
+  return (
+    <StyledLanding $show={show}>
+      {isFirstVisit ? (
+        // First Visit Content
+        <>
+          <WelcomeText>
+            Welcome to
+            <span>MoonStones</span>
+            {telegramUser && (
+              <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
+                {telegramUser.first_name}
+              </div>
+            )}
+          </WelcomeText>
+          
+          <FirstVisitInfo>
+            <div>🎮 Visit daily to build your <span className="highlight">streak</span></div>
+            <div>⚡ Each day you play adds to your streak</div>
+            <div>❌ Miss a day and streak resets</div>
+            <div>🏆 Compete for the highest streak!</div>
+          </FirstVisitInfo>
+        </>
+      ) : (
+        // Returning User Content
+        <>
+          <WelcomeText>
+            Welcome back to
+            <span>MoonStones</span>
+            {telegramUser && (
+              <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
+                {telegramUser.first_name}
+              </div>
+            )}
+          </WelcomeText>
+          
+          {userStats && (
+            <StatsContainer>
+              <div>🔥 Current Streak: {userStats.currentStreak} days</div>
+              <div>⭐ Highest Streak: {userStats.highestStreak} days</div>
+              <div>🎮 Total Visits: {userStats.visits}</div>
+            </StatsContainer>
+          )}
+        </>
+      )}
+      
+      <StartButton onClick={handleStart}>
+        {isFirstVisit ? 'Begin Journey' : 'Continue Journey'}
+      </StartButton>
+    </StyledLanding>
+  );
+};
+
+export default LandingPage;
