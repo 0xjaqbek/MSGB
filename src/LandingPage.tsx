@@ -13,9 +13,14 @@ type TelegramUser = {
 };
 
 interface LandingPageProps {
-  telegramUser: TelegramUser | null;
-  onStart: () => void;
-}
+    telegramUser: TelegramUser | null;
+    onStart: () => void;
+    userStats: {
+      currentStreak: number;
+      highestStreak: number;
+      visits: number;
+    } | null;
+  }
 
 interface StyledLandingProps {
   $show: boolean;
@@ -96,34 +101,50 @@ const StartButton = styled.button`
   }
 `;
 
-const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart }) => {
-  const [show, setShow] = useState(true);
+  
+const StatsContainer = styled.div`
+color: #88c8ff;
+font-size: 1.2rem;
+margin-top: 1rem;
+text-align: center;
+animation: ${fadeIn} 1s ease-out 0.7s backwards;
+`;
 
-  const handleStart = () => {
-    setShow(false);
-    setTimeout(() => {
-      onStart();
-    }, 500);
-  };
-
-  return (
-    <StyledLanding $show={show}>
-      <WelcomeText>
-        Welcome back/to
-        <span>MoonStones</span>
-        {telegramUser && (
-          <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
-            {telegramUser.first_name}
-          </div>
-          
+const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userStats }) => {
+    const [show, setShow] = useState(true);
+  
+    const handleStart = () => {
+      setShow(false);
+      setTimeout(() => {
+        onStart();
+      }, 500);
+    };
+  
+    return (
+      <StyledLanding $show={show}>
+        <WelcomeText>
+          Welcome back to
+          <span>MoonStones</span>
+          {telegramUser && (
+            <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
+              {telegramUser.first_name}
+            </div>
+          )}
+        </WelcomeText>
+        
+        {userStats && (
+          <StatsContainer>
+            <div>🔥 Current Streak: {userStats.currentStreak} days</div>
+            <div>⭐ Highest Streak: {userStats.highestStreak} days</div>
+            <div>🎮 Total Visits: {userStats.visits}</div>
+          </StatsContainer>
         )}
-        in day X 
-      </WelcomeText>
-      <StartButton onClick={handleStart}>
-        Start Journey
-      </StartButton>
-    </StyledLanding>
-  );
-};
-
-export default LandingPage;
+        
+        <StartButton onClick={handleStart}>
+          Start Journey
+        </StartButton>
+      </StyledLanding>
+    );
+  };
+  
+  export default LandingPage;

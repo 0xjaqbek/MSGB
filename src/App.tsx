@@ -3,7 +3,7 @@ import "./App.scss";
 import styled from "styled-components";
 import { useTonConnect } from "./hooks/useTonConnect";
 import "@twa-dev/sdk";
-import Content from "./Content";
+import Content, { trackUserVisit } from "./Content";
 import LandingPage from "./LandingPage";
 
 // Type definitions
@@ -25,18 +25,44 @@ function App() {
   const { network } = useTonConnect();
   const [showLanding, setShowLanding] = useState(true);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const [userStats, setUserStats] = useState<{
+    currentStreak: number;
+    highestStreak: number;
+    visits: number;
+  } | null>(null);
 
   useEffect(() => {
-    // Initialize Telegram WebApp
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      const user = tg.initDataUnsafe?.user;
-      if (user) {
-        setTelegramUser(user as TelegramUser);
+    const initializeApp = async () => {
+      // Initialize Telegram WebApp
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        const user = tg.initDataUnsafe?.user;
+        
+        if (user) {
+          setTelegramUser(user as TelegramUser);
+          
+          try {
+            // Track the visit
+            const visitStats = await trackUserVisit(
+              user.id.toString(),
+              user.first_name
+            );
+            
+            setUserStats({
+              currentStreak: visitStats.currentStreak,
+              highestStreak: visitStats.highestStreak,
+              visits: visitStats.visits
+            });
+          } catch (error) {
+            console.error('Error tracking user visit:', error);
+          }
+        }
       }
-    }
+    };
+
+    initializeApp();
   }, []);
 
   const handleStart = () => {
@@ -53,11 +79,12 @@ function App() {
         <div id="stars4"></div>
       </div>
 
-      {/* Landing page */}
+      {/* Landing page with streak information */}
       {showLanding && (
         <LandingPage 
-          telegramUser={telegramUser} 
+          telegramUser={telegramUser}
           onStart={handleStart}
+          userStats={userStats} // Pass stats to landing page
         />
       )}
 

@@ -9,7 +9,7 @@ import stone3 from './assets/stone3.png';
 import stone4 from './assets/stone4.png';
 import blastImage0 from './assets/blast0.png'; 
 import blastImage1 from './assets/blast1.png'; 
-import { getDatabase, ref, set, onValue, push, update } from 'firebase/database';
+import { getDatabase, ref, set, onValue, push, update, get } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 
@@ -71,6 +71,98 @@ declare global {
     };
   }
 }
+
+
+interface UserVisit {
+  lastVisit: string;
+  currentStreak: number;
+  highestStreak: number;
+  visits: number;
+}
+
+export const trackUserVisit = async (userId: string, userName: string) => {
+  const db = getDatabase();
+  const userVisitsRef = ref(db, `users/${userId}/visits`);
+  
+  try {
+    // Get current visit data
+    const snapshot = await get(userVisitsRef);
+    const now = new Date();
+    const today = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    
+    if (!snapshot.exists()) {
+      // First time user
+      const initialVisit: UserVisit = {
+        lastVisit: today,
+        currentStreak: 1,
+        highestStreak: 1,
+        visits: 1
+      };
+      
+      await set(userVisitsRef, initialVisit);
+      return initialVisit;
+    }
+    
+    const userData = snapshot.val() as UserVisit;
+    const lastVisitDate = new Date(userData.lastVisit);
+    const daysSinceLastVisit = Math.floor(
+      (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    
+    let newStreak = userData.currentStreak;
+    
+    // If last visit was yesterday, increment streak
+    if (daysSinceLastVisit === 1) {
+      newStreak = userData.currentStreak + 1;
+    } 
+    // If last visit was today, don't change streak
+    else if (daysSinceLastVisit === 0) {
+      newStreak = userData.currentStreak;
+    }
+    // If more than 1 day has passed, reset streak
+    else {
+      newStreak = 1;
+    }
+    
+    const updatedVisit: UserVisit = {
+      lastVisit: today,
+      currentStreak: newStreak,
+      highestStreak: Math.max(newStreak, userData.highestStreak),
+      visits: userData.visits + (daysSinceLastVisit === 0 ? 0 : 1)
+    };
+    
+    await set(userVisitsRef, updatedVisit);
+    
+    // Store visit history
+    const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${today}`);
+    await set(visitHistoryRef, {
+      timestamp: now.toISOString(),
+      userName: userName,
+      streak: newStreak
+    });
+    
+    return updatedVisit;
+  } catch (error) {
+    console.error('Error tracking user visit:', error);
+    throw error;
+  }
+};
+
+export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
+  const db = getDatabase();
+  const userVisitsRef = ref(db, `users/${userId}/visits`);
+  
+  try {
+    const snapshot = await get(userVisitsRef);
+    if (!snapshot.exists()) {
+      return null;
+    }
+    return snapshot.val() as UserVisit;
+  } catch (error) {
+    console.error('Error getting user visit stats:', error);
+    throw error;
+  }
+};
 
 const GAME_DURATION = 60; // 60 seconds for the game
 
