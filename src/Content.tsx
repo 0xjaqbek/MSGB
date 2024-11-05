@@ -90,7 +90,7 @@ interface VisitHistoryEntry {
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
-  top: 35%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -101,10 +101,8 @@ const PlaysInfoContainer = styled.div`
   padding: 0.5rem 1rem;
   border-radius: 15px;
   z-index: 1000;
-  pointer-events: none; // Allows clicking through the container
-  backdrop-filter: none; // Removes any blur effect
-  -webkit-backdrop-filter: none;
 `;
+
 // New interfaces for plays tracking
 interface UserPlays {
   playsToday: number;
@@ -115,6 +113,8 @@ interface UserPlays {
 const calculateMaxPlays = (streak: number): number => {
   return 5 + (streak - 1); // 5 base plays + bonus from streak
 };
+
+
 
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
   const db = getDatabase();
