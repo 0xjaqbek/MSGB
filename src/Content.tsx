@@ -557,51 +557,51 @@ return (
         />
       </>
     )}
+
+    {/* Rest of your existing JSX */}
     {!isPlaying && !telegramUser && (
       <WelcomeInfo className="scoreboard">
         Welcome<br></br>in
       </WelcomeInfo>
     )}
-    {!isPlaying && (
-      <StartButton
-        src={startImage}
-        alt="Start"
-        onClick={handleStartClick}
-        isClicked={isPlaying}
-      />
+    
+    {isPlaying && (
+      <ScoreBoard className="scoreboard">
+        Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+      </ScoreBoard>
     )}
-      {isPlaying && (
-        <ScoreBoard className="scoreboard">
-          Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
-        </ScoreBoard>
-      )}
-{isPlaying && !gameOver && currentStones.map((stone) => (
-    <Stone
-      key={`stone-${stone.id}`}
-      id={`stone-${stone.id}`}
-      src={[stone1, stone2, stone3, stone4][stone.type]}
-      alt={`Stone ${stone.type + 1}`}
-      speed={stone.speed}
-      startX={stone.startX}
-      endX={stone.endX}
-      startY={stone.startY}
-      endY={stone.endY}
-      posX={stone.posX}
-      posY={stone.posY}
-      direction={stone.direction}
-      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
-      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-    />
-  ))}
+
+    {isPlaying && !gameOver && currentStones.map((stone) => (
+      <Stone
+        key={`stone-${stone.id}`}
+        id={`stone-${stone.id}`}
+        src={[stone1, stone2, stone3, stone4][stone.type]}
+        alt={`Stone ${stone.type + 1}`}
+        speed={stone.speed}
+        startX={stone.startX}
+        endX={stone.endX}
+        startY={stone.startY}
+        endY={stone.endY}
+        posX={stone.posX}
+        posY={stone.posY}
+        direction={stone.direction}
+        onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+        onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+      />
+    ))}
 
     {gameOver && (
-      <>
-        <GameOverScreen className="scoreboard1">
-          <h2>Game Over</h2>
-        </GameOverScreen>
-      </>
+      <GameOverScreen className="scoreboard1">
+        <h2>Game Over</h2>
+        {playsRemaining === 0 && (
+          <div style={{ fontSize: '1rem', marginTop: '1rem', color: '#88c8ff' }}>
+            No plays remaining today.<br />Come back tomorrow for more!
+          </div>
+        )}
+      </GameOverScreen>
     )}
   </StyledContent>
-)};
+);
+};
 
 export default Content;
