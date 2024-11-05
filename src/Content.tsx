@@ -88,6 +88,33 @@ interface VisitHistoryEntry {
   streak: number;
 }
 
+const PlaysInfoContainer = styled.div`
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #88c8ff;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  z-index: 1000;
+`;
+
+// New interfaces for plays tracking
+interface UserPlays {
+  playsToday: number;
+  maxPlaysToday: number;
+  lastPlayDate: string;
+}
+
+const calculateMaxPlays = (streak: number): number => {
+  return 5 + (streak - 1); // 5 base plays + bonus from streak
+};
+
+
 export const trackUserVisit = async (userId: string, userName: string) => {
   const db = getDatabase();
   const userVisitsRef = ref(db, `users/${userId}/visits`);
@@ -207,39 +234,117 @@ const Content: React.FC = () => {
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
   const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const [playsRemaining, setPlaysRemaining] = useState<number | null>(null);
+  const [maxPlaysToday, setMaxPlaysToday] = useState<number>(5);
+  const [userStreak, setUserStreak] = useState<number>(1);
 
-  useEffect(() => {
-    // Initialize Telegram WebApp
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      tg.disableVerticalSwipes();
-      tg.setHeaderColor("#000000");
-      tg.setBottomBarColor("#000000");
-      const user = tg.initDataUnsafe?.user;
-      
-      if (user) {
-        setTelegramUser(user);
+  // Add function to get and update plays
+  const getPlaysInfo = useCallback(async (userId: string) => {
+    const db = getDatabase();
+    const playsRef = ref(db, `users/${userId}/plays`);
+    const today = new Date().toISOString().split('T')[0];
+    
+    try {
+      const snapshot = await get(playsRef);
+      const userData = snapshot.val() as UserPlays || {
+        playsToday: 0,
+        maxPlaysToday: calculateMaxPlays(userStreak),
+        lastPlayDate: today
+      };
+
+      if (userData.lastPlayDate !== today) {
+        // Reset plays for new day
+        userData.playsToday = 0;
+        userData.maxPlaysToday = calculateMaxPlays(userStreak);
+        userData.lastPlayDate = today;
       }
 
-      // Set up Telegram's main button
-      tg.MainButton.text = "Start Game";
-      tg.MainButton.onClick(() => handleStartClick());
-      tg.MainButton.show();
+      await set(playsRef, userData);
+      setPlaysRemaining(userData.maxPlaysToday - userData.playsToday);
+      setMaxPlaysToday(userData.maxPlaysToday);
+      return userData;
+    } catch (error) {
+      console.error('Error getting plays info:', error);
+      return null;
+    }
+  }, [userStreak]);
+
+  const updatePlaysCount = useCallback(async (userId: string) => {
+    const db = getDatabase();
+    const playsRef = ref(db, `users/${userId}/plays`);
+    
+    try {
+      const snapshot = await get(playsRef);
+      const userData = snapshot.val() as UserPlays;
+      const newPlaysCount = userData.playsToday + 1;
+      
+      if (newPlaysCount > userData.maxPlaysToday) {
+        return false;
+      }
+      
+      await set(playsRef, {
+        ...userData,
+        playsToday: newPlaysCount
+      });
+      
+      setPlaysRemaining(userData.maxPlaysToday - newPlaysCount);
+      return true;
+    } catch (error) {
+      console.error('Error updating plays count:', error);
+      return false;
     }
   }, []);
 
-  const handleStartClick = () => {
+  useEffect(() => {
+    const initTelegram = async () => {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        tg.disableVerticalSwipes();
+        tg.setHeaderColor("#000000");
+        tg.setBottomBarColor("#000000");
+        const user = tg.initDataUnsafe?.user;
+        
+        if (user) {
+          setTelegramUser(user);
+          const userVisitsRef = ref(getDatabase(), `users/${user.id}/visits`);
+          const snapshot = await get(userVisitsRef);
+          const userData = snapshot.val();
+          if (userData) {
+            setUserStreak(userData.currentStreak || 1);
+          }
+          await getPlaysInfo(user.id.toString());
+        }
+
+        tg.MainButton.text = "Start Game";
+        tg.MainButton.onClick(() => handleStartClick());
+        tg.MainButton.show();
+      }
+    };
+
+    initTelegram();
+  }, [getPlaysInfo]);
+
+  const handleStartClick = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (!tg?.initDataUnsafe?.user?.id) return;
+
+    const canPlay = await updatePlaysCount(tg.initDataUnsafe.user.id.toString());
+    if (!canPlay) {
+      alert("No plays remaining today. Come back tomorrow for more!");
+      return;
+    }
+
     setIsPlaying(true);
     setScore(0);
     setGameOver(false);
     setDifficulty(1);
     setCurrentStones([]);
     setStoneIdCounter(0);
-    setRemainingTime(GAME_DURATION); // Reset time to 60 seconds
-    window.Telegram?.WebApp?.MainButton.hide();
-    window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
+    setRemainingTime(GAME_DURATION);
+    tg.MainButton.hide();
+    tg.sendData(JSON.stringify({ action: 'gameStarted' }));
   };
 
 // Timer logic to reduce time by 1 second every interval and increase difficulty
@@ -415,28 +520,42 @@ const updateScore = useCallback(async () => {
   }
 }, [score, remainingTime, telegramUser, database]);
 
-
-
-
-
 return (
   <StyledContent>
-{/* Blast effect */}
-{showBlast && blastPosition && (
-        <Blast 
-          key={currentBlastImage} // Force re-render when image changes
-          src={currentBlastImage} 
-          posX={blastPosition.posX} 
-          posY={blastPosition.posY} 
-        />
-      )}
+    {/* Existing blast effect */}
+    {showBlast && blastPosition && (
+      <Blast 
+        key={currentBlastImage}
+        src={currentBlastImage} 
+        posX={blastPosition.posX} 
+        posY={blastPosition.posY} 
+      />
+    )}
+    
     {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
 
     {!isPlaying && telegramUser && (
-      <WelcomeInfo className="scoreboard">
-
-      </WelcomeInfo>
+      <>
+        <WelcomeInfo className="scoreboard">
+          {playsRemaining !== null && (
+            <PlaysInfoContainer>
+              <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
+              {userStreak > 1 && (
+                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+                  +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+                </div>
+              )}
+            </PlaysInfoContainer>
+          )}
+        </WelcomeInfo>
+        <StartButton
+          src={startImage}
+          alt="Start"
+          onClick={handleStartClick}
+          isClicked={isPlaying}
+        />
+      </>
     )}
     {!isPlaying && !telegramUser && (
       <WelcomeInfo className="scoreboard">
