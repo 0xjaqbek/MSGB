@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes, css } from 'styled-components';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './components/StyledComponents';
 import startImage from './assets/start.png';
@@ -11,7 +12,6 @@ import blastImage1 from './assets/blast1.png';
 import { getDatabase, ref, set, onValue, push, update, get } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
-import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -90,7 +90,7 @@ interface VisitHistoryEntry {
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
-  top: 35%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -101,7 +101,6 @@ const PlaysInfoContainer = styled.div`
   padding: 0.5rem 1rem;
   border-radius: 15px;
   z-index: 1000;
-  pointer-events: none;
 `;
 
 // New interfaces for plays tracking
@@ -113,6 +112,95 @@ interface UserPlays {
 
 const calculateMaxPlays = (streak: number): number => {
   return 5 + (streak - 1); // 5 base plays + bonus from streak
+};
+
+
+export const trackUserVisit = async (userId: string, userName: string) => {
+  const db = getDatabase();
+  const userVisitsRef = ref(db, `users/${userId}/visits`);
+  
+  try {
+    // Get current visit data
+    const snapshot = await get(userVisitsRef);
+    const now = new Date();
+    const today = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    
+    if (!snapshot.exists()) {
+      // First time user ever
+      const initialVisit: UserVisit = {
+        lastVisit: today,
+        currentStreak: 1,
+        highestStreak: 1,
+        totalVisits: 1,
+        dailyVisits: {
+          [today]: 1
+        },
+        firstVisitComplete: false
+      };
+      
+      await set(userVisitsRef, initialVisit);
+      return { ...initialVisit, isNewDay: true, isFirstVisit: true };
+    }
+    
+    const userData = snapshot.val() as UserVisit;
+    const lastVisitDate = new Date(userData.lastVisit);
+    const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
+    
+    // Check if this is a new day
+    const isNewDay = today !== lastVisitDay;
+    
+    // Calculate days between visits for streak
+    const daysSinceLastVisit = Math.floor(
+      (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    
+    let newStreak = userData.currentStreak;
+    
+    if (isNewDay) {
+      // If last visit was yesterday, increment streak
+      if (daysSinceLastVisit === 1) {
+        newStreak = userData.currentStreak + 1;
+      } 
+      // If more than 1 day has passed, reset streak
+      else if (daysSinceLastVisit > 1) {
+        newStreak = 1;
+      }
+    }
+    
+    // Update daily visits count
+    const dailyVisits = { ...userData.dailyVisits };
+    dailyVisits[today] = (dailyVisits[today] || 0) + 1;
+    
+    const updatedVisit: UserVisit = {
+      lastVisit: today,
+      currentStreak: newStreak,
+      highestStreak: Math.max(newStreak, userData.highestStreak),
+      totalVisits: userData.totalVisits + 1, // Increment on every visit
+      dailyVisits,
+      firstVisitComplete: true
+    };
+    
+    // Update visit history
+    const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${now.getTime()}`);
+    const historyEntry: VisitHistoryEntry = {
+      timestamp: now.toISOString(),
+      userName: userName,
+      streak: newStreak
+    };
+    await set(visitHistoryRef, historyEntry);
+    
+    await set(userVisitsRef, updatedVisit);
+    
+    return {
+      ...updatedVisit,
+      isNewDay,
+      isFirstVisit: !userData.firstVisitComplete,
+      todayVisits: dailyVisits[today]
+    };
+  } catch (error) {
+    console.error('Error tracking user visit:', error);
+    throw error;
+  }
 };
 
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
@@ -241,50 +329,23 @@ const Content: React.FC = () => {
   const handleStartClick = async () => {
     const tg = window.Telegram?.WebApp;
     if (!tg?.initDataUnsafe?.user?.id) return;
-  
-    try {
-      const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
-      
-      if (remainingPlays < 0) {
-        alert("No plays remaining today. Come back tomorrow for more!");
-        return;
-      }
-  
-      setIsPlaying(true);
-      setScore(0);
-      setGameOver(false);
-      setDifficulty(1);
-      setCurrentStones([]);
-      setStoneIdCounter(0);
-      setRemainingTime(GAME_DURATION);
-      window.Telegram?.WebApp?.MainButton.hide();
-      window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
-    } catch (error) {
-      console.error('Error starting game:', error);
-      alert("There was an error starting the game. Please try again.");
+
+    const canPlay = await updatePlaysCount(tg.initDataUnsafe.user.id.toString());
+    if (!canPlay) {
+      alert("No plays remaining today. Come back tomorrow for more!");
+      return;
     }
+
+    setIsPlaying(true);
+    setScore(0);
+    setGameOver(false);
+    setDifficulty(1);
+    setCurrentStones([]);
+    setStoneIdCounter(0);
+    setRemainingTime(GAME_DURATION);
+    tg.MainButton.hide();
+    tg.sendData(JSON.stringify({ action: 'gameStarted' }));
   };
-  
-  const [userVisitStats, setUserVisitStats] = useState<VisitStats | null>(null);
-
-  useEffect(() => {
-    const loadUserStats = async () => {
-      const tg = window.Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user) {
-        try {
-          const stats = await trackUserVisit(
-            tg.initDataUnsafe.user.id.toString(),
-            tg.initDataUnsafe.user.first_name
-          );
-          setUserVisitStats(stats);
-        } catch (error) {
-          console.error('Error loading user stats:', error);
-        }
-      }
-    };
-
-    loadUserStats();
-  }, []);
 
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {
@@ -461,6 +522,7 @@ const updateScore = useCallback(async () => {
 
 return (
   <StyledContent>
+    {/* Existing blast effect */}
     {showBlast && blastPosition && (
       <Blast 
         key={currentBlastImage}
@@ -470,6 +532,7 @@ return (
       />
     )}
     
+    {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
 
     {!isPlaying && telegramUser && (
@@ -494,10 +557,9 @@ return (
         />
       </>
     )}
-
     {!isPlaying && !telegramUser && (
       <WelcomeInfo className="scoreboard">
-        Welcome<br/>in
+        Welcome<br></br>in
       </WelcomeInfo>
     )}
     {!isPlaying && (
