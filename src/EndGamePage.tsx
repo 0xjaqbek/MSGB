@@ -41,10 +41,6 @@ interface EndGamePageProps {
             <h3 className="text-lg text-glow mb-3">Get More Plays!</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span>🔥 Build your streak</span>
-                <span className="text-glow">+1 play/day</span>
-              </div>
-              <div className="flex items-center justify-between">
                 <span>👥 Invite friends</span>
                 <span className="text-glow">+2 plays/friend</span>
               </div>
