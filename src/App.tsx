@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import "./App.scss";
-import styled from "styled-components";
 import { useTonConnect } from "./hooks/useTonConnect";
 import "@twa-dev/sdk";
 import Content from "./Content";
@@ -8,42 +7,6 @@ import LandingPage from "./LandingPage";
 import { trackUserVisit, type VisitStats } from './userTracking';
 import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
 import { TelegramUser, NavigationPage } from './types';
-
-const StyledApp = styled.div`
-  max-width: 100vw;
-  min-height: 100vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-
-  /* Create space for the navigation bar */
-  .content-container {
-    flex: 1;
-    margin-bottom: 64px; /* This should match the navigation bar height */
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Background animation container */
-  .bg-animation {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-  }
-
-  /* Navigation bar container */
-  .navigation-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000; /* Ensure it's above other content */
-    background: black;
-  }
-`;
 
 function App() {
   const { network } = useTonConnect();
@@ -120,7 +83,7 @@ function App() {
   };
 
   return (
-    <StyledApp>
+    <div className="app-container">
       <div className="bg-animation">
         <div id="stars"></div>
         <div id="stars2"></div>
@@ -140,7 +103,7 @@ function App() {
           />
         </div>
       )}
-    </StyledApp>
+    </div>
   );
 }
 
