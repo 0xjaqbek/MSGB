@@ -21,6 +21,7 @@ html, body {
   padding: 0;
   overflow: hidden;
   background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+  color: #88c8ff;
 }
 
 #root {
@@ -34,6 +35,7 @@ html, body {
   padding-bottom: 64px; // Height of navigation bar
   position: relative;
   z-index: 1;
+  align-items: center; 
 }
 
 // Background animations
@@ -192,4 +194,83 @@ html, body {
   height: 20px;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
   pointer-events: none;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 800px; // Limit width for better readability
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #88c8ff;
+
+  h1, h2, h3 {
+    color: #88c8ff;
+    text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
+    text-align: center;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(136, 200, 255, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px 0;
+    width: 100%;
+    box-shadow: 0 0 15px rgba(136, 200, 255, 0.2);
+    backdrop-filter: blur(5px);
+
+    &:hover {
+      box-shadow: 0 0 20px rgba(136, 200, 255, 0.3);
+    }
+  }
+
+  .text-info {
+    color: #88c8ff;
+    opacity: 0.8;
+  }
+
+  .text-value {
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(136, 200, 255, 0.3);
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid rgba(136, 200, 255, 0.1);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+// ... rest of your existing styles remain the same ...
+
+// Add these utility classes
+.text-glow {
+  color: #88c8ff;
+  text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
+}
+
+.box-glow {
+  box-shadow: 0 0 15px rgba(136, 200, 255, 0.3);
+}
+
+.border-glow {
+  border: 1px solid rgba(136, 200, 255, 0.3);
+}
+
+.center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }

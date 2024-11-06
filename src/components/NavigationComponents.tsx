@@ -105,19 +105,17 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (
-    <div className="min-h-screen bg-black/50 p-4 text-white flex flex-col items-center max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]">Friends</h1>
-      <div className="space-y-4 w-full">
-        <div className="bg-blue-950/40 rounded-lg p-6 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-          <h2 className="text-xl mb-2 text-blue-300">Welcome, {telegramUser?.first_name}</h2>
-          <h3 className="text-xl mb-2 text-blue-400">Leaderboard</h3>
-          <p className="text-blue-200/60">Coming soon...</p>
-        </div>
-        
-        <div className="bg-blue-950/40 rounded-lg p-6 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-          <h2 className="text-xl mb-2 text-blue-300">Friend Requests</h2>
-          <p className="text-blue-200/60">No pending requests</p>
-        </div>
+    <div className="page-container">
+      <h1 className="text-glow text-2xl mb-4">Friends</h1>
+      <div className="card center-content">
+        <h2 className="text-glow text-xl mb-2">Welcome, {telegramUser?.first_name}</h2>
+        <h3 className="text-glow text-xl mb-2">Leaderboard</h3>
+        <p className="text-info">Coming soon...</p>
+      </div>
+      
+      <div className="card center-content">
+        <h2 className="text-glow text-xl mb-2">Friend Requests</h2>
+        <p className="text-info">No pending requests</p>
       </div>
     </div>
   );
@@ -125,46 +123,41 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
 
 const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) => {
   if (!telegramUser) {
-    return <div className="min-h-screen bg-black/50 p-4 text-white flex justify-center">
-      <span className="text-blue-400 animate-pulse">Loading...</span>
+    return <div className="page-container center-content">
+      <span className="text-glow animate-pulse">Loading...</span>
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-black/50 p-4 text-white flex flex-col items-center max-w-2xl mx-auto">
-      <div className="w-full bg-blue-950/40 rounded-lg p-6 mb-4 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-        <h1 className="text-2xl font-bold mb-4 text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]">My Account</h1>
-        <div className="space-y-3">
-          <p className="flex justify-between items-center p-2 rounded bg-blue-900/20">
-            <span className="text-blue-200">Name:</span>
-            <span className="text-white">{telegramUser.first_name}</span>
-          </p>
+    <div className="page-container">
+      <div className="card">
+        <h1 className="text-glow text-2xl mb-4">My Account</h1>
+        <div className="space-y-2">
+          <div className="stat-row">
+            <span className="text-info">Name:</span>
+            <span className="text-value">{telegramUser.first_name}</span>
+          </div>
           {userStats && (
             <>
-              <p className="flex justify-between items-center p-2 rounded bg-blue-900/20">
-                <span className="text-blue-200">Current Streak:</span>
-                <span className="text-white">{userStats.currentStreak} days</span>
-              </p>
-              <p className="flex justify-between items-center p-2 rounded bg-blue-900/20">
-                <span className="text-blue-200">Highest Streak:</span>
-                <span className="text-white">{userStats.highestStreak} days</span>
-              </p>
-              <p className="flex justify-between items-center p-2 rounded bg-blue-900/20">
-                <span className="text-blue-200">Total Visits:</span>
-                <span className="text-white">{userStats.totalVisits}</span>
-              </p>
-              <p className="flex justify-between items-center p-2 rounded bg-blue-900/20">
-                <span className="text-blue-200">Today's Plays:</span>
-                <span className="text-white">{userStats.playsToday} / {userStats.maxPlaysToday}</span>
-              </p>
+              <div className="stat-row">
+                <span className="text-info">Current Streak:</span>
+                <span className="text-value">{userStats.currentStreak} days</span>
+              </div>
+              <div className="stat-row">
+                <span className="text-info">Highest Streak:</span>
+                <span className="text-value">{userStats.highestStreak} days</span>
+              </div>
+              <div className="stat-row">
+                <span className="text-info">Total Visits:</span>
+                <span className="text-value">{userStats.totalVisits}</span>
+              </div>
+              <div className="stat-row">
+                <span className="text-info">Today's Plays:</span>
+                <span className="text-value">{userStats.playsToday} / {userStats.maxPlaysToday}</span>
+              </div>
             </>
           )}
         </div>
-      </div>
-      
-      <div className="w-full bg-blue-950/40 rounded-lg p-6 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-        <h2 className="text-xl font-bold mb-4 text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]">Statistics</h2>
-        <p className="text-blue-200/60">More stats coming soon...</p>
       </div>
     </div>
   );
@@ -172,31 +165,29 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
 
 const TasksPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-black/50 p-4 text-white flex flex-col items-center max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]">Daily Tasks</h1>
-      <div className="space-y-4 w-full">
-        <div className="bg-blue-950/40 rounded-lg p-6 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-          <h2 className="text-xl mb-4 text-blue-300">Today's Tasks</h2>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border border-blue-500/20 rounded bg-blue-900/20">
-              <span className="text-white">Play 5 games</span>
-              <span className="text-blue-400 font-medium">0/5</span>
-            </div>
-            <div className="flex items-center justify-between p-3 border border-blue-500/20 rounded bg-blue-900/20">
-              <span className="text-white">Score 50 points</span>
-              <span className="text-blue-400 font-medium">0/50</span>
-            </div>
-            <div className="flex items-center justify-between p-3 border border-blue-500/20 rounded bg-blue-900/20">
-              <span className="text-white">Visit the app</span>
-              <span className="text-green-400">✓</span>
-            </div>
+    <div className="page-container">
+      <h1 className="text-glow text-2xl mb-4">Daily Tasks</h1>
+      <div className="card">
+        <h2 className="text-glow text-xl mb-4">Today's Tasks</h2>
+        <div className="space-y-3">
+          <div className="stat-row">
+            <span>Play 5 games</span>
+            <span className="text-glow">0/5</span>
+          </div>
+          <div className="stat-row">
+            <span>Score 50 points</span>
+            <span className="text-glow">0/50</span>
+          </div>
+          <div className="stat-row">
+            <span>Visit the app</span>
+            <span className="text-green-400">✓</span>
           </div>
         </div>
-        
-        <div className="bg-blue-950/40 rounded-lg p-6 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-          <h2 className="text-xl mb-2 text-blue-300">Weekly Challenges</h2>
-          <p className="text-blue-200/60">Coming soon...</p>
-        </div>
+      </div>
+      
+      <div className="card center-content mt-4">
+        <h2 className="text-glow text-xl mb-2">Weekly Challenges</h2>
+        <p className="text-info">Coming soon...</p>
       </div>
     </div>
   );
