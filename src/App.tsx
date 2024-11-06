@@ -53,6 +53,9 @@ function App() {
     setShowLanding(false);
   };
 
+  // Show navigation bar only when not on landing page AND not on main game page
+  const shouldShowNavigation = !showLanding && currentPage !== 'main';
+
   const renderCurrentPage = () => {
     if (showLanding) {
       return (
@@ -89,8 +92,7 @@ function App() {
 
       {renderCurrentPage()}
 
-      {/* Always render NavigationBar when not showing landing */}
-      {!showLanding && (
+      {shouldShowNavigation && (
         <NavigationBar 
           currentPage={currentPage}
           onNavigate={setCurrentPage}
@@ -99,5 +101,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
