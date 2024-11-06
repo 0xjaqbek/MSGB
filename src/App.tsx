@@ -12,7 +12,37 @@ import { TelegramUser, NavigationPage } from './types';
 const StyledApp = styled.div`
   max-width: 100vw;
   min-height: 100vh;
-  padding-bottom: 4rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  /* Create space for the navigation bar */
+  .content-container {
+    flex: 1;
+    margin-bottom: 64px; /* This should match the navigation bar height */
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Background animation container */
+  .bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  /* Navigation bar container */
+  .navigation-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Ensure it's above other content */
+    background: black;
+  }
 `;
 
 function App() {
@@ -98,13 +128,17 @@ function App() {
         <div id="stars4"></div>
       </div>
 
-      {renderCurrentPage()}
+      <div className="content-container">
+        {renderCurrentPage()}
+      </div>
 
       {!showLanding && (
-        <NavigationBar 
-          currentPage={currentPage}
-          onNavigate={setCurrentPage}
-        />
+        <div className="navigation-container">
+          <NavigationBar 
+            currentPage={currentPage}
+            onNavigate={setCurrentPage}
+          />
+        </div>
       )}
     </StyledApp>
   );
