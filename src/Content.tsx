@@ -11,6 +11,7 @@ import blastImage1 from './assets/blast1.png';
 import { getDatabase, ref, set, onValue, push, update, get } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
+import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -87,94 +88,6 @@ interface VisitHistoryEntry {
   streak: number;
 }
 
-export const trackUserVisit = async (userId: string, userName: string) => {
-  const db = getDatabase();
-  const userVisitsRef = ref(db, `users/${userId}/visits`);
-  
-  try {
-    // Get current visit data
-    const snapshot = await get(userVisitsRef);
-    const now = new Date();
-    const today = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    
-    if (!snapshot.exists()) {
-      // First time user ever
-      const initialVisit: UserVisit = {
-        lastVisit: today,
-        currentStreak: 1,
-        highestStreak: 1,
-        totalVisits: 1,
-        dailyVisits: {
-          [today]: 1
-        },
-        firstVisitComplete: false
-      };
-      
-      await set(userVisitsRef, initialVisit);
-      return { ...initialVisit, isNewDay: true, isFirstVisit: true };
-    }
-    
-    const userData = snapshot.val() as UserVisit;
-    const lastVisitDate = new Date(userData.lastVisit);
-    const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
-    
-    // Check if this is a new day
-    const isNewDay = today !== lastVisitDay;
-    
-    // Calculate days between visits for streak
-    const daysSinceLastVisit = Math.floor(
-      (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    
-    let newStreak = userData.currentStreak;
-    
-    if (isNewDay) {
-      // If last visit was yesterday, increment streak
-      if (daysSinceLastVisit === 1) {
-        newStreak = userData.currentStreak + 1;
-      } 
-      // If more than 1 day has passed, reset streak
-      else if (daysSinceLastVisit > 1) {
-        newStreak = 1;
-      }
-    }
-    
-    // Update daily visits count
-    const dailyVisits = { ...userData.dailyVisits };
-    dailyVisits[today] = (dailyVisits[today] || 0) + 1;
-    
-    const updatedVisit: UserVisit = {
-      lastVisit: today,
-      currentStreak: newStreak,
-      highestStreak: Math.max(newStreak, userData.highestStreak),
-      totalVisits: userData.totalVisits + 1, // Increment on every visit
-      dailyVisits,
-      firstVisitComplete: true
-    };
-    
-    // Update visit history
-    const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${now.getTime()}`);
-    const historyEntry: VisitHistoryEntry = {
-      timestamp: now.toISOString(),
-      userName: userName,
-      streak: newStreak
-    };
-    await set(visitHistoryRef, historyEntry);
-    
-    await set(userVisitsRef, updatedVisit);
-    
-    return {
-      ...updatedVisit,
-      isNewDay,
-      isFirstVisit: !userData.firstVisitComplete,
-      todayVisits: dailyVisits[today]
-    };
-  } catch (error) {
-    console.error('Error tracking user visit:', error);
-    throw error;
-  }
-};
-
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
   const db = getDatabase();
   const userVisitsRef = ref(db, `users/${userId}/visits`);
@@ -229,17 +142,54 @@ const Content: React.FC = () => {
     }
   }, []);
 
-  const handleStartClick = () => {
-    setIsPlaying(true);
-    setScore(0);
-    setGameOver(false);
-    setDifficulty(1);
-    setCurrentStones([]);
-    setStoneIdCounter(0);
-    setRemainingTime(GAME_DURATION); // Reset time to 60 seconds
-    window.Telegram?.WebApp?.MainButton.hide();
-    window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
+  const handleStartClick = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (!tg?.initDataUnsafe?.user?.id) return;
+  
+    try {
+      const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
+      
+      if (remainingPlays < 0) {
+        alert("No plays remaining today. Come back tomorrow for more!");
+        return;
+      }
+  
+      setIsPlaying(true);
+      setScore(0);
+      setGameOver(false);
+      setDifficulty(1);
+      setCurrentStones([]);
+      setStoneIdCounter(0);
+      setRemainingTime(GAME_DURATION);
+      window.Telegram?.WebApp?.MainButton.hide();
+      window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
+    } catch (error) {
+      console.error('Error starting game:', error);
+      alert("There was an error starting the game. Please try again.");
+    }
   };
+
+  // Add this state at the top of your component:
+  const [userVisitStats, setUserVisitStats] = useState<VisitStats | null>(null);
+
+useEffect(() => {
+  const loadUserStats = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (tg?.initDataUnsafe?.user) {
+      try {
+        const stats = await trackUserVisit(
+          tg.initDataUnsafe.user.id.toString(),
+          tg.initDataUnsafe.user.first_name
+        );
+        setUserVisitStats(stats);
+      } catch (error) {
+        console.error('Error loading user stats:', error);
+      }
+    }
+  };
+
+  loadUserStats();
+}, []);
 
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {
@@ -432,11 +382,30 @@ return (
     {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
 
-    {!isPlaying && telegramUser && (
-      <WelcomeInfo className="scoreboard">
-
-      </WelcomeInfo>
-    )}
+    {!isPlaying && telegramUser && userVisitStats && (
+  <WelcomeInfo className="scoreboard">
+    <div style={{ 
+      position: 'absolute', 
+      top: '-60px', 
+      left: '50%', 
+      transform: 'translateX(-50%)',
+      color: '#88c8ff',
+      textAlign: 'center',
+      fontSize: '1.2rem',
+      textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
+      background: 'rgba(0, 0, 0, 0.6)',
+      padding: '0.5rem 1rem',
+      borderRadius: '15px',
+    }}>
+      <div>🎮 {userVisitStats.playsRemaining} of {userVisitStats.maxPlaysToday} plays remaining</div>
+      {userVisitStats.currentStreak > 1 && (
+        <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+          +{userVisitStats.currentStreak - 1} bonus {userVisitStats.currentStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+        </div>
+      )}
+    </div>
+  </WelcomeInfo>
+)}
     {!isPlaying && !telegramUser && (
       <WelcomeInfo className="scoreboard">
         Welcome<br></br>in
