@@ -20,96 +20,84 @@ interface AccountPageProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }) => {
   return (
-    <nav className="w-full h-16 bg-black bg-opacity-80 backdrop-blur-lg border-t border-opacity-20 border-blue-400">
-      <div className="w-full h-full max-w-screen-xl mx-auto flex justify-around items-center">
+    <nav className="w-full h-16 bg-black bg-opacity-40 backdrop-blur-md border-t border-white border-opacity-5">
+      <div className="h-full max-w-lg mx-auto flex justify-between items-center px-6">
         <button 
           onClick={() => onNavigate('main')}
-          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
-            ${currentPage === 'main' ? 'text-blue-400' : 'text-gray-400'}`}
+          className={`flex flex-col items-center transition-all duration-300 ${
+            currentPage === 'main' 
+              ? 'text-blue-400' 
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
         >
-          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
-            ${currentPage === 'main' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
-          <svg 
-            viewBox="0 0 24 24" 
-            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <path d="M12 3L4 9v12h16V9l-8-6z" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M12 3v6m0 0l4-3m-4 3l-4-3" strokeLinecap="round" strokeLinejoin="round" />
+          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M12 2L3 9v11a2 2 0 002 2h14a2 2 0 002-2V9l-9-7z" />
           </svg>
-          <span className="text-xs font-light tracking-wider">MAIN</span>
+          <div className="flex flex-col items-center">
+            <span className="text-xs">Game</span>
+            <span className="text-[10px] opacity-60">Play Now</span>
+          </div>
         </button>
 
         <button 
           onClick={() => onNavigate('friends')}
-          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
-            ${currentPage === 'friends' ? 'text-blue-400' : 'text-gray-400'}`}
+          className={`flex flex-col items-center transition-all duration-300 ${
+            currentPage === 'friends' 
+              ? 'text-blue-400' 
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
         >
-          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
-            ${currentPage === 'friends' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
-          <svg 
-            viewBox="0 0 24 24" 
-            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <path d="M12 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM19 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM5 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-            <path d="M12 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-            <path d="M5 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-            <path d="M19 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-            <path d="M12 8v4M5 8v4M19 8v4" strokeLinecap="round" />
+          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
-          <span className="text-xs font-light tracking-wider">FRIENDS</span>
+          <div className="flex flex-col items-center">
+            <span className="text-xs">Friends</span>
+            <span className="text-[10px] opacity-60">Leaderboard</span>
+          </div>
         </button>
 
         <button 
           onClick={() => onNavigate('account')}
-          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
-            ${currentPage === 'account' ? 'text-blue-400' : 'text-gray-400'}`}
+          className={`flex flex-col items-center transition-all duration-300 ${
+            currentPage === 'account' 
+              ? 'text-blue-400' 
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
         >
-          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
-            ${currentPage === 'account' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
-          <svg 
-            viewBox="0 0 24 24" 
-            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <circle cx="12" cy="8" r="5" />
-            <path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2" />
-            <path d="M12 8v4m0 0l-2-2m2 2l2-2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
-          <span className="text-xs font-light tracking-wider">ACCOUNT</span>
+          <div className="flex flex-col items-center">
+            <span className="text-xs">Profile</span>
+            <span className="text-[10px] opacity-60">Statistics</span>
+          </div>
         </button>
 
         <button 
           onClick={() => onNavigate('tasks')}
-          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
-            ${currentPage === 'tasks' ? 'text-blue-400' : 'text-gray-400'}`}
+          className={`flex flex-col items-center transition-all duration-300 ${
+            currentPage === 'tasks' 
+              ? 'text-blue-400' 
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
         >
-          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
-            ${currentPage === 'tasks' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
-          <svg 
-            viewBox="0 0 24 24" 
-            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
-            <path d="M9 6l3 3 3-3M9 18l3-3 3 3" strokeLinecap="round" strokeLinejoin="round" />
+          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
           </svg>
-          <span className="text-xs font-light tracking-wider">TASKS</span>
+          <div className="flex flex-col items-center">
+            <span className="text-xs">Tasks</span>
+            <span className="text-[10px] opacity-60">Daily Goals</span>
+          </div>
         </button>
       </div>
     </nav>
   );
 };
-
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (

@@ -179,79 +179,34 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
   z-index: 1000;
   
-  // Futuristic gradient border effect
-  &::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(56, 189, 248, 0.2),
-      rgba(56, 189, 248, 0.4),
-      rgba(56, 189, 248, 0.2),
-      transparent
-    );
-  }
-  
-  // Glowing effect for active elements
-  .text-blue-400 {
-    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-    
-    svg {
-      filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.5));
-    }
-  }
-
-  // Hover effects
   button {
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 4px;
-      height: 4px;
-      background: #38bdf8;
-      border-radius: 50%;
-      transform: translateX(-50%) scale(0);
-      transition: transform 0.3s ease;
-      opacity: 0;
+    position: relative;
+    padding: 0.5rem;
+    
+    // Subtle glow effect for active state
+    &.text-blue-400 {
+      svg {
+        filter: drop-shadow(0 0 2px rgba(96, 165, 250, 0.3));
+      }
     }
-
-    &:hover::after {
-      transform: translateX(-50%) scale(1);
-      opacity: 0.5;
-    }
-
-    // Active state glow
-    &.active::after {
-      transform: translateX(-50%) scale(1.5);
-      opacity: 1;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+    
+    // Subtle scale on press
+    &:active {
+      transform: scale(0.97);
     }
   }
 }
 
-// Add a subtle pulse animation for the active item
-@keyframes subtle-pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.text-blue-400 svg {
-  animation: subtle-pulse 2s ease-in-out infinite;
+// Optional: Add a subtle gradient overlay at the bottom of the screen
+.navigation-container::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+  pointer-events: none;
 }
