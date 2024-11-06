@@ -26,6 +26,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+interface ContentProps {
+  onGameStateChange: (isPlaying: boolean) => void;
+}
+
 interface Stone {
   id: number;
   type: number;
@@ -106,7 +110,7 @@ export const getUserVisitStats = async (userId: string): Promise<UserVisit | nul
 
 const GAME_DURATION = 60; // 60 seconds for the game
 
-const Content: React.FC = () => {
+const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
   const [showBlink, setShowBlink] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
@@ -123,6 +127,10 @@ const Content: React.FC = () => {
   const [maxPlaysToday, setMaxPlaysToday] = useState<number>(5);
   const [userStreak, setUserStreak] = useState<number>(1);
   const [visitStats, setVisitStats] = useState<VisitStats | null>(null);
+  
+  useEffect(() => {
+    onGameStateChange(isPlaying);
+  }, [isPlaying, onGameStateChange]);
 
   useEffect(() => {
     const initApp = async () => {
@@ -185,26 +193,36 @@ const Content: React.FC = () => {
     }
   };
 
+  interface ContentProps {
+    onGameStateChange: (isPlaying: boolean) => void;
+  }
+  
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {
   if (isPlaying && !gameOver) {
     const timer = setInterval(() => {
       setRemainingTime((prevTime) => {
         if (prevTime <= 1) {
-          setGameOver(true); // End game if time is up
+          setGameOver(true);
           return 0;
         }
         return prevTime - 1;
       });
 
-      // Increase difficulty over time
-      setDifficulty((prevDifficulty) => prevDifficulty + 0.03); // Gradually increase difficulty
-    }, 1000); // Reduce time every second
+      setDifficulty((prevDifficulty) => prevDifficulty + 0.03);
+    }, 1000);
 
     return () => clearInterval(timer);
   }
 }, [isPlaying, gameOver]);
 
+useEffect(() => {
+  if (isPlaying) {
+    setShowNavigation(false);
+  } else {
+    setShowNavigation(true);
+  }
+}, [isPlaying]);
 
   useEffect(() => {
     if (gameOver) {
@@ -376,7 +394,6 @@ const PlaysInfoContainer = styled.div`
 
 return (
   <StyledContent>
-    {/* Keep your existing Blast and BlinkScreen components */}
     {showBlast && blastPosition && (
       <Blast 
         key={currentBlastImage}
@@ -388,7 +405,6 @@ return (
     
     <BlinkScreen isVisible={showBlink} />
 
-    {/* Render plays info separately from WelcomeInfo */}
     {!isPlaying && telegramUser && visitStats && (
       <PlaysInfoContainer>
         <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
@@ -400,7 +416,6 @@ return (
       </PlaysInfoContainer>
     )}
 
-    {/* Keep WelcomeInfo separate */}
     {!isPlaying && telegramUser && (
       <WelcomeInfo className="scoreboard">
         {/* Empty for spacing */}
@@ -413,7 +428,6 @@ return (
       </WelcomeInfo>
     )}
 
-
     {!isPlaying && (
       <StartButton
         src={startImage}
@@ -422,38 +436,44 @@ return (
         isClicked={isPlaying}
       />
     )}
-      {isPlaying && (
-        <ScoreBoard className="scoreboard">
-          Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
-        </ScoreBoard>
-      )}
-{isPlaying && !gameOver && currentStones.map((stone) => (
-    <Stone
-      key={`stone-${stone.id}`}
-      id={`stone-${stone.id}`}
-      src={[stone1, stone2, stone3, stone4][stone.type]}
-      alt={`Stone ${stone.type + 1}`}
-      speed={stone.speed}
-      startX={stone.startX}
-      endX={stone.endX}
-      startY={stone.startY}
-      endY={stone.endY}
-      posX={stone.posX}
-      posY={stone.posY}
-      direction={stone.direction}
-      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
-      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-    />
-  ))}
+
+    {isPlaying && (
+      <ScoreBoard className="scoreboard">
+        Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+      </ScoreBoard>
+    )}
+
+    {isPlaying && !gameOver && currentStones.map((stone) => (
+      <Stone
+        key={`stone-${stone.id}`}
+        id={`stone-${stone.id}`}
+        src={[stone1, stone2, stone3, stone4][stone.type]}
+        alt={`Stone ${stone.type + 1}`}
+        speed={stone.speed}
+        startX={stone.startX}
+        endX={stone.endX}
+        startY={stone.startY}
+        endY={stone.endY}
+        posX={stone.posX}
+        posY={stone.posY}
+        direction={stone.direction}
+        onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+        onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+      />
+    ))}
 
     {gameOver && (
-      <>
-        <GameOverScreen className="scoreboard1">
-          <h2>Game Over</h2>
-        </GameOverScreen>
-      </>
+      <GameOverScreen className="scoreboard1">
+        <h2>Game Over</h2>
+      </GameOverScreen>
     )}
   </StyledContent>
-)};
+);
+};
 
+export type { ContentProps };
 export default Content;
+
+function setShowNavigation(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}

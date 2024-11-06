@@ -6,6 +6,8 @@ import "@twa-dev/sdk";
 import Content from "./Content";
 import LandingPage from "./LandingPage";
 import { trackUserVisit, type VisitStats } from './userTracking';
+import { TasksPage, FriendsPage, AccountPage } from './pages/Pages';
+import Navigation from './components/Navigation';
 
 interface TelegramUser {
   id: number;
@@ -29,11 +31,15 @@ const StyledApp = styled.div`
   min-height: 100vh;
 `;
 
+type Page = 'main' | 'tasks' | 'friends' | 'account';
+
 function App() {
   const { network } = useTonConnect();
   const [showLanding, setShowLanding] = useState(true);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [currentPage, setCurrentPage] = useState<Page>('main');
+  const [showNavigation, setShowNavigation] = useState(true);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -87,6 +93,36 @@ function App() {
     setShowLanding(false);
   };
 
+  // Handle navigation visibility
+  const handleNavigationVisibility = (isGamePlaying: boolean) => {
+    setShowNavigation(!isGamePlaying);
+  };
+
+  const renderPage = () => {
+    if (showLanding) {
+      return (
+        <LandingPage 
+          telegramUser={telegramUser}
+          onStart={handleStart}
+          userStats={userStats}
+        />
+      );
+    }
+
+    switch (currentPage) {
+      case 'main':
+        return <Content onGameStateChange={handleNavigationVisibility} />;
+      case 'tasks':
+        return <TasksPage />;
+      case 'friends':
+        return <FriendsPage />;
+      case 'account':
+        return <AccountPage />;
+      default:
+        return <Content onGameStateChange={handleNavigationVisibility} />;
+    }
+  };
+
   return (
     <StyledApp>
       <div className="bg-animation">
@@ -96,15 +132,14 @@ function App() {
         <div id="stars4"></div>
       </div>
 
-      {showLanding && (
-        <LandingPage 
-          telegramUser={telegramUser}
-          onStart={handleStart}
-          userStats={userStats}
+      {renderPage()}
+      
+      {showNavigation && !showLanding && (
+        <Navigation 
+          currentPage={currentPage} 
+          onNavigate={setCurrentPage} 
         />
       )}
-
-      {!showLanding && <Content />}
     </StyledApp>
   );
 }
