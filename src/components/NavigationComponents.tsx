@@ -20,56 +20,85 @@ interface AccountPageProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }) => {
   return (
-    <div className="fixed bottom-14 left-0 right-0 z-50">
-      <div className="flex justify-around items-center max-w-md mx-auto px-4">
-        <button 
-          onClick={() => onNavigate('main')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
-            currentPage === 'main' 
-              ? 'text-white' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <span className="text-2xl">🎮</span>
-          <span className="text-xs mt-0.5">Main</span>
-        </button>
+    <div style={{
+      position: 'fixed',
+      bottom: '56px',  // Position above Telegram button
+      left: 0,
+      right: 0,
+      zIndex: 9999,
+      padding: '8px',
+      display: 'flex',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      background: 'transparent'
+    }}>
+      <button 
+        onClick={() => onNavigate('main')}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: 'transparent',
+          border: 'none',
+          color: currentPage === 'main' ? '#fff' : 'rgba(255,255,255,0.7)',
+          padding: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <span style={{ fontSize: '24px' }}>🎮</span>
+        <span style={{ fontSize: '12px', marginTop: '4px' }}>Main</span>
+      </button>
 
-        <button 
-          onClick={() => onNavigate('friends')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
-            currentPage === 'friends' 
-              ? 'text-white' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <span className="text-2xl">👥</span>
-          <span className="text-xs mt-0.5">Friends</span>
-        </button>
+      <button 
+        onClick={() => onNavigate('friends')}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: 'transparent',
+          border: 'none',
+          color: currentPage === 'friends' ? '#fff' : 'rgba(255,255,255,0.7)',
+          padding: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <span style={{ fontSize: '24px' }}>👥</span>
+        <span style={{ fontSize: '12px', marginTop: '4px' }}>Friends</span>
+      </button>
 
-        <button 
-          onClick={() => onNavigate('account')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
-            currentPage === 'account' 
-              ? 'text-white' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <span className="text-2xl">👤</span>
-          <span className="text-xs mt-0.5">Account</span>
-        </button>
+      <button 
+        onClick={() => onNavigate('account')}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: 'transparent',
+          border: 'none',
+          color: currentPage === 'account' ? '#fff' : 'rgba(255,255,255,0.7)',
+          padding: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <span style={{ fontSize: '24px' }}>👤</span>
+        <span style={{ fontSize: '12px', marginTop: '4px' }}>Account</span>
+      </button>
 
-        <button 
-          onClick={() => onNavigate('tasks')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
-            currentPage === 'tasks' 
-              ? 'text-white' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <span className="text-2xl">📋</span>
-          <span className="text-xs mt-0.5">Tasks</span>
-        </button>
-      </div>
+      <button 
+        onClick={() => onNavigate('tasks')}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: 'transparent',
+          border: 'none',
+          color: currentPage === 'tasks' ? '#fff' : 'rgba(255,255,255,0.7)',
+          padding: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <span style={{ fontSize: '24px' }}>📋</span>
+        <span style={{ fontSize: '12px', marginTop: '4px' }}>Tasks</span>
+      </button>
     </div>
   );
 };

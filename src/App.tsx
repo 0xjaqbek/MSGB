@@ -79,20 +79,17 @@ function App() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
-      <div className="absolute inset-0">
-        <div className="bg-animation">
-          <div id="stars"></div>
-          <div id="stars2"></div>
-          <div id="stars3"></div>
-          <div id="stars4"></div>
-        </div>
+    <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      <div className="bg-animation">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+        <div id="stars4"></div>
       </div>
 
-      <main className="relative z-10 h-full">
-        {renderCurrentPage()}
-      </main>
+      {renderCurrentPage()}
 
+      {/* Always render NavigationBar when not showing landing */}
       {!showLanding && (
         <NavigationBar 
           currentPage={currentPage}
