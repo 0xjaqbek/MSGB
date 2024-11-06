@@ -219,7 +219,7 @@ html, body {
     border-radius: 15px;
     padding: 8px;
     margin: 10px 0;
-    width: calc(100% - 16px); // Account for padding
+    width: calc(95% - 16px); // Account for padding
     max-width: 400px; // Maximum width for larger screens
     box-shadow: 0 0 15px rgba(136, 200, 255, 0.2);
     backdrop-filter: blur(5px);
