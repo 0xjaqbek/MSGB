@@ -358,8 +358,25 @@ const updateScore = useCallback(async () => {
   }
 }, [score, remainingTime, telegramUser, database]);
 
+const PlaysInfoContainer = styled.div`
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #88c8ff;
+  text-align: center;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  z-index: 1001; // Higher than other elements
+  pointer-events: none; // Let clicks pass through
+`;
+
 return (
   <StyledContent>
+    {/* Keep your existing Blast and BlinkScreen components */}
     {showBlast && blastPosition && (
       <Blast 
         key={currentBlastImage}
@@ -371,28 +388,22 @@ return (
     
     <BlinkScreen isVisible={showBlink} />
 
+    {/* Render plays info separately from WelcomeInfo */}
     {!isPlaying && telegramUser && visitStats && (
+      <PlaysInfoContainer>
+        <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
+        {userStreak > 1 && (
+          <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+            +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+          </div>
+        )}
+      </PlaysInfoContainer>
+    )}
+
+    {/* Keep WelcomeInfo separate */}
+    {!isPlaying && telegramUser && (
       <WelcomeInfo className="scoreboard">
-        <div style={{ 
-          position: 'absolute', 
-          top: '-60px', 
-          left: '50%', 
-          transform: 'translateX(-50%)',
-          color: '#88c8ff',
-          textAlign: 'center',
-          fontSize: '1.2rem',
-          textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
-          background: 'rgba(0, 0, 0, 0.6)',
-          padding: '0.5rem 1rem',
-          borderRadius: '15px',
-        }}>
-          <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
-          {userStreak > 1 && (
-            <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: "white" }}>
-              +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-            </div>
-          )}
-        </div>
+        {/* Empty for spacing */}
       </WelcomeInfo>
     )}
 
@@ -401,6 +412,7 @@ return (
         Welcome<br/>in
       </WelcomeInfo>
     )}
+
 
     {!isPlaying && (
       <StartButton
