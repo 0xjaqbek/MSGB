@@ -8,12 +8,14 @@ import { trackUserVisit, type VisitStats } from './userTracking';
 import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
 import { TelegramUser, NavigationPage } from './types';
 
+
 function App() {
   const { network } = useTonConnect();
   const [showLanding, setShowLanding] = useState(true);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
   const [userStats, setUserStats] = useState<VisitStats | null>(null);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('main');
+  const [isPlaying, setIsPlaying] = useState(false); // New state for tracking gameplay
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -53,8 +55,10 @@ function App() {
     setShowLanding(false);
   };
 
-  // Show navigation bar only when not on landing page AND not on main game page
-  const shouldShowNavigation = !showLanding && currentPage !== 'main';
+  // Handler for game state
+  const handleGameStateChange = (isGamePlaying: boolean) => {
+    setIsPlaying(isGamePlaying);
+  };
 
   const renderCurrentPage = () => {
     if (showLanding) {
@@ -69,7 +73,7 @@ function App() {
 
     switch (currentPage) {
       case 'main':
-        return <Content />;
+        return <Content onGameStateChange={handleGameStateChange} />;
       case 'friends':
         return <FriendsPage telegramUser={telegramUser} />;
       case 'account':
@@ -77,7 +81,7 @@ function App() {
       case 'tasks':
         return <TasksPage />;
       default:
-        return <Content />;
+        return <Content onGameStateChange={handleGameStateChange} />;
     }
   };
 
@@ -92,7 +96,8 @@ function App() {
 
       {renderCurrentPage()}
 
-      {shouldShowNavigation && (
+      {/* Show navigation bar only when not playing and not on landing */}
+      {!showLanding && !isPlaying && (
         <NavigationBar 
           currentPage={currentPage}
           onNavigate={setCurrentPage}
@@ -101,4 +106,5 @@ function App() {
     </div>
   );
 }
+
 export default App;

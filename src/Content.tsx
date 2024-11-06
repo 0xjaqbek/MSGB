@@ -88,6 +88,11 @@ interface VisitHistoryEntry {
   streak: number;
 }
 
+interface ContentProps {
+  onGameStateChange: (isPlaying: boolean) => void;
+}
+
+
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
   const db = getDatabase();
   const userVisitsRef = ref(db, `users/${userId}/visits`);
@@ -106,7 +111,7 @@ export const getUserVisitStats = async (userId: string): Promise<UserVisit | nul
 
 const GAME_DURATION = 60; // 60 seconds for the game
 
-const Content: React.FC = () => {
+const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
   const [showBlink, setShowBlink] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
@@ -157,6 +162,10 @@ const Content: React.FC = () => {
     initApp();
   }, []);
 
+  useEffect(() => {
+    onGameStateChange(isPlaying);
+  }, [isPlaying, onGameStateChange]);
+
   const handleStartClick = async () => {
     const tg = window.Telegram?.WebApp;
     if (!tg?.initDataUnsafe?.user?.id) return;
@@ -170,7 +179,7 @@ const Content: React.FC = () => {
       }
 
       setPlaysRemaining(remainingPlays);
-      setIsPlaying(true);
+      setIsPlaying(true); // This will trigger the useEffect above
       setScore(0);
       setGameOver(false);
       setDifficulty(1);
@@ -184,6 +193,7 @@ const Content: React.FC = () => {
       alert("There was an error starting the game. Please try again.");
     }
   };
+
 
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {
@@ -206,16 +216,18 @@ useEffect(() => {
 }, [isPlaying, gameOver]);
 
 
-  useEffect(() => {
-    if (gameOver) {
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.MainButton.text = "Play Again";
-        tg.MainButton.show();
-        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
-      }
+useEffect(() => {
+  if (gameOver) {
+    setIsPlaying(false); // This will trigger the useEffect to notify parent
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.MainButton.text = "Play Again";
+      tg.MainButton.show();
+      updateScore();
+      tg.sendData(JSON.stringify({ action: 'gameOver', score }));
     }
-  }, [gameOver, score]);
+  }
+}, [gameOver, score]);
 
   const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
@@ -315,17 +327,16 @@ useEffect(() => {
 
   useEffect(() => {
     if (gameOver) {
-      // Show Telegram's main button when the game is over
+      setIsPlaying(false); // This will trigger the useEffect to notify parent
       const tg = window.Telegram?.WebApp;
       if (tg) {
         tg.MainButton.text = "Play Again";
         tg.MainButton.show();
         updateScore();
-        // Send the final score to Telegram
         tg.sendData(JSON.stringify({ action: 'gameOver', score }));
       }
     }
-}, [gameOver, score]);
+  }, [gameOver, score]);
 
 const formatDate = (timestamp: string | number | Date) => {
   const date = new Date(timestamp);
@@ -457,3 +468,7 @@ return (
 )};
 
 export default Content;
+
+function onGameStateChange(isPlaying: boolean) {
+  throw new Error("Function not implemented.");
+}
