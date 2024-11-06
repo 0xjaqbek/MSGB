@@ -22,7 +22,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
   return (
     <div style={{
       position: 'fixed',
-      bottom: '5%',  // Position above Telegram button
+      bottom: '1%',  // Position above Telegram button
       left: 0,
       right: 0,
       zIndex: 9999,

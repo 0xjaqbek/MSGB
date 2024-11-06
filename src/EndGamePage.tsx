@@ -34,10 +34,6 @@ interface EndGamePageProps {
               <div className="text-glow text-lg">
                 Come back {nextPlayTime} for more plays!
               </div>
-              <div className="stat-row bg-blue-900/20 rounded-lg">
-                <span className="text-info">Next Reset:</span>
-                <span className="text-value">Tomorrow at 00:00</span>
-              </div>
             </div>
           )}
   
@@ -58,24 +54,7 @@ interface EndGamePageProps {
               </div>
             </div>
           </div>
-  
-          <div className="space-y-3">
-            <button
-              onClick={onShare}
-              className="w-full p-3 rounded-lg bg-blue-500/20 border border-blue-400/30 
-                       hover:bg-blue-500/30 transition-all duration-300 text-glow"
-            >
-              Share with Friends
-            </button>
-            <button
-              onClick={onClose}
-              className="w-full p-3 rounded-lg bg-transparent border border-blue-400/30 
-                       hover:bg-blue-500/20 transition-all duration-300 text-info"
-            >
-              Back to Menu
-            </button>
           </div>
-        </div>
   
         {playsFromStreak > 0 && (
           <div className="card mt-4 text-center bg-blue-900/20">
