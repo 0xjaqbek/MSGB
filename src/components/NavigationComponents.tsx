@@ -20,57 +20,96 @@ interface AccountPageProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }) => {
   return (
-    <nav className="w-full h-16 bg-black bg-opacity-90 backdrop-blur-md border-t border-gray-800 flex justify-around items-center">
-      <button 
-        onClick={() => onNavigate('main')}
-        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
-          currentPage === 'main' 
-            ? 'text-blue-400 scale-110' 
-            : 'text-gray-400 hover:text-gray-200'
-        }`}
-      >
-        <Home size={24} className="mb-1" />
-        <span className="text-xs font-medium">Main</span>
-      </button>
-      
-      <button 
-        onClick={() => onNavigate('friends')}
-        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
-          currentPage === 'friends' 
-            ? 'text-blue-400 scale-110' 
-            : 'text-gray-400 hover:text-gray-200'
-        }`}
-      >
-        <Users size={24} className="mb-1" />
-        <span className="text-xs font-medium">Friends</span>
-      </button>
-      
-      <button 
-        onClick={() => onNavigate('account')}
-        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
-          currentPage === 'account' 
-            ? 'text-blue-400 scale-110' 
-            : 'text-gray-400 hover:text-gray-200'
-        }`}
-      >
-        <User size={24} className="mb-1" />
-        <span className="text-xs font-medium">Account</span>
-      </button>
-      
-      <button 
-        onClick={() => onNavigate('tasks')}
-        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
-          currentPage === 'tasks' 
-            ? 'text-blue-400 scale-110' 
-            : 'text-gray-400 hover:text-gray-200'
-        }`}
-      >
-        <CheckSquare size={24} className="mb-1" />
-        <span className="text-xs font-medium">Tasks</span>
-      </button>
+    <nav className="w-full h-16 bg-black bg-opacity-80 backdrop-blur-lg border-t border-opacity-20 border-blue-400">
+      <div className="w-full h-full max-w-screen-xl mx-auto flex justify-around items-center">
+        <button 
+          onClick={() => onNavigate('main')}
+          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
+            ${currentPage === 'main' ? 'text-blue-400' : 'text-gray-400'}`}
+        >
+          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
+            ${currentPage === 'main' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
+          <svg 
+            viewBox="0 0 24 24" 
+            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+          >
+            <path d="M12 3L4 9v12h16V9l-8-6z" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M12 3v6m0 0l4-3m-4 3l-4-3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="text-xs font-light tracking-wider">MAIN</span>
+        </button>
+
+        <button 
+          onClick={() => onNavigate('friends')}
+          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
+            ${currentPage === 'friends' ? 'text-blue-400' : 'text-gray-400'}`}
+        >
+          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
+            ${currentPage === 'friends' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
+          <svg 
+            viewBox="0 0 24 24" 
+            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+          >
+            <path d="M12 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM19 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM5 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            <path d="M12 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            <path d="M5 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            <path d="M19 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            <path d="M12 8v4M5 8v4M19 8v4" strokeLinecap="round" />
+          </svg>
+          <span className="text-xs font-light tracking-wider">FRIENDS</span>
+        </button>
+
+        <button 
+          onClick={() => onNavigate('account')}
+          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
+            ${currentPage === 'account' ? 'text-blue-400' : 'text-gray-400'}`}
+        >
+          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
+            ${currentPage === 'account' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
+          <svg 
+            viewBox="0 0 24 24" 
+            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="8" r="5" />
+            <path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2" />
+            <path d="M12 8v4m0 0l-2-2m2 2l2-2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="text-xs font-light tracking-wider">ACCOUNT</span>
+        </button>
+
+        <button 
+          onClick={() => onNavigate('tasks')}
+          className={`group flex flex-col items-center justify-center w-1/4 h-full relative
+            ${currentPage === 'tasks' ? 'text-blue-400' : 'text-gray-400'}`}
+        >
+          <div className={`absolute top-0 w-full h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300
+            ${currentPage === 'tasks' ? 'scale-x-100' : 'group-hover:scale-x-50'}`} />
+          <svg 
+            viewBox="0 0 24 24" 
+            className="w-6 h-6 mb-1 transition-transform duration-300 group-hover:scale-110"
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+            <path d="M9 6l3 3 3-3M9 18l3-3 3 3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="text-xs font-light tracking-wider">TASKS</span>
+        </button>
+      </div>
     </nav>
   );
 };
+
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (
