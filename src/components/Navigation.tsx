@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Home, Target, Users, User } from 'lucide-react';
 
 const NavigationContainer = styled.div`
   position: fixed;
@@ -26,13 +25,19 @@ const NavButton = styled.button<{ $isActive?: boolean }>`
   align-items: center;
   gap: 0.3rem;
   transition: all 0.3s ease;
+  min-width: 50px;
 
   &:hover {
     opacity: 1;
     color: #88c8ff;
   }
 
-  span {
+  .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .label {
     font-size: 0.7rem;
   }
 `;
@@ -52,29 +57,29 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
         onClick={() => onNavigate('main')}
         disabled={currentPage === 'main'}
       >
-        <Home size={24} />
-        <span>Main</span>
+        <div className="icon">🎮</div>
+        <div className="label">Main</div>
       </NavButton>
       <NavButton 
         $isActive={currentPage === 'tasks'} 
         onClick={() => onNavigate('tasks')}
       >
-        <Target size={24} />
-        <span>Tasks</span>
+        <div className="icon">📋</div>
+        <div className="label">Tasks</div>
       </NavButton>
       <NavButton 
         $isActive={currentPage === 'friends'} 
         onClick={() => onNavigate('friends')}
       >
-        <Users size={24} />
-        <span>Friends</span>
+        <div className="icon">👥</div>
+        <div className="label">Friends</div>
       </NavButton>
       <NavButton 
         $isActive={currentPage === 'account'} 
         onClick={() => onNavigate('account')}
       >
-        <User size={24} />
-        <span>Account</span>
+        <div className="icon">👤</div>
+        <div className="label">Account</div>
       </NavButton>
     </NavigationContainer>
   );
