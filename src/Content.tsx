@@ -360,7 +360,7 @@ const updateScore = useCallback(async () => {
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
-  top: 100px;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   color: #88c8ff;
