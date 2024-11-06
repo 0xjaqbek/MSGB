@@ -6,34 +6,21 @@ import "@twa-dev/sdk";
 import Content from "./Content";
 import LandingPage from "./LandingPage";
 import { trackUserVisit, type VisitStats } from './userTracking';
-
-interface TelegramUser {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-  is_premium?: boolean;
-}
-
-interface UserStats {
-  currentStreak: number;
-  highestStreak: number;
-  totalVisits: number;
-  todayVisits: number;
-  isFirstVisit: boolean;
-}
+import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
+import { TelegramUser, NavigationPage } from './types';
 
 const StyledApp = styled.div`
   max-width: 100vw;
   min-height: 100vh;
+  padding-bottom: 4rem;
 `;
 
 function App() {
   const { network } = useTonConnect();
   const [showLanding, setShowLanding] = useState(true);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
-  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [userStats, setUserStats] = useState<VisitStats | null>(null);
+  const [currentPage, setCurrentPage] = useState<NavigationPage>('main');
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -51,14 +38,7 @@ function App() {
               user.id.toString(),
               user.first_name
             );
-            
-            setUserStats({
-              currentStreak: visitStats.currentStreak,
-              highestStreak: visitStats.highestStreak,
-              totalVisits: visitStats.totalVisits,
-              todayVisits: visitStats.todayVisits,
-              isFirstVisit: visitStats.isFirstVisit
-            });
+            setUserStats(visitStats);
           } catch (error) {
             console.error('Error tracking user visit:', error);
           }
@@ -71,20 +51,42 @@ function App() {
 
   const handleStart = async () => {
     if (userStats?.isFirstVisit && telegramUser) {
-      const updatedStats = await trackUserVisit(
-        telegramUser.id.toString(),
-        telegramUser.first_name
-      );
-      
-      setUserStats({
-        currentStreak: updatedStats.currentStreak,
-        highestStreak: updatedStats.highestStreak,
-        totalVisits: updatedStats.totalVisits,
-        todayVisits: updatedStats.todayVisits,
-        isFirstVisit: false
-      });
+      try {
+        const updatedStats = await trackUserVisit(
+          telegramUser.id.toString(),
+          telegramUser.first_name
+        );
+        setUserStats(updatedStats);
+      } catch (error) {
+        console.error('Error updating user stats:', error);
+      }
     }
     setShowLanding(false);
+  };
+
+  const renderCurrentPage = () => {
+    if (showLanding) {
+      return (
+        <LandingPage 
+          telegramUser={telegramUser}
+          onStart={handleStart}
+          userStats={userStats}
+        />
+      );
+    }
+
+    switch (currentPage) {
+      case 'main':
+        return <Content />;
+      case 'friends':
+        return <FriendsPage telegramUser={telegramUser} />;
+      case 'account':
+        return <AccountPage telegramUser={telegramUser} userStats={userStats} />;
+      case 'tasks':
+        return <TasksPage />;
+      default:
+        return <Content />;
+    }
   };
 
   return (
@@ -96,15 +98,14 @@ function App() {
         <div id="stars4"></div>
       </div>
 
-      {showLanding && (
-        <LandingPage 
-          telegramUser={telegramUser}
-          onStart={handleStart}
-          userStats={userStats}
+      {renderCurrentPage()}
+
+      {!showLanding && (
+        <NavigationBar 
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
         />
       )}
-
-      {!showLanding && <Content />}
     </StyledApp>
   );
 }

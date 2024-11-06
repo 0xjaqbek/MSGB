@@ -44,3 +44,31 @@ export type Stone = {
       };
     }
   }
+ 
+  export interface UserVisit {
+    lastVisit: string;
+    currentStreak: number;
+    highestStreak: number;
+    totalVisits: number;
+    dailyVisits: { [key: string]: number };
+    firstVisitComplete: boolean;
+    playsToday: number;
+    maxPlaysToday: number;
+  }
+  
+  export interface VisitStats {
+    lastVisit: string;
+    currentStreak: number;
+    highestStreak: number;
+    totalVisits: number;
+    dailyVisits: { [key: string]: number };
+    firstVisitComplete: boolean;
+    isNewDay: boolean;
+    isFirstVisit: boolean;
+    todayVisits: number;
+    playsRemaining: number;
+    playsToday: number;
+    maxPlaysToday: number;
+  }
+  
+  export type NavigationPage = 'main' | 'friends' | 'account' | 'tasks';
