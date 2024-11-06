@@ -20,79 +20,54 @@ interface AccountPageProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }) => {
   return (
-    <nav className="w-full h-16 bg-black bg-opacity-40 backdrop-blur-md border-t border-white border-opacity-5">
-      <div className="h-full max-w-lg mx-auto flex justify-between items-center px-6">
+    <nav className="fixed bottom-0 left-0 right-0 mb-14 bg-transparent">
+      <div className="flex justify-around items-center max-w-md mx-auto px-4">
         <button 
           onClick={() => onNavigate('main')}
-          className={`flex flex-col items-center transition-all duration-300 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
             currentPage === 'main' 
-              ? 'text-blue-400' 
-              : 'text-gray-400 hover:text-gray-300'
+              ? 'text-blue-400 scale-110' 
+              : 'text-white opacity-70 hover:opacity-100'
           }`}
         >
-          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M12 2L3 9v11a2 2 0 002 2h14a2 2 0 002-2V9l-9-7z" />
-          </svg>
-          <div className="flex flex-col items-center">
-            <span className="text-xs">Game</span>
-            <span className="text-[10px] opacity-60">Play Now</span>
-          </div>
+          <span className="text-2xl mb-0.5">🎮</span>
+          <span className="text-xs font-light">Main</span>
         </button>
 
         <button 
           onClick={() => onNavigate('friends')}
-          className={`flex flex-col items-center transition-all duration-300 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
             currentPage === 'friends' 
-              ? 'text-blue-400' 
-              : 'text-gray-400 hover:text-gray-300'
+              ? 'text-blue-400 scale-110' 
+              : 'text-white opacity-70 hover:opacity-100'
           }`}
         >
-          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
-          <div className="flex flex-col items-center">
-            <span className="text-xs">Friends</span>
-            <span className="text-[10px] opacity-60">Leaderboard</span>
-          </div>
+          <span className="text-2xl mb-0.5">👥</span>
+          <span className="text-xs font-light">Friends</span>
         </button>
 
         <button 
           onClick={() => onNavigate('account')}
-          className={`flex flex-col items-center transition-all duration-300 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
             currentPage === 'account' 
-              ? 'text-blue-400' 
-              : 'text-gray-400 hover:text-gray-300'
+              ? 'text-blue-400 scale-110' 
+              : 'text-white opacity-70 hover:opacity-100'
           }`}
         >
-          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          <div className="flex flex-col items-center">
-            <span className="text-xs">Profile</span>
-            <span className="text-[10px] opacity-60">Statistics</span>
-          </div>
+          <span className="text-2xl mb-0.5">👤</span>
+          <span className="text-xs font-light">Account</span>
         </button>
 
         <button 
           onClick={() => onNavigate('tasks')}
-          className={`flex flex-col items-center transition-all duration-300 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
             currentPage === 'tasks' 
-              ? 'text-blue-400' 
-              : 'text-gray-400 hover:text-gray-300'
+              ? 'text-blue-400 scale-110' 
+              : 'text-white opacity-70 hover:opacity-100'
           }`}
         >
-          <svg className="w-5 h-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M9 11l3 3L22 4" />
-            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-          </svg>
-          <div className="flex flex-col items-center">
-            <span className="text-xs">Tasks</span>
-            <span className="text-[10px] opacity-60">Daily Goals</span>
-          </div>
+          <span className="text-2xl mb-0.5">📋</span>
+          <span className="text-xs font-light">Tasks</span>
         </button>
       </div>
     </nav>

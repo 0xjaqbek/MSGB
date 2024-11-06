@@ -167,46 +167,28 @@ body {
   }
 }
 
-// Content container styles
-.content-container {
-  position: relative;
-  z-index: 1;
-  min-height: calc(100vh - 64px); // Subtract navigation height
-}
-
 .navigation-container {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 999; // Just below the Telegram button
   
   button {
-    position: relative;
-    padding: 0.5rem;
-    
-    // Subtle glow effect for active state
-    &.text-blue-400 {
-      svg {
-        filter: drop-shadow(0 0 2px rgba(96, 165, 250, 0.3));
-      }
-    }
-    
-    // Subtle scale on press
     &:active {
-      transform: scale(0.97);
+      transform: scale(0.95);
     }
   }
 }
 
-// Optional: Add a subtle gradient overlay at the bottom of the screen
+// Optional: Add a very subtle gradient if needed
 .navigation-container::before {
   content: '';
   position: absolute;
   bottom: 100%;
   left: 0;
   right: 0;
-  height: 40px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+  height: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
   pointer-events: none;
 }
