@@ -2809,7 +2809,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   text-align: center;
   font-size: 1.2rem;
   text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
   border-radius: 15px;
   z-index: 1001; // Higher than other elements
