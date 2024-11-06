@@ -114,32 +114,47 @@ const Content: React.FC = () => {
   const [currentStones, setCurrentStones] = useState<Stone[]>([]);
   const [difficulty, setDifficulty] = useState(1);
   const [stoneIdCounter, setStoneIdCounter] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(GAME_DURATION); // Time remaining in seconds
+  const [remainingTime, setRemainingTime] = useState(GAME_DURATION);
   const [showBlast, setShowBlast] = useState(false);
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
   const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const [playsRemaining, setPlaysRemaining] = useState<number | null>(null);
+  const [maxPlaysToday, setMaxPlaysToday] = useState<number>(5);
+  const [userStreak, setUserStreak] = useState<number>(1);
+  const [visitStats, setVisitStats] = useState<VisitStats | null>(null);
 
   useEffect(() => {
-    // Initialize Telegram WebApp
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      tg.disableVerticalSwipes();
-      tg.setHeaderColor("#000000");
-      tg.setBottomBarColor("#000000");
-      const user = tg.initDataUnsafe?.user;
-      
-      if (user) {
-        setTelegramUser(user);
-      }
+    const initApp = async () => {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        tg.disableVerticalSwipes();
+        tg.setHeaderColor("#000000");
+        tg.setBottomBarColor("#000000");
+        const user = tg.initDataUnsafe?.user;
+        
+        if (user) {
+          setTelegramUser(user);
+          try {
+            const stats = await trackUserVisit(user.id.toString(), user.first_name);
+            setVisitStats(stats);
+            setPlaysRemaining(stats.playsRemaining);
+            setMaxPlaysToday(stats.maxPlaysToday);
+            setUserStreak(stats.currentStreak);
+          } catch (error) {
+            console.error('Error loading user stats:', error);
+          }
+        }
 
-      // Set up Telegram's main button
-      tg.MainButton.text = "Start Game";
-      tg.MainButton.onClick(() => handleStartClick());
-      tg.MainButton.show();
-    }
+        tg.MainButton.text = "Start Game";
+        tg.MainButton.onClick(() => handleStartClick());
+        tg.MainButton.show();
+      }
+    };
+
+    initApp();
   }, []);
 
   const handleStartClick = async () => {
@@ -153,7 +168,8 @@ const Content: React.FC = () => {
         alert("No plays remaining today. Come back tomorrow for more!");
         return;
       }
-  
+
+      setPlaysRemaining(remainingPlays);
       setIsPlaying(true);
       setScore(0);
       setGameOver(false);
@@ -161,35 +177,13 @@ const Content: React.FC = () => {
       setCurrentStones([]);
       setStoneIdCounter(0);
       setRemainingTime(GAME_DURATION);
-      window.Telegram?.WebApp?.MainButton.hide();
-      window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
+      tg.MainButton.hide();
+      tg.sendData(JSON.stringify({ action: 'gameStarted' }));
     } catch (error) {
       console.error('Error starting game:', error);
       alert("There was an error starting the game. Please try again.");
     }
   };
-
-  // Add this state at the top of your component:
-  const [userVisitStats, setUserVisitStats] = useState<VisitStats | null>(null);
-
-useEffect(() => {
-  const loadUserStats = async () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg?.initDataUnsafe?.user) {
-      try {
-        const stats = await trackUserVisit(
-          tg.initDataUnsafe.user.id.toString(),
-          tg.initDataUnsafe.user.first_name
-        );
-        setUserVisitStats(stats);
-      } catch (error) {
-        console.error('Error loading user stats:', error);
-      }
-    }
-  };
-
-  loadUserStats();
-}, []);
 
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {
@@ -364,53 +358,50 @@ const updateScore = useCallback(async () => {
   }
 }, [score, remainingTime, telegramUser, database]);
 
-
-
-
-
 return (
   <StyledContent>
-{/* Blast effect */}
-{showBlast && blastPosition && (
-        <Blast 
-          key={currentBlastImage} // Force re-render when image changes
-          src={currentBlastImage} 
-          posX={blastPosition.posX} 
-          posY={blastPosition.posY} 
-        />
-      )}
-    {/* Blink effect */}
+    {showBlast && blastPosition && (
+      <Blast 
+        key={currentBlastImage}
+        src={currentBlastImage} 
+        posX={blastPosition.posX} 
+        posY={blastPosition.posY} 
+      />
+    )}
+    
     <BlinkScreen isVisible={showBlink} />
 
-    {!isPlaying && telegramUser && userVisitStats && (
-  <WelcomeInfo className="scoreboard">
-    <div style={{ 
-      position: 'absolute', 
-      top: '-60px', 
-      left: '50%', 
-      transform: 'translateX(-50%)',
-      color: '#88c8ff',
-      textAlign: 'center',
-      fontSize: '1.2rem',
-      textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
-      background: 'rgba(0, 0, 0, 0.6)',
-      padding: '0.5rem 1rem',
-      borderRadius: '15px',
-    }}>
-      <div>🎮 {userVisitStats.playsRemaining} of {userVisitStats.maxPlaysToday} plays remaining</div>
-      {userVisitStats.currentStreak > 1 && (
-        <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-          +{userVisitStats.currentStreak - 1} bonus {userVisitStats.currentStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-        </div>
-      )}
-    </div>
-  </WelcomeInfo>
-)}
-    {!isPlaying && !telegramUser && (
+    {!isPlaying && telegramUser && visitStats && (
       <WelcomeInfo className="scoreboard">
-        Welcome<br></br>in
+        <div style={{ 
+          position: 'absolute', 
+          top: '-60px', 
+          left: '50%', 
+          transform: 'translateX(-50%)',
+          color: '#88c8ff',
+          textAlign: 'center',
+          fontSize: '1.2rem',
+          textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
+          background: 'rgba(0, 0, 0, 0.6)',
+          padding: '0.5rem 1rem',
+          borderRadius: '15px',
+        }}>
+          <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
+          {userStreak > 1 && (
+            <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+              +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+            </div>
+          )}
+        </div>
       </WelcomeInfo>
     )}
+
+    {!isPlaying && !telegramUser && (
+      <WelcomeInfo className="scoreboard">
+        Welcome<br/>in
+      </WelcomeInfo>
+    )}
+
     {!isPlaying && (
       <StartButton
         src={startImage}
