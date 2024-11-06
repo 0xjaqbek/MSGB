@@ -83,25 +83,25 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <div className="bg-animation">
-        <div id="stars"></div>
-        <div id="stars2"></div>
-        <div id="stars3"></div>
-        <div id="stars4"></div>
+    <div className="relative h-[100vh] overflow-hidden">
+      <div className="fixed inset-0">
+        <div className="bg-animation">
+          <div id="stars"></div>
+          <div id="stars2"></div>
+          <div id="stars3"></div>
+          <div id="stars4"></div>
+        </div>
       </div>
 
-      <div className="content-container">
+      <div className="relative h-full">
         {renderCurrentPage()}
       </div>
 
       {!showLanding && (
-        <div className="navigation-container">
-          <NavigationBar 
-            currentPage={currentPage}
-            onNavigate={setCurrentPage}
-          />
-        </div>
+        <NavigationBar 
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+        />
       )}
     </div>
   );
