@@ -25,12 +25,8 @@ function App() {
         
         if (user) {
           setTelegramUser(user as TelegramUser);
-          
           try {
-            const visitStats = await trackUserVisit(
-              user.id.toString(),
-              user.first_name
-            );
+            const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
             setUserStats(visitStats);
           } catch (error) {
             console.error('Error tracking user visit:', error);
@@ -83,8 +79,8 @@ function App() {
   };
 
   return (
-    <div className="relative h-[100vh] overflow-hidden">
-      <div className="fixed inset-0">
+    <div className="fixed inset-0 overflow-hidden">
+      <div className="absolute inset-0">
         <div className="bg-animation">
           <div id="stars"></div>
           <div id="stars2"></div>
@@ -93,9 +89,9 @@ function App() {
         </div>
       </div>
 
-      <div className="relative h-full">
+      <main className="relative z-10 h-full">
         {renderCurrentPage()}
-      </div>
+      </main>
 
       {!showLanding && (
         <NavigationBar 

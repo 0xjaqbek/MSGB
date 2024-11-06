@@ -20,57 +20,57 @@ interface AccountPageProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 mb-14 bg-transparent">
+    <div className="fixed bottom-14 left-0 right-0 z-50">
       <div className="flex justify-around items-center max-w-md mx-auto px-4">
         <button 
           onClick={() => onNavigate('main')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
             currentPage === 'main' 
-              ? 'text-blue-400 scale-110' 
-              : 'text-white opacity-70 hover:opacity-100'
+              ? 'text-white' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
-          <span className="text-2xl mb-0.5">🎮</span>
-          <span className="text-xs font-light">Main</span>
+          <span className="text-2xl">🎮</span>
+          <span className="text-xs mt-0.5">Main</span>
         </button>
 
         <button 
           onClick={() => onNavigate('friends')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
             currentPage === 'friends' 
-              ? 'text-blue-400 scale-110' 
-              : 'text-white opacity-70 hover:opacity-100'
+              ? 'text-white' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
-          <span className="text-2xl mb-0.5">👥</span>
-          <span className="text-xs font-light">Friends</span>
+          <span className="text-2xl">👥</span>
+          <span className="text-xs mt-0.5">Friends</span>
         </button>
 
         <button 
           onClick={() => onNavigate('account')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
             currentPage === 'account' 
-              ? 'text-blue-400 scale-110' 
-              : 'text-white opacity-70 hover:opacity-100'
+              ? 'text-white' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
-          <span className="text-2xl mb-0.5">👤</span>
-          <span className="text-xs font-light">Account</span>
+          <span className="text-2xl">👤</span>
+          <span className="text-xs mt-0.5">Account</span>
         </button>
 
         <button 
           onClick={() => onNavigate('tasks')}
-          className={`flex flex-col items-center p-2 min-w-[64px] transition-all duration-200 ${
+          className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${
             currentPage === 'tasks' 
-              ? 'text-blue-400 scale-110' 
-              : 'text-white opacity-70 hover:opacity-100'
+              ? 'text-white' 
+              : 'text-white/70 hover:text-white'
           }`}
         >
-          <span className="text-2xl mb-0.5">📋</span>
-          <span className="text-xs font-light">Tasks</span>
+          <span className="text-2xl">📋</span>
+          <span className="text-xs mt-0.5">Tasks</span>
         </button>
       </div>
-    </nav>
+    </div>
   );
 };
 
