@@ -12,6 +12,7 @@ import { getDatabase, ref, set, onValue, push, update, get } from 'firebase/data
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
+import EndGamePage from "./EndGamePage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -128,6 +129,8 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
   const [maxPlaysToday, setMaxPlaysToday] = useState<number>(5);
   const [userStreak, setUserStreak] = useState<number>(1);
   const [visitStats, setVisitStats] = useState<VisitStats | null>(null);
+  const [showEndGame, setShowEndGame] = useState(false);
+  const [endGameReason, setEndGameReason] = useState<'no-plays' | 'game-over'>('game-over');
 
   useEffect(() => {
     const initApp = async () => {
@@ -174,7 +177,8 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
       
       if (remainingPlays < 0) {
-        alert("No plays remaining today. Come back tomorrow for more!");
+        setEndGameReason('no-plays');
+        setShowEndGame(true);
         return;
       }
 
@@ -218,7 +222,9 @@ useEffect(() => {
 
 useEffect(() => {
   if (gameOver) {
-    setIsPlaying(false); // This will trigger the useEffect to notify parent
+    setIsPlaying(false);
+    setEndGameReason('game-over');
+    setShowEndGame(true);
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.MainButton.text = "Play Again";
@@ -325,19 +331,6 @@ useEffect(() => {
     }
   }, [isPlaying, gameOver, spawnStone]);
 
-  useEffect(() => {
-    if (gameOver) {
-      setIsPlaying(false); // This will trigger the useEffect to notify parent
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.MainButton.text = "Play Again";
-        tg.MainButton.show();
-        updateScore();
-        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
-      }
-    }
-  }, [gameOver, score]);
-
 const formatDate = (timestamp: string | number | Date) => {
   const date = new Date(timestamp);
   return date.toLocaleString(); // Formats the date to a human-readable format
@@ -385,90 +378,113 @@ const PlaysInfoContainer = styled.div`
   pointer-events: none; // Let clicks pass through
 `;
 
+const handleShare = () => {
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.sendData(JSON.stringify({ 
+      action: 'share', 
+      score: endGameReason === 'game-over' ? score : undefined 
+    }));
+  }
+};
+
+const handleClose = () => {
+  setShowEndGame(false);
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.MainButton.text = "Start Game";
+    tg.MainButton.show();
+  }
+};
+
 return (
   <StyledContent>
-    {/* Keep your existing Blast and BlinkScreen components */}
-    {showBlast && blastPosition && (
-      <Blast 
-        key={currentBlastImage}
-        src={currentBlastImage} 
-        posX={blastPosition.posX} 
-        posY={blastPosition.posY} 
+    {showEndGame ? (
+      <EndGamePage
+        reason={endGameReason}
+        score={endGameReason === 'game-over' ? score : undefined}
+        playsFromStreak={userStreak > 1 ? userStreak - 1 : 0}
+        onShare={handleShare}
+        onClose={handleClose}
       />
-    )}
-    
-    <BlinkScreen isVisible={showBlink} />
-
-    {/* Render plays info separately from WelcomeInfo */}
-    {!isPlaying && telegramUser && visitStats && (
-      <PlaysInfoContainer>
-        <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
-        {userStreak > 1 && (
-          <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-            +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-          </div>
-        )}
-      </PlaysInfoContainer>
-    )}
-
-    {/* Keep WelcomeInfo separate */}
-    {!isPlaying && telegramUser && (
-      <WelcomeInfo className="scoreboard">
-        {/* Empty for spacing */}
-      </WelcomeInfo>
-    )}
-
-    {!isPlaying && !telegramUser && (
-      <WelcomeInfo className="scoreboard">
-        Welcome<br/>in
-      </WelcomeInfo>
-    )}
-
-
-    {!isPlaying && (
-      <StartButton
-        src={startImage}
-        alt="Start"
-        onClick={handleStartClick}
-        isClicked={isPlaying}
-      />
-    )}
-      {isPlaying && (
-        <ScoreBoard className="scoreboard">
-          Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
-        </ScoreBoard>
-      )}
-{isPlaying && !gameOver && currentStones.map((stone) => (
-    <Stone
-      key={`stone-${stone.id}`}
-      id={`stone-${stone.id}`}
-      src={[stone1, stone2, stone3, stone4][stone.type]}
-      alt={`Stone ${stone.type + 1}`}
-      speed={stone.speed}
-      startX={stone.startX}
-      endX={stone.endX}
-      startY={stone.startY}
-      endY={stone.endY}
-      posX={stone.posX}
-      posY={stone.posY}
-      direction={stone.direction}
-      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
-      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-    />
-  ))}
-
-    {gameOver && (
+    ) : (
       <>
-        <GameOverScreen className="scoreboard1">
-          <h2>Game Over</h2>
-        </GameOverScreen>
+        {showBlast && blastPosition && (
+          <Blast 
+            key={currentBlastImage}
+            src={currentBlastImage} 
+            posX={blastPosition.posX} 
+            posY={blastPosition.posY} 
+          />
+        )}
+        
+        <BlinkScreen isVisible={showBlink} />
+
+        {!isPlaying && telegramUser && visitStats && (
+          <PlaysInfoContainer>
+            <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
+            {userStreak > 1 && (
+              <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+                +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+              </div>
+            )}
+          </PlaysInfoContainer>
+        )}
+
+        {!isPlaying && telegramUser && (
+          <WelcomeInfo className="scoreboard">
+            {/* Empty for spacing */}
+          </WelcomeInfo>
+        )}
+
+        {!isPlaying && !telegramUser && (
+          <WelcomeInfo className="scoreboard">
+            Welcome<br/>in
+          </WelcomeInfo>
+        )}
+
+        {!isPlaying && (
+          <StartButton
+            src={startImage}
+            alt="Start"
+            onClick={handleStartClick}
+            isClicked={isPlaying}
+          />
+        )}
+
+        {isPlaying && (
+          <ScoreBoard className="scoreboard">
+            Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+          </ScoreBoard>
+        )}
+
+        {isPlaying && !gameOver && currentStones.map((stone) => (
+          <Stone
+            key={`stone-${stone.id}`}
+            id={`stone-${stone.id}`}
+            src={[stone1, stone2, stone3, stone4][stone.type]}
+            alt={`Stone ${stone.type + 1}`}
+            speed={stone.speed}
+            startX={stone.startX}
+            endX={stone.endX}
+            startY={stone.startY}
+            endY={stone.endY}
+            posX={stone.posX}
+            posY={stone.posY}
+            direction={stone.direction}
+            onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+            onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+          />
+        ))}
+
+        {gameOver && (
+          <GameOverScreen className="scoreboard1">
+            <h2>Game Over</h2>
+          </GameOverScreen>
+        )}
       </>
     )}
   </StyledContent>
 )};
 
 export default Content;
-
-function onGameStateChange(isPlaying: boolean) {
-  throw new Error("Function not implemented.");
-}
