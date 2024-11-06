@@ -106,15 +106,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (
     <div className="page-container">
-      <h1 className="text-glow text-2xl mb-4">Friends</h1>
-      <div className="card center-content">
-        <h2 className="text-glow text-xl mb-2">Welcome, {telegramUser?.first_name}</h2>
-        <h3 className="text-glow text-xl mb-2">Leaderboard</h3>
+      <h1 className="text-glow text-xl mb-4">Friends</h1>
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Welcome, {telegramUser?.first_name}</h2>
+        <h3 className="text-glow text-lg mb-2">Leaderboard</h3>
         <p className="text-info">Coming soon...</p>
       </div>
       
-      <div className="card center-content">
-        <h2 className="text-glow text-xl mb-2">Friend Requests</h2>
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Friend Requests</h2>
         <p className="text-info">No pending requests</p>
       </div>
     </div>
@@ -123,7 +123,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
 
 const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) => {
   if (!telegramUser) {
-    return <div className="page-container center-content">
+    return <div className="page-container">
       <span className="text-glow animate-pulse">Loading...</span>
     </div>;
   }
@@ -131,7 +131,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
   return (
     <div className="page-container">
       <div className="card">
-        <h1 className="text-glow text-2xl mb-4">My Account</h1>
+        <h1 className="text-glow text-xl mb-4">My Account</h1>
         <div className="space-y-2">
           <div className="stat-row">
             <span className="text-info">Name:</span>
@@ -159,6 +159,11 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
           )}
         </div>
       </div>
+      
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Statistics</h2>
+        <p className="text-info">More stats coming soon...</p>
+      </div>
     </div>
   );
 };
@@ -166,10 +171,10 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
 const TasksPage: React.FC = () => {
   return (
     <div className="page-container">
-      <h1 className="text-glow text-2xl mb-4">Daily Tasks</h1>
+      <h1 className="text-glow text-xl mb-4">Daily Tasks</h1>
       <div className="card">
-        <h2 className="text-glow text-xl mb-4">Today's Tasks</h2>
-        <div className="space-y-3">
+        <h2 className="text-glow text-lg mb-2">Today's Tasks</h2>
+        <div className="space-y-2">
           <div className="stat-row">
             <span>Play 5 games</span>
             <span className="text-glow">0/5</span>
@@ -185,8 +190,8 @@ const TasksPage: React.FC = () => {
         </div>
       </div>
       
-      <div className="card center-content mt-4">
-        <h2 className="text-glow text-xl mb-2">Weekly Challenges</h2>
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Weekly Challenges</h2>
         <p className="text-info">Coming soon...</p>
       </div>
     </div>
