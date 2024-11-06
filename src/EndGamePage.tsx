@@ -60,7 +60,6 @@ interface EndGamePageProps {
           <div className="card mt-4 text-center bg-blue-900/20">
             <div className="text-glow">
               <span className="text-lg">🎉 Streak Bonus!</span>
-              <p className="mt-2">You get +{playsFromStreak} extra {playsFromStreak === 1 ? 'play' : 'plays'}</p>
               <p className="text-sm text-info mt-1">Keep your streak for more bonuses!</p>
             </div>
           </div>
