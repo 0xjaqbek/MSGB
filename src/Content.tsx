@@ -388,7 +388,7 @@ return (
         }}>
           <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
           {userStreak > 1 && (
-            <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+            <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: "white" }}>
               +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
             </div>
           )}
