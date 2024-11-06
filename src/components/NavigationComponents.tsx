@@ -20,39 +20,55 @@ interface AccountPageProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-16 bg-black border-t border-gray-800 flex justify-around items-center z-50">
+    <nav className="w-full h-16 bg-black bg-opacity-90 backdrop-blur-md border-t border-gray-800 flex justify-around items-center">
       <button 
         onClick={() => onNavigate('main')}
-        className={`flex flex-col items-center ${currentPage === 'main' ? 'text-blue-400' : 'text-gray-400'}`}
+        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
+          currentPage === 'main' 
+            ? 'text-blue-400 scale-110' 
+            : 'text-gray-400 hover:text-gray-200'
+        }`}
       >
-        <Home size={24} />
-        <span className="text-xs mt-1">Main</span>
+        <Home size={24} className="mb-1" />
+        <span className="text-xs font-medium">Main</span>
       </button>
       
       <button 
         onClick={() => onNavigate('friends')}
-        className={`flex flex-col items-center ${currentPage === 'friends' ? 'text-blue-400' : 'text-gray-400'}`}
+        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
+          currentPage === 'friends' 
+            ? 'text-blue-400 scale-110' 
+            : 'text-gray-400 hover:text-gray-200'
+        }`}
       >
-        <Users size={24} />
-        <span className="text-xs mt-1">Friends</span>
+        <Users size={24} className="mb-1" />
+        <span className="text-xs font-medium">Friends</span>
       </button>
       
       <button 
         onClick={() => onNavigate('account')}
-        className={`flex flex-col items-center ${currentPage === 'account' ? 'text-blue-400' : 'text-gray-400'}`}
+        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
+          currentPage === 'account' 
+            ? 'text-blue-400 scale-110' 
+            : 'text-gray-400 hover:text-gray-200'
+        }`}
       >
-        <User size={24} />
-        <span className="text-xs mt-1">Account</span>
+        <User size={24} className="mb-1" />
+        <span className="text-xs font-medium">Account</span>
       </button>
       
       <button 
         onClick={() => onNavigate('tasks')}
-        className={`flex flex-col items-center ${currentPage === 'tasks' ? 'text-blue-400' : 'text-gray-400'}`}
+        className={`flex flex-col items-center justify-center w-1/4 h-full transition-all duration-200 ${
+          currentPage === 'tasks' 
+            ? 'text-blue-400 scale-110' 
+            : 'text-gray-400 hover:text-gray-200'
+        }`}
       >
-        <CheckSquare size={24} />
-        <span className="text-xs mt-1">Tasks</span>
+        <CheckSquare size={24} className="mb-1" />
+        <span className="text-xs font-medium">Tasks</span>
       </button>
-    </div>
+    </nav>
   );
 };
 
