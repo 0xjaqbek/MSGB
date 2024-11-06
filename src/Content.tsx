@@ -11,7 +11,6 @@ import blastImage1 from './assets/blast1.png';
 import { getDatabase, ref, set, onValue, push, update, get } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
-import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -88,30 +87,92 @@ interface VisitHistoryEntry {
   streak: number;
 }
 
-const PlaysInfoContainer = styled.div`
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #88c8ff;
-  font-size: 1.2rem;
-  text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
-  background: rgba(0, 0, 0, 0.6);
-  padding: 0.5rem 1rem;
-  border-radius: 15px;
-  z-index: 1000;
-`;
-
-// New interfaces for plays tracking
-interface UserPlays {
-  playsToday: number;
-  maxPlaysToday: number;
-  lastPlayDate: string;
-}
-
-const calculateMaxPlays = (streak: number): number => {
-  return 5 + (streak - 1); // 5 base plays + bonus from streak
+export const trackUserVisit = async (userId: string, userName: string) => {
+  const db = getDatabase();
+  const userVisitsRef = ref(db, `users/${userId}/visits`);
+  
+  try {
+    // Get current visit data
+    const snapshot = await get(userVisitsRef);
+    const now = new Date();
+    const today = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    
+    if (!snapshot.exists()) {
+      // First time user ever
+      const initialVisit: UserVisit = {
+        lastVisit: today,
+        currentStreak: 1,
+        highestStreak: 1,
+        totalVisits: 1,
+        dailyVisits: {
+          [today]: 1
+        },
+        firstVisitComplete: false
+      };
+      
+      await set(userVisitsRef, initialVisit);
+      return { ...initialVisit, isNewDay: true, isFirstVisit: true };
+    }
+    
+    const userData = snapshot.val() as UserVisit;
+    const lastVisitDate = new Date(userData.lastVisit);
+    const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
+    
+    // Check if this is a new day
+    const isNewDay = today !== lastVisitDay;
+    
+    // Calculate days between visits for streak
+    const daysSinceLastVisit = Math.floor(
+      (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    
+    let newStreak = userData.currentStreak;
+    
+    if (isNewDay) {
+      // If last visit was yesterday, increment streak
+      if (daysSinceLastVisit === 1) {
+        newStreak = userData.currentStreak + 1;
+      } 
+      // If more than 1 day has passed, reset streak
+      else if (daysSinceLastVisit > 1) {
+        newStreak = 1;
+      }
+    }
+    
+    // Update daily visits count
+    const dailyVisits = { ...userData.dailyVisits };
+    dailyVisits[today] = (dailyVisits[today] || 0) + 1;
+    
+    const updatedVisit: UserVisit = {
+      lastVisit: today,
+      currentStreak: newStreak,
+      highestStreak: Math.max(newStreak, userData.highestStreak),
+      totalVisits: userData.totalVisits + 1, // Increment on every visit
+      dailyVisits,
+      firstVisitComplete: true
+    };
+    
+    // Update visit history
+    const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${now.getTime()}`);
+    const historyEntry: VisitHistoryEntry = {
+      timestamp: now.toISOString(),
+      userName: userName,
+      streak: newStreak
+    };
+    await set(visitHistoryRef, historyEntry);
+    
+    await set(userVisitsRef, updatedVisit);
+    
+    return {
+      ...updatedVisit,
+      isNewDay,
+      isFirstVisit: !userData.firstVisitComplete,
+      todayVisits: dailyVisits[today]
+    };
+  } catch (error) {
+    console.error('Error tracking user visit:', error);
+    throw error;
+  }
 };
 
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
@@ -145,145 +206,41 @@ const Content: React.FC = () => {
   const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
   const [currentBlastImage, setCurrentBlastImage] = useState<string>(blastImage0);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
-  const [playsRemaining, setPlaysRemaining] = useState<number | null>(null);
-  const [maxPlaysToday, setMaxPlaysToday] = useState<number>(5);
-  const [userStreak, setUserStreak] = useState<number>(1);
-
-  // Add function to get and update plays
-  const getPlaysInfo = useCallback(async (userId: string) => {
-    const db = getDatabase();
-    const playsRef = ref(db, `users/${userId}/plays`);
-    const today = new Date().toISOString().split('T')[0];
-    
-    try {
-      const snapshot = await get(playsRef);
-      const userData = snapshot.val() as UserPlays || {
-        playsToday: 0,
-        maxPlaysToday: calculateMaxPlays(userStreak),
-        lastPlayDate: today
-      };
-
-      if (userData.lastPlayDate !== today) {
-        // Reset plays for new day
-        userData.playsToday = 0;
-        userData.maxPlaysToday = calculateMaxPlays(userStreak);
-        userData.lastPlayDate = today;
-      }
-
-      await set(playsRef, userData);
-      setPlaysRemaining(userData.maxPlaysToday - userData.playsToday);
-      setMaxPlaysToday(userData.maxPlaysToday);
-      return userData;
-    } catch (error) {
-      console.error('Error getting plays info:', error);
-      return null;
-    }
-  }, [userStreak]);
-
-  const updatePlaysCount = useCallback(async (userId: string) => {
-    const db = getDatabase();
-    const playsRef = ref(db, `users/${userId}/plays`);
-    
-    try {
-      const snapshot = await get(playsRef);
-      const userData = snapshot.val() as UserPlays;
-      const newPlaysCount = userData.playsToday + 1;
-      
-      if (newPlaysCount > userData.maxPlaysToday) {
-        return false;
-      }
-      
-      await set(playsRef, {
-        ...userData,
-        playsToday: newPlaysCount
-      });
-      
-      setPlaysRemaining(userData.maxPlaysToday - newPlaysCount);
-      return true;
-    } catch (error) {
-      console.error('Error updating plays count:', error);
-      return false;
-    }
-  }, []);
 
   useEffect(() => {
-    const initTelegram = async () => {
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.ready();
-        tg.expand();
-        tg.disableVerticalSwipes();
-        tg.setHeaderColor("#000000");
-        tg.setBottomBarColor("#000000");
-        const user = tg.initDataUnsafe?.user;
-        
-        if (user) {
-          setTelegramUser(user);
-          const userVisitsRef = ref(getDatabase(), `users/${user.id}/visits`);
-          const snapshot = await get(userVisitsRef);
-          const userData = snapshot.val();
-          if (userData) {
-            setUserStreak(userData.currentStreak || 1);
-          }
-          await getPlaysInfo(user.id.toString());
-        }
-
-        tg.MainButton.text = "Start Game";
-        tg.MainButton.onClick(() => handleStartClick());
-        tg.MainButton.show();
-      }
-    };
-
-    initTelegram();
-  }, [getPlaysInfo]);
-
-  const handleStartClick = async () => {
+    // Initialize Telegram WebApp
     const tg = window.Telegram?.WebApp;
-    if (!tg?.initDataUnsafe?.user?.id) return;
-  
-    try {
-      const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.disableVerticalSwipes();
+      tg.setHeaderColor("#000000");
+      tg.setBottomBarColor("#000000");
+      const user = tg.initDataUnsafe?.user;
       
-      if (remainingPlays < 0) {
-        alert("No plays remaining today. Come back tomorrow for more!");
-        return;
+      if (user) {
+        setTelegramUser(user);
       }
-  
-      setIsPlaying(true);
-      setScore(0);
-      setGameOver(false);
-      setDifficulty(1);
-      setCurrentStones([]);
-      setStoneIdCounter(0);
-      setRemainingTime(GAME_DURATION);
-      window.Telegram?.WebApp?.MainButton.hide();
-      window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
-    } catch (error) {
-      console.error('Error starting game:', error);
-      alert("There was an error starting the game. Please try again.");
+
+      // Set up Telegram's main button
+      tg.MainButton.text = "Start Game";
+      tg.MainButton.onClick(() => handleStartClick());
+      tg.MainButton.show();
     }
-  };
-  
-  const [userVisitStats, setUserVisitStats] = useState<VisitStats | null>(null);
-
-  useEffect(() => {
-    const loadUserStats = async () => {
-      const tg = window.Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user) {
-        try {
-          const stats = await trackUserVisit(
-            tg.initDataUnsafe.user.id.toString(),
-            tg.initDataUnsafe.user.first_name
-          );
-          setUserVisitStats(stats);
-        } catch (error) {
-          console.error('Error loading user stats:', error);
-        }
-      }
-    };
-
-    loadUserStats();
   }, []);
+
+  const handleStartClick = () => {
+    setIsPlaying(true);
+    setScore(0);
+    setGameOver(false);
+    setDifficulty(1);
+    setCurrentStones([]);
+    setStoneIdCounter(0);
+    setRemainingTime(GAME_DURATION); // Reset time to 60 seconds
+    window.Telegram?.WebApp?.MainButton.hide();
+    window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
+  };
+
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {
   if (isPlaying && !gameOver) {
@@ -457,90 +414,74 @@ const updateScore = useCallback(async () => {
   }
 }, [score, remainingTime, telegramUser, database]);
 
+
+
+
+
 return (
   <StyledContent>
-    {/* Existing blast effect */}
-    {showBlast && blastPosition && (
-      <Blast 
-        key={currentBlastImage}
-        src={currentBlastImage} 
-        posX={blastPosition.posX} 
-        posY={blastPosition.posY} 
-      />
-    )}
-    
+{/* Blast effect */}
+{showBlast && blastPosition && (
+        <Blast 
+          key={currentBlastImage} // Force re-render when image changes
+          src={currentBlastImage} 
+          posX={blastPosition.posX} 
+          posY={blastPosition.posY} 
+        />
+      )}
     {/* Blink effect */}
     <BlinkScreen isVisible={showBlink} />
 
-    {!isPlaying && telegramUser && userVisitStats && (
-  <WelcomeInfo className="scoreboard">
-    <div style={{ 
-      position: 'absolute', 
-      top: '-60px', 
-      left: '50%', 
-      transform: 'translateX(-50%)',
-      color: '#88c8ff',
-      textAlign: 'center',
-      fontSize: '1.2rem',
-      textShadow: '0 0 10px rgba(136, 200, 255, 0.5)',
-      background: 'rgba(0, 0, 0, 0.6)',
-      padding: '0.5rem 1rem',
-      borderRadius: '15px',
-    }}>
-      <div>🎮 {userVisitStats.playsRemaining} of {userVisitStats.maxPlaysToday} plays remaining</div>
-      {userVisitStats.currentStreak > 1 && (
-        <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-          +{userVisitStats.currentStreak - 1} bonus {userVisitStats.currentStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-        </div>
-      )}
-    </div>
-  </WelcomeInfo>
-)}
+    {!isPlaying && telegramUser && (
+      <WelcomeInfo className="scoreboard">
 
-    {/* Rest of your existing JSX */}
+      </WelcomeInfo>
+    )}
     {!isPlaying && !telegramUser && (
       <WelcomeInfo className="scoreboard">
         Welcome<br></br>in
       </WelcomeInfo>
     )}
-    
-    {isPlaying && (
-      <ScoreBoard className="scoreboard">
-        Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
-      </ScoreBoard>
-    )}
-
-    {isPlaying && !gameOver && currentStones.map((stone) => (
-      <Stone
-        key={`stone-${stone.id}`}
-        id={`stone-${stone.id}`}
-        src={[stone1, stone2, stone3, stone4][stone.type]}
-        alt={`Stone ${stone.type + 1}`}
-        speed={stone.speed}
-        startX={stone.startX}
-        endX={stone.endX}
-        startY={stone.startY}
-        endY={stone.endY}
-        posX={stone.posX}
-        posY={stone.posY}
-        direction={stone.direction}
-        onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
-        onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+    {!isPlaying && (
+      <StartButton
+        src={startImage}
+        alt="Start"
+        onClick={handleStartClick}
+        isClicked={isPlaying}
       />
-    ))}
+    )}
+      {isPlaying && (
+        <ScoreBoard className="scoreboard">
+          Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+        </ScoreBoard>
+      )}
+{isPlaying && !gameOver && currentStones.map((stone) => (
+    <Stone
+      key={`stone-${stone.id}`}
+      id={`stone-${stone.id}`}
+      src={[stone1, stone2, stone3, stone4][stone.type]}
+      alt={`Stone ${stone.type + 1}`}
+      speed={stone.speed}
+      startX={stone.startX}
+      endX={stone.endX}
+      startY={stone.startY}
+      endY={stone.endY}
+      posX={stone.posX}
+      posY={stone.posY}
+      direction={stone.direction}
+      onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}  // Pass the stone's position
+      onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+    />
+  ))}
 
     {gameOver && (
-      <GameOverScreen className="scoreboard1">
-        <h2>Game Over</h2>
-        {playsRemaining === 0 && (
-          <div style={{ fontSize: '1rem', marginTop: '1rem', color: '#88c8ff' }}>
-            No plays remaining today.<br />Come back tomorrow for more!
-          </div>
-        )}
-      </GameOverScreen>
+      <>
+        <GameOverScreen className="scoreboard1">
+          <h2>Game Over</h2>
+        </GameOverScreen>
+      </>
     )}
   </StyledContent>
-);
-};
+)};
 
 export default Content;
