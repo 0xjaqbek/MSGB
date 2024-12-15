@@ -1207,7 +1207,7 @@ PERFORMANCE OF THIS SOFTWARE.
   padding: 5px;
   text-align: center;
   z-index: 400;
-`,aD="/MSGB/assets/start-c100645f.png",lD="/MSGB/assets/stone1-71936a0d.svg",uD="/MSGB/assets/stone2-0d684d9c.png",fD="/MSGB/assets/stone3-b50bbf3d.png",cD="/MSGB/assets/stone4-43f09034.svg",V8="/MSGB/assets/blast0-1807490b.svg",hD="/MSGB/assets/blast1-c3745492.svg";/**
+`,aD="/MSGB/assets/start-c100645f.png",lD="/MSGB/assets/stone1-71936a0d.svg",uD="/MSGB/assets/stone2-d58a4986.svg",fD="/MSGB/assets/stone3-c09b8f72.svg",cD="/MSGB/assets/stone4-43f09034.svg",V8="/MSGB/assets/blast0-1807490b.svg",hD="/MSGB/assets/blast1-c3745492.svg";/**
  * @license
  * Copyright 2017 Google LLC
  *
