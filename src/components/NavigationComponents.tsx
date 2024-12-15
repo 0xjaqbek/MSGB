@@ -3,6 +3,14 @@ import React from 'react';
 import { Home, Users, User, CheckSquare } from 'lucide-react';
 import { TelegramUser, NavigationPage } from '../types';
 import { VisitStats } from '../userTracking';
+import mainActive from '../assets/mainA.svg';
+import mainDefault from '../assets/mainD.svg';
+import friendsActive from '../assets/friendsA.svg';
+import friendsDefault from '../assets/friendsD.svg';
+import accountActive from '../assets/accountA.svg';
+import accountDefault from '../assets/accountD.svg';
+import tasksActive from '../assets/taskasA.svg';
+import tasksDefault from '../assets/tasksD.svg';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -22,7 +30,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
   return (
     <div style={{
       position: 'fixed',
-      bottom: '1%',  // Position above Telegram button
+      bottom: '1%',
       left: 0,
       right: 0,
       zIndex: 9999,
@@ -45,7 +53,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           cursor: 'pointer'
         }}
       >
-        <span style={{ fontSize: '24px' }}>🎮</span>
+        <img 
+          src={currentPage === 'main' ? mainActive : mainDefault} 
+          alt="Main"
+          style={{ width: '24px', height: '24px' }}
+        />
         <span style={{ fontSize: '12px', marginTop: '4px' }}>Main</span>
       </button>
 
@@ -62,7 +74,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           cursor: 'pointer'
         }}
       >
-        <span style={{ fontSize: '24px' }}>👥</span>
+        <img 
+          src={currentPage === 'friends' ? friendsActive : friendsDefault} 
+          alt="Friends"
+          style={{ width: '24px', height: '24px' }}
+        />
         <span style={{ fontSize: '12px', marginTop: '4px' }}>Friends</span>
       </button>
 
@@ -79,7 +95,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           cursor: 'pointer'
         }}
       >
-        <span style={{ fontSize: '24px' }}>👤</span>
+        <img 
+          src={currentPage === 'account' ? accountActive : accountDefault} 
+          alt="Account"
+          style={{ width: '24px', height: '24px' }}
+        />
         <span style={{ fontSize: '12px', marginTop: '4px' }}>Account</span>
       </button>
 
@@ -96,7 +116,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           cursor: 'pointer'
         }}
       >
-        <span style={{ fontSize: '24px' }}>📋</span>
+        <img 
+          src={currentPage === 'tasks' ? tasksActive : tasksDefault} 
+          alt="Tasks"
+          style={{ width: '24px', height: '24px' }}
+        />
         <span style={{ fontSize: '12px', marginTop: '4px' }}>Tasks</span>
       </button>
     </div>
