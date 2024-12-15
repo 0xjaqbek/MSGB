@@ -62,6 +62,8 @@ declare global {
           user?: TelegramUser;
         };
         MainButton: {
+          color: string;
+          textColor: string;
           text: string;
           onClick: (callback: () => void) => void;
           show: () => void;
@@ -139,10 +141,11 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         tg.ready();
         tg.expand();
         tg.disableVerticalSwipes();
-        tg.setHeaderColor("#000000");
-        tg.setBottomBarColor("#000000");
+        tg.setHeaderColor("#000000"); // Header color: Black
+        tg.setBottomBarColor("#000000"); // Bottom bar color: Black
+  
         const user = tg.initDataUnsafe?.user;
-        
+  
         if (user) {
           setTelegramUser(user);
           try {
@@ -152,18 +155,28 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
             setMaxPlaysToday(stats.maxPlaysToday);
             setUserStreak(stats.currentStreak);
           } catch (error) {
-            console.error('Error loading user stats:', error);
+            console.error("Error loading user stats:", error);
           }
         }
+  
+      // Directly manipulate button styles
+      tg.MainButton.text = "Start Game";
+      tg.MainButton.onClick(() => handleStartClick());
+      tg.MainButton.show();
 
-        tg.MainButton.text = "Start Game";
-        tg.MainButton.onClick(() => handleStartClick());
-        tg.MainButton.show(); 
+      // Apply styles directly (if supported by your runtime)
+      try {
+        tg.MainButton.color = "#000080"; // Background color
+        tg.MainButton.textColor = "#800080"; // Text color
+      } catch (error) {
+        console.warn("MainButton styling may not be supported:", error);
       }
-    };
-
+    }
+  };
+  
     initApp();
   }, []);
+  
 
   useEffect(() => {
     onGameStateChange(isPlaying);

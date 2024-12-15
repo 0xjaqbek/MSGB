@@ -14,6 +14,8 @@ declare global {
           user?: TelegramUser;
         };
         MainButton: {
+          color: string;
+          textColor: string;
           text: string;
           onClick: (callback: () => void) => void;
           show: () => void;
