@@ -1,9 +1,9 @@
-import stone1 from '@assets/stone1.png';
+import stone1 from '@assets/stone1.svg';
 import stone2 from '@assets/stone2.png';
 import stone3 from '@assets/stone3.png';
-import stone4 from '@assets/stone4.png';
-import blastImage0 from '@assets/blast0.png';
-import blastImage1 from '@assets/blast1.png';
+import stone4 from '@assets/stone4.svg';
+import blastImage0 from '@assets/blast0.svg';
+import blastImage1 from '@assets/blast1.svg';
 import startImage from '@assets/start.png';
 
 export const GAME_DURATION = 60;
