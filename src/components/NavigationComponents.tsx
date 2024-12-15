@@ -101,7 +101,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          padding: '8px',
+          padding: '2px',
           cursor: 'pointer'
         }}
       >
