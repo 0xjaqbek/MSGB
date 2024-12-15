@@ -44,11 +44,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
         onClick={() => onNavigate('main')}
         style={{
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          color: currentPage === 'main' ? '#fff' : 'rgba(255,255,255,0.7)',
           padding: '8px',
           cursor: 'pointer'
         }}
@@ -58,18 +56,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alt="Main"
           style={{ width: '24px', height: '24px' }}
         />
-        <span style={{ fontSize: '12px', marginTop: '4px' }}>Main</span>
       </button>
 
       <button 
         onClick={() => onNavigate('friends')}
         style={{
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          color: currentPage === 'friends' ? '#fff' : 'rgba(255,255,255,0.7)',
           padding: '8px',
           cursor: 'pointer'
         }}
@@ -79,18 +74,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alt="Friends"
           style={{ width: '24px', height: '24px' }}
         />
-        <span style={{ fontSize: '12px', marginTop: '4px' }}>Friends</span>
       </button>
 
       <button 
         onClick={() => onNavigate('account')}
         style={{
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          color: currentPage === 'account' ? '#fff' : 'rgba(255,255,255,0.7)',
           padding: '8px',
           cursor: 'pointer'
         }}
@@ -100,18 +92,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alt="Account"
           style={{ width: '24px', height: '24px' }}
         />
-        <span style={{ fontSize: '12px', marginTop: '4px' }}>Account</span>
       </button>
 
       <button 
         onClick={() => onNavigate('tasks')}
         style={{
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          color: currentPage === 'tasks' ? '#fff' : 'rgba(255,255,255,0.7)',
           padding: '8px',
           cursor: 'pointer'
         }}
@@ -121,7 +110,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alt="Tasks"
           style={{ width: '24px', height: '24px' }}
         />
-        <span style={{ fontSize: '12px', marginTop: '4px' }}>Tasks</span>
       </button>
     </div>
   );
