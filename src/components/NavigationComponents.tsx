@@ -54,7 +54,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
         <img 
           src={currentPage === 'main' ? mainActive : mainDefault} 
           alt="Main"
-          style={{ width: '5vh', height: '5vh' }}
+          style={{ width: '25vh', height: '25vh' }}
         />
       </button>
 
@@ -72,7 +72,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
         <img 
           src={currentPage === 'friends' ? friendsActive : friendsDefault} 
           alt="Friends"
-          style={{ width: '5vh', height: '5vh' }}
+          style={{ width: '25vh', height: '25vh' }}
         />
       </button>
 
@@ -90,7 +90,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
         <img 
           src={currentPage === 'account' ? accountActive : accountDefault} 
           alt="Account"
-          style={{ width: '5vh', height: '5vh' }}
+          style={{ width: '25vh', height: '25vh' }}
         />
       </button>
 
@@ -108,7 +108,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
         <img 
           src={currentPage === 'tasks' ? tasksActive : tasksDefault} 
           alt="Tasks"
-          style={{ width: '5vh', height: '5vh' }}
+          style={{ width: '25vh', height: '25vh' }}
         />
       </button>
     </div>
