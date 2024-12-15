@@ -62,8 +62,6 @@ declare global {
           user?: TelegramUser;
         };
         MainButton: {
-          setTextColor(arg0: string): unknown;
-          setBackgroundColor(arg0: string): unknown;
           text: string;
           onClick: (callback: () => void) => void;
           show: () => void;
@@ -160,9 +158,7 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
 
         tg.MainButton.text = "Start Game";
         tg.MainButton.onClick(() => handleStartClick());
-        tg.MainButton.show();
-        tg.MainButton.setBackgroundColor('#080080'); 
-        tg.MainButton.setTextColor('#000080');  
+        tg.MainButton.show(); 
       }
     };
 

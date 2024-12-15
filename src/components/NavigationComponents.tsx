@@ -34,7 +34,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       left: 0,
       right: 0,
       zIndex: 9999,
-      padding: '8px',
+      padding: '2px',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
@@ -47,7 +47,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          padding: '8px',
+          padding: '2px',
           cursor: 'pointer'
         }}
       >
@@ -65,7 +65,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          padding: '8px',
+          padding: '2px',
           cursor: 'pointer'
         }}
       >
@@ -83,7 +83,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
           alignItems: 'center',
           background: 'transparent',
           border: 'none',
-          padding: '8px',
+          padding: '2px',
           cursor: 'pointer'
         }}
       >
