@@ -167,7 +167,7 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       // Apply styles directly (if supported by your runtime)
       try {
         tg.MainButton.color = "#000080"; // Background color
-        tg.MainButton.textColor = "#800080"; // Text color
+        tg.MainButton.textColor = "#ADD8E6"; // Text color
       } catch (error) {
         console.warn("MainButton styling may not be supported:", error);
       }
