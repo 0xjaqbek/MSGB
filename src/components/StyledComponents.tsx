@@ -55,6 +55,7 @@ export const BlinkScreen = styled.div<{ isVisible: boolean }>`
 export const StartButton = styled.img<{ isClicked: boolean }>`
   width: 75vw;
   cursor: pointer;
+  top: 70%;
   ${({ isClicked }) => isClicked
     ? css`display: none;`
     : css`animation: ${imageAnimation} 2s infinite;`}
