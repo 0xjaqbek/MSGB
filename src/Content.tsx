@@ -323,10 +323,19 @@ useEffect(() => {
     }
   
     if (type === 3) {
-      setGameOver(true);
-      setShowBlink(true);
-      setTimeout(() => setShowBlink(false), 5000);
-      navigator.vibrate(200);
+      setScore(prev => prev - 10); // Subtract 10 points
+      setBlastPosition({ posX, posY });
+      setCurrentBlastImage(blastImage0);
+      setShowBlast(true);
+      navigator.vibrate([100, 50, 100]); // Different vibration pattern for penalty
+
+      setTimeout(() => {
+        setCurrentBlastImage(blastImage1);
+      }, 100);
+
+      setTimeout(() => {
+        setShowBlast(false);
+      }, 200);
     } else {
       setBlastPosition({ posX, posY });
       setCurrentBlastImage(blastImage0);
@@ -340,15 +349,11 @@ useEffect(() => {
         setShowBlast(false);
       }, 200);
 
-  
-      setScore((prev) => {
-        const newScore = prev + 1;
-        return newScore;
-      });
-      setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
+      setScore(prev => prev + 1);
     }
-  }, []);
-  
+    
+    setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
+}, []);
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
