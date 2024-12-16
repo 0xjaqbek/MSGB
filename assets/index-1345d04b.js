@@ -1155,9 +1155,11 @@ PERFORMANCE OF THIS SOFTWARE.
   z-index: 500;
   ${({isVisible:e})=>e&&_s`animation: ${ZL} 0.5s ease-out;`}
 `,nD=xn.img`
+  position: absolute;  // Add this
   width: 75vw;
   cursor: pointer;
-  top: 90%;
+  top: 40%;
+  transform: translateX(-50%);  // Add this to center horizontally
   ${({isClicked:e})=>e?_s`display: none;`:_s`animation: ${eD} 2s infinite;`}
 `,iD=xn.img`
   position: absolute;
