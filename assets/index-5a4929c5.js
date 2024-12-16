@@ -1157,6 +1157,7 @@ PERFORMANCE OF THIS SOFTWARE.
 `,nD=xn.img`
   width: 75vw;
   cursor: pointer;
+  top: 70%;
   ${({isClicked:e})=>e?_s`display: none;`:_s`animation: ${eD} 2s infinite;`}
 `,iD=xn.img`
   position: absolute;
