@@ -21,7 +21,7 @@ html, body {
   padding: 0;
   overflow: hidden;
   background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-  color: #88c8ff;
+  color: #0FF;
 }
 
 #root {
@@ -207,7 +207,7 @@ html, body {
   color: #ADD8E6;
 
   h1, h2, h3 {
-    color: #ADD8E6;
+    color: #0FF;
     text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
     text-align: center;
     font-family: 'Lato', sans-serif;
@@ -230,7 +230,7 @@ html, body {
   }
 
   .text-info {
-    color: #ADD8E6;
+    color: #0FF;
     opacity: 0.8;
   }
 
@@ -257,7 +257,7 @@ html, body {
 
 // Add these utility classes
 .text-glow {
-  color: #88c8ff;
+  color: #0FF;
   text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
 }
 
