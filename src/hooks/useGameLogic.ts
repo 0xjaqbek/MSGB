@@ -100,11 +100,23 @@ export const useGameLogic = () => {
       navigator.vibrate(50);
     }
   
-    if (type === 3) {
-      setGameOver(true);
-      setShowBlink(true);
-      setTimeout(() => setShowBlink(false), 5000);
-      navigator.vibrate(200);
+    if (type === 3) { // Stone type 4 (index 3)
+      setScore((prev) => prev - 10); // Allow negative points
+      setBlastPosition({ posX, posY });
+      setCurrentBlastImage(BLAST_IMAGES.blast0);
+      setShowBlast(true);
+      
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+
+      setTimeout(() => {
+        setCurrentBlastImage(BLAST_IMAGES.blast1);
+      }, 100);
+
+      setTimeout(() => {
+        setShowBlast(false);
+      }, 200);
     } else {
       setBlastPosition({ posX, posY });
       setCurrentBlastImage(BLAST_IMAGES.blast0);
@@ -119,9 +131,10 @@ export const useGameLogic = () => {
       }, 200);
 
       setScore((prev) => prev + 1);
-      setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
     }
-  }, []);
+    
+    setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
+}, []);
 
   return {
     showBlink,
