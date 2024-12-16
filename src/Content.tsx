@@ -133,6 +133,27 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
   const [visitStats, setVisitStats] = useState<VisitStats | null>(null);
   const [showEndGame, setShowEndGame] = useState(false);
   const [endGameReason, setEndGameReason] = useState<'no-plays' | 'game-over'>('game-over');
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+
+  const getTotalPoints = async (playerId: string) => {
+    const db = getDatabase();
+    const playerScoresRef = ref(db, `/${playerId}/scores`);
+    
+    try {
+      const snapshot = await get(playerScoresRef);
+      if (!snapshot.exists()) {
+        return 0;
+      }
+      
+      const scores = snapshot.val();
+      return Object.values(scores).reduce((total: number, entry: any) => {
+        return total + (entry.score || 0);
+      }, 0);
+    } catch (error) {
+      console.error('Error getting total points:', error);
+      return 0;
+    }
+  };
 
   useEffect(() => {
     const initApp = async () => {
@@ -154,8 +175,10 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
             setPlaysRemaining(stats.playsRemaining);
             setMaxPlaysToday(stats.maxPlaysToday);
             setUserStreak(stats.currentStreak);
+            const points = await getTotalPoints(user.id.toString());
+            setTotalPoints(points);
           } catch (error) {
-            console.error("Error loading user stats:", error);
+            console.error('Error loading user stats:', error);
           }
         }
   
@@ -356,18 +379,21 @@ const updateScore = useCallback(async () => {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
     const playerScoresRef = ref(database, `/${playerId}/scores`);
-    const timestamp = Date.now(); // Use Date.now() as the key
-    const formattedTimestamp = formatDate(timestamp); // Store formatted timestamp in the data
+    const timestamp = Date.now();
+    const formattedTimestamp = formatDate(timestamp);
 
-    // Add the new score to the array
     await update(playerScoresRef, {
-      [timestamp]: {  // Use timestamp (number) as key, not the formatted string
+      [timestamp]: {
         userName,
         score,
         remainingTime,
-        timestamp: formattedTimestamp,  // Store the human-readable timestamp
+        timestamp: formattedTimestamp,
       }
     });
+
+    // Update total points after adding new score
+    const newTotal = await getTotalPoints(playerId);
+    setTotalPoints(newTotal);
 
     console.log('Score updated successfully!');
   } catch (error) {
@@ -387,8 +413,11 @@ const PlaysInfoContainer = styled.div`
   background: rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
   border-radius: 15px;
-  z-index: 1001; // Higher than other elements
-  pointer-events: none; // Let clicks pass through
+  z-index: 1001;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
 const handleShare = () => {
@@ -437,12 +466,15 @@ return (
           <PlaysInfoContainer>
             <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
             {userStreak > 1 && (
-              <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-                +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-              </div>
-            )}
-          </PlaysInfoContainer>
+            <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+            +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
+            </div>
         )}
+            <div style={{ fontSize: '1.1rem', marginTop: '0.3rem' }}>
+              🏆 Total Points: {totalPoints}
+            </div>
+  </PlaysInfoContainer>
+)}
 
         {!isPlaying && telegramUser && (
           <WelcomeInfo className="scoreboard">
