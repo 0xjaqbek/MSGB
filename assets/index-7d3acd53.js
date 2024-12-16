@@ -1140,7 +1140,7 @@ PERFORMANCE OF THIS SOFTWARE.
   position: relative;
   overflow: hidden;
   touch-action: none;
-  font-family: 'Lato';
+  font-family: 'REM';
   background: -webkit-linear-gradient(white, #38495a);
   -webkit-background-clip: text;
 `,tD=xn.div`
@@ -1192,7 +1192,7 @@ PERFORMANCE OF THIS SOFTWARE.
   position: absolute;
   top: 20%;
   left: 50%;
-  font-family: 'Lato';
+  font-family: 'REM';
   transform: translate(-50%, -50%);
   font-size: 24px;
   color: white;
