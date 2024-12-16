@@ -2805,7 +2805,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  color: #88c8ff;
+  color: #0FF;
   text-align: center;
   font-size: 1.2rem;
   text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
@@ -2853,7 +2853,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   span {
     display: block;
     font-size: 3.5rem;
-    color: #88c8ff;
+    color: #0FF;
     margin: 1rem 0;
   }
 `,hj=xn.div`
@@ -2870,15 +2870,15 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     font-weight: bold;
   }
 `,dj=xn.div`
-  color: #88c8ff;
+  color: #0FF;
   font-size: 1.2rem;
   margin-top: 1rem;
   text-align: center;
   animation: ${wh} 1s ease-out 0.7s backwards;
 `,pj=xn.button`
   background: transparent;
-  border: 2px solid #88c8ff;
-  color: #88c8ff;
+  border: 2px solid #0FF;
+  color: #0FF;
   padding: 1rem 2rem;
   font-size: 1.5rem;
   border-radius: 30px;
@@ -2888,7 +2888,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   margin-top: 2rem;
 
   &:hover {
-    background: #88c8ff;
+    background: #0FF;
     color: #000;
     transform: scale(1.05);
     box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);
