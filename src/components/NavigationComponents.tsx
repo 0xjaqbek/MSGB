@@ -1,5 +1,5 @@
 // components/NavigationComponents.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Home, Users, User, CheckSquare } from 'lucide-react';
 import { TelegramUser, NavigationPage } from '../types';
 import { VisitStats } from '../userTracking';
@@ -11,6 +11,7 @@ import accountActive from '../assets/accountA.svg';
 import accountDefault from '../assets/accountD.svg';
 import tasksActive from '../assets/taskasA.svg';
 import tasksDefault from '../assets/tasksD.svg';
+import { get, getDatabase, ref } from 'firebase/database';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -134,6 +135,32 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
 };
 
 const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) => {
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTotalPoints = async () => {
+      if (telegramUser) {
+        try {
+          const db = getDatabase();
+          const playerScoresRef = ref(db, `/${telegramUser.id}/scores`);
+          const snapshot = await get(playerScoresRef);
+          
+          if (snapshot.exists()) {
+            const scores = snapshot.val();
+            const total = Object.values(scores).reduce((sum: number, entry: any) => {
+              return sum + (entry.score || 0);
+            }, 0);
+            setTotalPoints(total);
+          }
+        } catch (error) {
+          console.error('Error fetching total points:', error);
+        }
+      }
+    };
+
+    fetchTotalPoints();
+  }, [telegramUser]);
+
   if (!telegramUser) {
     return <div className="page-container">
       <span className="text-glow animate-pulse">Loading...</span>
@@ -166,6 +193,10 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
               <div className="stat-row">
                 <span className="text-info">Today's Plays:</span>
                 <span className="text-value">{userStats.playsToday} / {userStats.maxPlaysToday}</span>
+              </div>
+              <div className="stat-row">
+                <span className="text-info">Total Points:</span>
+                <span className="text-value">{totalPoints}</span>
               </div>
             </>
           )}
