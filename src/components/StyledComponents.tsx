@@ -53,14 +53,15 @@ export const BlinkScreen = styled.div<{ isVisible: boolean }>`
 `;
 
 export const StartButton = styled.img<{ isClicked: boolean }>`
+  position: absolute;  // Add this
   width: 75vw;
   cursor: pointer;
-  top: 90%;
+  top: 40%;
+  transform: translateX(-50%);  // Add this to center horizontally
   ${({ isClicked }) => isClicked
     ? css`display: none;`
     : css`animation: ${imageAnimation} 2s infinite;`}
 `;
-
 export const Stone = styled.img<{
   speed: number;
   direction: 'horizontal' | 'vertical';
