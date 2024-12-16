@@ -60,7 +60,7 @@ const WelcomeText = styled.div`
   span {
     display: block;
     font-size: 3.5rem;
-    color: #88c8ff;
+    color: #0FF;
     margin: 1rem 0;
   }
 `;
@@ -81,7 +81,7 @@ const FirstVisitInfo = styled.div`
 `;
 
 const StatsContainer = styled.div`
-  color: #88c8ff;
+  color: #0FF;
   font-size: 1.2rem;
   margin-top: 1rem;
   text-align: center;
@@ -90,8 +90,8 @@ const StatsContainer = styled.div`
 
 const StartButton = styled.button`
   background: transparent;
-  border: 2px solid #88c8ff;
-  color: #88c8ff;
+  border: 2px solid #0FF;
+  color: #0FF;
   padding: 1rem 2rem;
   font-size: 1.5rem;
   border-radius: 30px;
@@ -101,7 +101,7 @@ const StartButton = styled.button`
   margin-top: 2rem;
 
   &:hover {
-    background: #88c8ff;
+    background: #0FF;
     color: #000;
     transform: scale(1.05);
     box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);

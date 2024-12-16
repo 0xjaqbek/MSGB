@@ -380,7 +380,7 @@ const PlaysInfoContainer = styled.div`
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  color: #88c8ff;
+  color: #0FF;
   text-align: center;
   font-size: 1.2rem;
   text-shadow: 0 0 10px rgba(136, 200, 255, 0.5);
