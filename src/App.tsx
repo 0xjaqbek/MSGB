@@ -8,14 +8,13 @@ import { trackUserVisit, type VisitStats } from './userTracking';
 import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
 import { TelegramUser, NavigationPage } from './types';
 
-
 function App() {
   const { network } = useTonConnect();
   const [showLanding, setShowLanding] = useState(true);
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
   const [userStats, setUserStats] = useState<VisitStats | null>(null);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('main');
-  const [isPlaying, setIsPlaying] = useState(false); // New state for tracking gameplay
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -55,12 +54,28 @@ function App() {
     setShowLanding(false);
   };
 
-  // Handler for game state
   const handleGameStateChange = (isGamePlaying: boolean) => {
     setIsPlaying(isGamePlaying);
   };
 
-  const renderCurrentPage = () => {
+  return (
+    <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+      {/* Background container */}
+      <div className={`background-container ${isPlaying ? 'game-bg' : 'main-bg'}`} />
+
+      {renderCurrentPage()}
+
+      {/* Show navigation bar only when not playing and not on landing */}
+      {!showLanding && !isPlaying && (
+        <NavigationBar 
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+        />
+      )}
+    </div>
+  );
+
+  function renderCurrentPage() {
     if (showLanding) {
       return (
         <LandingPage 
@@ -83,28 +98,7 @@ function App() {
       default:
         return <Content onGameStateChange={handleGameStateChange} />;
     }
-  };
-
-  return (
-    <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
-      <div className="bg-animation">
-        <div id="stars"></div>
-        <div id="stars2"></div>
-        <div id="stars3"></div>
-        <div id="stars4"></div>
-      </div>
-
-      {renderCurrentPage()}
-
-      {/* Show navigation bar only when not playing and not on landing */}
-      {!showLanding && !isPlaying && (
-        <NavigationBar 
-          currentPage={currentPage}
-          onNavigate={setCurrentPage}
-        />
-      )}
-    </div>
-  );
+  }
 }
 
 export default App;

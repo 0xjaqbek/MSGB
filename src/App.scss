@@ -20,7 +20,6 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
   color: #0FF;
 }
 
@@ -252,6 +251,26 @@ html, body {
     &:last-child {
       border-bottom: none;
     }
+  }
+}
+
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  transition: opacity 0.5s ease-in-out;
+
+  &.main-bg {
+    background: url('../assets/mainPage.svg') no-repeat center center;
+    background-size: cover;
+  }
+
+  &.game-bg {
+    background: url('../assets/GAME.svg') no-repeat center center;
+    background-size: cover;
   }
 }
 
