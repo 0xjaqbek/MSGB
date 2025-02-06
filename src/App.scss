@@ -264,12 +264,12 @@ html, body {
   transition: opacity 0.5s ease-in-out;
 
   &.main-bg {
-    background: url('../assets/mainPage.svg') no-repeat center center;
+    background: url('../src/assets/mainPage.svg') no-repeat center center;
     background-size: cover;
   }
 
   &.game-bg {
-    background: url('../assets/GAME.svg') no-repeat center center;
+    background: url('../src/assets/GAME.svg') no-repeat center center;
     background-size: cover;
   }
 }
