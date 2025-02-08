@@ -15,7 +15,6 @@ interface LandingPageProps {
     playsRemaining: number; 
   } | null;
 }
-  
 
 const fadeIn = keyframes`
   from {
@@ -42,20 +41,46 @@ const StyledLanding = styled.div<{ $show: boolean }>`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
+  padding: 5% 0;
   transition: opacity 0.5s ease-in-out;
   opacity: ${props => props.$show ? 1 : 0};
   pointer-events: ${props => props.$show ? 'auto' : 'none'};
+`;
+
+const HeroContainer = styled.div`
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+
+const WelcomeContainer = styled.div`
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+
+const ButtonContainer = styled.div`
+  height: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 15px;
 `;
 
 const WelcomeText = styled.div`
   color: #fff;
   font-size: 2.5rem;
   text-align: center;
-  margin-bottom: 2rem;
   animation: ${fadeIn} 1s ease-out, ${float} 6s ease-in-out infinite;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 
@@ -82,19 +107,8 @@ const FirstVisitInfo = styled.div`
   }
 `;
 
-const StatsContainer = styled.div`
-  color: #0FF;
-  font-size: 1.2rem;
-  margin-top: 1rem;
-  text-align: center;
-  animation: ${fadeIn} 1s ease-out 0.7s backwards;
-`;
-
 const StartButton = styled.button`
-  position: fixed;  // Add this
-  bottom: 5%;      // Add this
-  left: 50%;       // Add this
-  transform: translateX(-50%);  // Add this
+  width: 80%;
   background: transparent;
   border: 2px solid #0FF;
   color: #0FF;
@@ -107,31 +121,23 @@ const StartButton = styled.button`
   &:hover {
     background: #0FF;
     color: #000;
-    transform: translateX(-50%) scale(1.05);  // Modified to keep horizontal centering
+    transform: scale(1.05);
     box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);
   }
 `;
 
-const StartPlayingButton = styled.button`
-  position: fixed;
-  bottom: 15%;
-  left: 50%;
-  transform: translateX(-50%);
+const StartPlayingButton = styled(StartButton)`
   background: #0FF;
   color: #000;
   border: none;
-  padding: 1rem 2rem;
-  font-size: 1.5rem;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
 
   &:hover {
-    transform: translateX(-50%) scale(1.05);
+    background: #0FF;
+    color: #000;
+    transform: scale(1.05);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
   }
 `;
-
 
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userStats }) => {
   const [show, setShow] = useState(true);
@@ -159,9 +165,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
 
   return (
     <StyledLanding $show={show}>
-      {isFirstVisit ? (
-        // First Visit Content
-        <>
+      <HeroContainer>
+        {isFirstVisit ? (
           <WelcomeText>
             Welcome to
             <span>MoonStones</span>
@@ -171,33 +176,38 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
               </div>
             )}
           </WelcomeText>
-          
+        ) : null}
+      </HeroContainer>
+
+      <WelcomeContainer>
+        {isFirstVisit ? (
           <FirstVisitInfo>
             <div>🎮 Visit daily to build your <span className="highlight">streak</span></div>
             <div>⚡ Each day you play adds to your streak</div>
             <div>❌ Miss a day and streak resets</div>
             <div>🏆 Compete for the highest streak!</div>
           </FirstVisitInfo>
-        </>
-      ) : (
-        // Returning User Content - Show WelcomeSection here
-        <>
-          {telegramUser && userStats && (
-            <WelcomeSection 
-              userName={telegramUser.first_name}
-              ticketsLeft={userStats.playsRemaining}
-            />
-          )}
-        </>
-      )}
-      
-      <StartPlayingButton onClick={handleStartPlaying}>
-        START PLAYING
-      </StartPlayingButton>
-      
-      <StartButton onClick={handleGoToMainPage}>
-        {isFirstVisit ? 'GO TO MAIN PAGE' : 'GO TO MAIN PAGE'}
-      </StartButton>
+        ) : (
+          <>
+            {telegramUser && userStats && (
+              <WelcomeSection 
+                userName={telegramUser.first_name}
+                ticketsLeft={userStats.playsRemaining}
+              />
+            )}
+          </>
+        )}
+      </WelcomeContainer>
+
+      <ButtonContainer>
+        <StartPlayingButton onClick={handleStartPlaying}>
+          START PLAYING
+        </StartPlayingButton>
+        
+        <StartButton onClick={handleGoToMainPage}>
+          {isFirstVisit ? 'GO TO MAIN PAGE' : 'GO TO MAIN PAGE'}
+        </StartButton>
+      </ButtonContainer>
     </StyledLanding>
   );
 };
