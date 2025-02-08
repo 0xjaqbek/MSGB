@@ -39,7 +39,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
-      background: 'transparent'
+      background: 'transparent',
+      maxWidth: '100vw', 
+      overflow: 'hidden'
     }}>
       <button 
         onClick={() => onNavigate('main')}
