@@ -36,7 +36,7 @@ const float = keyframes`
 
 const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
-  top: 0;
+  top: 30px;
   left: 0;
   width: 100vw;
   height: 100vh;
