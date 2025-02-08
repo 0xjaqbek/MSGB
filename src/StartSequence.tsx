@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import stone1 from '../src/assets/stone1.svg';
+import blastImage from '../src/assets/blast.svg';
 import blastImage0 from '../src/assets/blast0.svg';
 import blastImage1 from '../src/assets/blast1.svg';
 
@@ -50,6 +51,7 @@ const StartSequence: React.FC<StartSequenceProps> = ({ onComplete, isAnimating }
       case 'stone1':
         return stone1;
       case 'blast':
+        return blastImage; 
       case 'blast0':
         return blastImage0;
       case 'blast1':
