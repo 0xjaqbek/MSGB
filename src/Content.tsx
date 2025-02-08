@@ -13,6 +13,7 @@ import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 import EndGamePage from "./EndGamePage";
+import StartAdventureButton from './components/StartAdventureButton';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -182,11 +183,6 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
           }
         }
   
-      // Directly manipulate button styles
-      tg.MainButton.text = "Start Game";
-      tg.MainButton.onClick(() => handleStartClick());
-      tg.MainButton.show();
-
       // Apply styles directly (if supported by your runtime)
       try {
         tg.MainButton.color = "#0FF"; // Background color
@@ -525,12 +521,7 @@ return (
         )}
 
         {!isPlaying && (
-          <StartButton
-            src={startImage}
-            alt="Start"
-            onClick={handleStartClick}
-            isClicked={isPlaying}
-          />
+          <StartAdventureButton onClick={handleStartClick} />
         )}
 
         {isPlaying && (
