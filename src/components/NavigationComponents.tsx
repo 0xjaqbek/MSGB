@@ -136,7 +136,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ marginTop: '30px' }}>
       <div className="card">
         <h1 className="text-glow text-xl mb-4">My Account</h1>
         <div className="space-y-2">

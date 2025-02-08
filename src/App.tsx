@@ -41,7 +41,7 @@ function App() {
         borderRadius: '10px' 
       }}>
         <a 
-          href="https://t.me/moonstones_bot" 
+          href="https://t.me/moonstonesgamebot" 
           style={{ 
             color: '#0FF', 
             textDecoration: 'none',
