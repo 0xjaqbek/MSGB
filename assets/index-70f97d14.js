@@ -2824,7 +2824,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
@@ -2833,11 +2833,12 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: 1;
   pointer-events: auto;
 `,uj=Yt.div`
-  height: 65%;
+  height: 35%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
+  margin-bottom: 1rem;
 `,fj=Yt.img`
   width: 45vw;
   height: auto;
@@ -2862,6 +2863,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   .text {
     color: white;
     font-size: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .highlight {
