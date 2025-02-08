@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import hero from '../src/assets/hero.svg';
-import welcomeBox from '../src/assets/welcomeBox.svg';
+import hero from '../assets/hero.svg';
+import welcomeBox from '../assets/welcomeBox.svg';
 
 const WelcomeContainer = styled.div`
   position: absolute;
