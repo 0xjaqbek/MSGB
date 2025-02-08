@@ -2837,7 +2837,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,uj=Yt.div`
   height: 65%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
@@ -3002,7 +3002,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   top: 20px;  /* Moves the section 30px lower */
   height: 65%;
   display: flex;
-  justify-content: top;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
 `,Tj=Yt.div`
