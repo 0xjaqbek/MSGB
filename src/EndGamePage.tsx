@@ -57,7 +57,7 @@ const HeroContainer = styled.div`
 `;
 
 const HeroImage = styled.img`
-  width: 45vw;
+  width: 65vw;
   height: auto;
   margin-bottom: 1rem;
 `;
