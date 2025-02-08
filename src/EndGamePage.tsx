@@ -48,7 +48,7 @@ const StyledEndGame = styled.div`
 `;
 
 const HeroContainer = styled.div`
-  height: 35%;
+  height: 65%;
   display: flex;
   justify-content: center;
   align-items: center;

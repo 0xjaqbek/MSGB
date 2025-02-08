@@ -4,7 +4,7 @@ import { useTonConnect } from "./hooks/useTonConnect";
 import "@twa-dev/sdk";
 import Content from "./Content";
 import LandingPage from "./LandingPage";
-import { trackUserVisit, type VisitStats } from './userTracking';
+import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
 import { TelegramUser, NavigationPage } from './types';
 
@@ -59,12 +59,25 @@ function App() {
     setIsPlaying(isGamePlaying);
   };
 
-  const handleDirectGameStart = () => {
-    setShowLanding(false);
-    const event = new CustomEvent('start-game');
-    setTimeout(() => {
-      window.dispatchEvent(event);
-    }, 100);
+  const handleDirectGameStart = async () => {
+    if (telegramUser) {
+      try {
+        const remainingPlays = await updatePlayCount(telegramUser.id.toString());
+        
+        if (remainingPlays < 0) {
+          // Handle no plays scenario
+          return;
+        }
+
+        setShowLanding(false);
+        const event = new CustomEvent('start-game');
+        setTimeout(() => {
+          window.dispatchEvent(event);
+        }, 100);
+      } catch (error) {
+        console.error('Error updating play count:', error);
+      }
+    }
   };
 
   return (

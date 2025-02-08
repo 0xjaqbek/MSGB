@@ -243,7 +243,8 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
     if (!tg?.initDataUnsafe?.user?.id) return;
   
     try {
-      const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
+      const userId = tg.initDataUnsafe.user.id.toString();
+      const remainingPlays = await updatePlayCount(userId);
       
       if (remainingPlays < 0) {
         setEndGameReason('no-plays');
