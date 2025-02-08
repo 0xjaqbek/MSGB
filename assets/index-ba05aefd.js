@@ -2979,8 +2979,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,jS=dr.button`
   width: 80%;
   background: transparent;
-  border: 2px solid #0FF;
-  color: #0FF;
+  border: 2px solid #9D4EDD; // Changed to purple
+  color: #9D4EDD; // Changed to purple
   padding: 1rem 2rem;
   font-size: 1rem;
   border-radius: 30px;
@@ -2988,10 +2988,10 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   transition: all 0.3s ease;
 
   &:hover {
-    background: #0FF;
+    background: #9D4EDD; // Changed to purple
     color: #000;
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);
+    box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); // Changed to purple with opacity
   }
 `,Rj=dr(jS)`
   background: #0FF;
