@@ -69,7 +69,8 @@ const WelcomeContainer = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  height: 30%;
+  position: fixed; 
+  bottom: 10px;       
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -77,7 +78,6 @@ const ButtonContainer = styled.div`
   width: 100%;
   gap: 10px;
 `;
-
 const WelcomeText = styled.div`
   color: #fff;
   font-size: 2.5rem;
