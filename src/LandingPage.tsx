@@ -35,7 +35,7 @@ const float = keyframes`
 `;
 
 const StyledLanding = styled.div<{ $show: boolean }>`
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   width: 100vw;
@@ -53,22 +53,25 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  position: absolute;  /* Required for top to work */
-  top: 20px;  /* Moves the section 30px lower */
-  height: 65%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  position: absolute;
+  top: 20px; /* Moves it exactly 20px from the top */
+  left: 0;
   width: 100%;
+  height: auto; /* Allow it to adjust based on content */
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  justify-content: flex-start; /* Align content to the top */
+  align-items: center;
 `;
 
 const WelcomeContainer = styled.div`
   position: absolute;
-  top: calc(65% + 20px); /* Places it below HeroContainer */
+  top: calc(20px + 100%); /* Moves it below HeroContainer */
   left: 0;
   width: 100%;
-  height: 30%;
+  height: auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
