@@ -53,7 +53,8 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  top: '30px';
+  position: relative;  /* Required for top to work */
+  top: 30px;  /* Moves the section 30px lower */
   height: 65%;
   display: flex;
   justify-content: center;
@@ -62,7 +63,8 @@ const HeroContainer = styled.div`
 `;
 
 const WelcomeContainer = styled.div`
-  top: 30px;
+  position: relative;
+  top: 30px;  /* Moves this section 30px lower */
   height: 30%;
   display: flex;
   justify-content: center;

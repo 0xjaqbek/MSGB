@@ -86,7 +86,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
       <div className="card">
         <h2 className="text-glow text-lg mb-2">Welcome, {telegramUser?.first_name}</h2>
@@ -181,7 +181,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
 
 const TasksPage: React.FC = () => {
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Daily Tasks</h1>
       <div className="card">
         <h2 className="text-glow text-lg mb-2">Today's Tasks</h2>
