@@ -2983,7 +2983,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   100% { transform: translateY(0px); }
 `,Ij=Yt.div`
   position: fixed;
-  top: 0;
+  top: 30px;
   left: 0;
   width: 100vw;
   height: 100vh;
