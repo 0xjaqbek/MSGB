@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { TelegramUser } from './types';
 import WelcomeSection from './components/WelcomeSection';
@@ -143,6 +143,17 @@ const StartPlayingButton = styled(StartButton)`
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDirectStart, userStats }) => {
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
+
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.disableVerticalSwipes();
+      tg.setHeaderColor("#000000");
+      tg.setBottomBarColor("#000000");
+    }
+  }, []);
 
   const handleGoToMainPage = () => {
     setShow(false);
