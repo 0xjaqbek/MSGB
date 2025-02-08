@@ -3,41 +3,47 @@ import styled from 'styled-components';
 import hero from '../assets/hero.svg';
 import welcomeBox from '../assets/welcomeBox.svg';
 
-const WelcomeContainer = styled.div`
-  position: absolute;
-  top: 5%;
-  left: 50%;
-  transform: translateX(-50%);
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 90vw;
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const HeroImage = styled.img`
   width: 90vw;
+  height: auto;
   margin-bottom: 1rem;
 `;
 
-const WelcomeBoxContainer = styled.div`
+const BoxContainer = styled.div`
   position: relative;
   width: 90vw;
 `;
 
-const WelcomeBoxImage = styled.img`
+const BoxImage = styled.img`
   width: 100%;
+  height: auto;
 `;
 
-const WelcomeText = styled.div`
+const BoxContent = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  font-family: 'REM', sans-serif;
+  line-height: 1.5;
   width: 100%;
   padding: 0 1rem;
-  color: white;
-  font-family: 'REM', sans-serif;
+
+  .text {
+    color: white;
+  }
 
   .highlight {
     color: #FFD700;
@@ -51,17 +57,17 @@ interface WelcomeSectionProps {
 
 const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName, ticketsLeft }) => {
   return (
-    <WelcomeContainer>
+    <Container>
       <HeroImage src={hero} alt="Hero" />
-      <WelcomeBoxContainer>
-        <WelcomeBoxImage src={welcomeBox} alt="Welcome Box" />
-        <WelcomeText>
-          <div>Hello {userName}</div>
-          <div>You got <span className="highlight">{ticketsLeft} tickets</span></div>
-          <div>Use them wisely.</div>
-        </WelcomeText>
-      </WelcomeBoxContainer>
-    </WelcomeContainer>
+      <BoxContainer>
+        <BoxImage src={welcomeBox} alt="Welcome Box" />
+        <BoxContent>
+          <div className="text">Hello {userName}</div>
+          <div className="text">You got <span className="highlight">{ticketsLeft} tickets</span></div>
+          <div className="text">Use them wisely.</div>
+        </BoxContent>
+      </BoxContainer>
+    </Container>
   );
 };
 
