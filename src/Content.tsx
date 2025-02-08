@@ -187,7 +187,6 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
     
     initApp();
 
-    // Handler for direct game start (no animation)
     const startGameHandler = async () => {
       if (!telegramUser?.id) return;
   
@@ -201,7 +200,8 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         }
   
         setPlaysRemaining(remainingPlays);
-        setIsPlaying(true);
+        setIsStartAnimating(false); // Make sure animation is off
+        setIsPlaying(true);  // Start the game immediately
         setScore(0);
         setGameOver(false);
         setDifficulty(1);
@@ -220,22 +220,12 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       }
     };
 
-    // Handler for animated game start
-    const startAdventureHandler = () => {
-      const tg = window.Telegram?.WebApp;
-      if (!tg?.initDataUnsafe?.user?.id) return;
-      
-      setIsStartAnimating(true);
-    };
-
     window.addEventListener('start-game', startGameHandler);
-    window.addEventListener('start-adventure', startAdventureHandler);
 
     return () => {
       window.removeEventListener('start-game', startGameHandler);
-      window.removeEventListener('start-adventure', startAdventureHandler);
     };
-  }, [telegramUser]);
+}, [telegramUser]);
 
   useEffect(() => {
     onGameStateChange(isPlaying);
