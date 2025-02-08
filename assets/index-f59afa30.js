@@ -2930,7 +2930,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: ${e=>e.$show?1:0};
   pointer-events: ${e=>e.$show?"auto":"none"};
 `,Cj=dr.div`
-  height: 55%;
+  height: 65%;
   display: flex;
   justify-content: center;
   align-items: center;
