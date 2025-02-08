@@ -1,5 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
+import hero from '../src/assets/hero.svg';
+import welcomeBox from '../src/assets/welcomeBox.svg';
 
 interface EndGamePageProps {
   reason: 'no-plays' | 'game-over';
@@ -21,6 +23,12 @@ const fadeIn = keyframes`
   }
 `;
 
+const float = keyframes`
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+`;
+
 const StyledEndGame = styled.div`
   position: fixed;
   top: 0;
@@ -29,22 +37,28 @@ const StyledEndGame = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
+  padding: 5% 0;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+  pointer-events: auto;
 `;
 
-const Container = styled.div`
+const HeroContainer = styled.div`
+  height: 65%;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  width: 90vw;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: ${fadeIn} 1s ease-out;
+  width: 100%;
+`;
+
+const HeroImage = styled.img`
+  width: 45vw;
+  height: auto;
+  margin-bottom: 1rem;
 `;
 
 const BoxContainer = styled.div`
@@ -52,75 +66,64 @@ const BoxContainer = styled.div`
   width: 80vw;
 `;
 
-const BoxImage = styled.div`
+const BoxImage = styled.img`
   width: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(136, 200, 255, 0.2);
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 0 15px rgba(136, 200, 255, 0.2);
-  backdrop-filter: blur(5px);
+  height: auto;
 `;
 
 const BoxContent = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
   font-family: 'REM', sans-serif;
   line-height: 1.5;
   width: 100%;
-  padding: 1rem;
-
-  .title {
-    color: #FFD700;
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  }
+  padding: 0 1rem;
 
   .text {
     color: white;
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .highlight {
-    color: #0FF;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    color: #FFD700;
   }
 `;
 
 const EndGamePage: React.FC<EndGamePageProps> = ({ 
   reason, 
   score, 
-  nextPlayTime = "tomorrow",
-  playsFromStreak = 0,
-  onShare,
-  onClose 
+  playsFromStreak = 0
 }) => {
   return (
     <StyledEndGame>
-      <Container>
-        <BoxContainer>
-          <BoxImage>
-            <BoxContent>
-              <div className="title">GAME OVER</div>
+      <HeroContainer>
+        <HeroImage src={hero} alt="Hero" />
+      </HeroContainer>
+
+      <BoxContainer>
+        <BoxImage src={welcomeBox} alt="Welcome Box" />
+        <BoxContent>
+          <div className="text">GAME OVER</div>
+          {reason === 'no-plays' ? (
+            <div className="text">NO TICKETS LEFT!</div>
+          ) : (
+            <>
               <div className="text">
-                {reason === 'no-plays' ? (
-                  'NO TICKETS LEFT!'
-                ) : (
-                  <>
-                    YOU HAVE <span className="highlight">{playsFromStreak}</span>
-                    {playsFromStreak === 1 ? ' TICKET' : ' TICKETS'} LEFT!
-                  </>
-                )}
+                YOU HAVE <span className="highlight">{playsFromStreak}</span>
+                {playsFromStreak === 1 ? ' TICKET' : ' TICKETS'} LEFT!
               </div>
               {score !== undefined && (
-                <div className="text" style={{ marginTop: '1rem' }}>
+                <div className="text">
                   FINAL SCORE: <span className="highlight">{score}</span>
                 </div>
               )}
-            </BoxContent>
-          </BoxImage>
-        </BoxContainer>
-      </Container>
+            </>
+          )}
+        </BoxContent>
+      </BoxContainer>
     </StyledEndGame>
   );
 };
