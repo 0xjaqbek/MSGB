@@ -91,7 +91,7 @@ const WelcomeContent = styled.div`
 
 const WelcomeContainer = styled.div`
   position: relative;
-  top: calc(20px + 100%); /* Moves it below HeroContainer */
+  top: 50%; /* Moves it below HeroContainer */
   left: 0;
   width: 100%;
   height: auto;
