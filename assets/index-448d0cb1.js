@@ -2942,7 +2942,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 100%;
 `,Mj=dr.div`
-  height: 30%;
+  position: fixed; 
+  bottom: 10px;       
   display: flex;
   flex-direction: column;
   justify-content: center;
