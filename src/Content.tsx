@@ -188,24 +188,38 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
     initApp();
 
     // Add event listener for alternative game start methods
-    const startGameHandler = async () => {
-      if (!telegramUser?.id) return;
-  
-      try {
-        const remainingPlays = await updatePlayCount(telegramUser.id.toString());
-        
-        if (remainingPlays < 0) {
-          setEndGameReason('no-plays');
-          setShowEndGame(true);
-          return;
-        }
-  
-        setPlaysRemaining(remainingPlays);
-        setIsStartAnimating(true);
-      } catch (error) {
-        console.error('Error starting game:', error);
-        alert("There was an error starting the game. Please try again.");
-      }
+// In Content.tsx, modify the event listener in useEffect:
+const startGameHandler = async () => {
+  if (!telegramUser?.id) return;
+
+  try {
+    const remainingPlays = await updatePlayCount(telegramUser.id.toString());
+    
+    if (remainingPlays < 0) {
+      setEndGameReason('no-plays');
+      setShowEndGame(true);
+      return;
+    }
+
+    setPlaysRemaining(remainingPlays);
+    // Skip animation and directly start game
+    setIsPlaying(true);
+    setScore(0);
+    setGameOver(false);
+    setDifficulty(1);
+    setCurrentStones([]);
+    setStoneIdCounter(0);
+    setRemainingTime(GAME_DURATION);
+
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.MainButton.hide();
+      tg.sendData(JSON.stringify({ action: 'gameStarted' }));
+    }
+  } catch (error) {
+    console.error('Error starting game:', error);
+    alert("There was an error starting the game. Please try again.");
+  }
     };
 
     window.addEventListener('start-game', startGameHandler);

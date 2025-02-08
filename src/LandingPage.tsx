@@ -12,7 +12,7 @@ interface LandingPageProps {
     totalVisits: number;
     todayVisits: number;
     isFirstVisit: boolean;
-    playsRemaining: number; 
+    playsRemaining: number;
   } | null;
 }
 
@@ -151,13 +151,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
   };
 
   const handleStartPlaying = () => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg?.initDataUnsafe?.user?.id) return;
-  
     setShow(false);
-    
-    // Directly dispatch a custom event for game start
-    window.dispatchEvent(new CustomEvent('start-game'));
+    setTimeout(() => {
+      onStart();
+      // Directly start the game without animation
+      window.dispatchEvent(new CustomEvent('start-game'));
+    }, 500);
   };
 
   return (
