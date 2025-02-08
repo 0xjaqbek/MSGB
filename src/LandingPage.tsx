@@ -36,7 +36,7 @@ const float = keyframes`
 
 const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
-  top: 40px;
+  top: 50px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -212,9 +212,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
           START PLAYING
         </StartPlayingButton>
         
-        <StartButton onClick={handleGoToMainPage}>
-          {isFirstVisit ? 'GO TO MAIN PAGE' : 'GO TO MAIN PAGE'}
-        </StartButton>
+        <StartPlayingButton onClick={handleStartPlaying}>
+          {userStats?.playsRemaining === 0 ? 'NO TICKETS LEFT' : 'START PLAYING'}
+        </StartPlayingButton>
       </ButtonContainer>
     </StyledLanding>
   );

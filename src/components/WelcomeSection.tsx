@@ -64,7 +64,16 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName, ticketsLeft }
         <BoxContent>
           <div className="text">Hello {userName}</div>
           <div className="text">You got <span className="highlight">{ticketsLeft} tickets</span></div>
-          <div className="text">Use them wisely.</div>
+          <div className="text">
+            {ticketsLeft > 0 ? (
+              "Use them wisely."
+            ) : (
+              <>
+                Invite a Friend<br/>
+                or get back Tomorrow.
+              </>
+            )}
+          </div>
         </BoxContent>
       </BoxContainer>
     </Container>
