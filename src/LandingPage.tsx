@@ -115,7 +115,7 @@ const StartButton = styled.button`
   color: #9D4EDD; // Changed to purple
   padding: 1rem 2rem;
   font-size: 1rem;
-  border-radius: 30px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
 

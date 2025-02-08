@@ -1,67 +1,128 @@
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
+
 interface EndGamePageProps {
-    reason: 'no-plays' | 'game-over';
-    score?: number;
-    nextPlayTime?: string; // Time until next play is available
-    playsFromStreak?: number;
-    onShare?: () => void;
-    onClose?: () => void;
+  reason: 'no-plays' | 'game-over';
+  score?: number;
+  nextPlayTime?: string;
+  playsFromStreak?: number;
+  onShare?: () => void;
+  onClose?: () => void;
+}
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  const EndGamePage: React.FC<EndGamePageProps> = ({ 
-    reason, 
-    score, 
-    nextPlayTime = "tomorrow",
-    playsFromStreak = 0,
-    onShare,
-    onClose 
-  }) => {
-    return (
-      <div className="page-container">
-        <div className="card text-center">
-          <h1 className="text-glow text-2xl mb-4">
-            {reason === 'game-over' ? 'Game Over!' : 'No Plays Remaining'}
-          </h1>
-          
-          {reason === 'game-over' && score !== undefined && (
-            <div className="mb-6">
-              <p className="text-3xl text-glow mb-2">{score}</p>
-              <p className="text-info">Final Score</p>
-            </div>
-          )}
-          
-          {reason === 'no-plays' && (
-            <div className="space-y-4 mb-6">
-              <div className="text-glow text-lg">
-                Come back {nextPlayTime} for more plays!
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const StyledEndGame = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0);
+  z-index: 1000;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90vw;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ${fadeIn} 1s ease-out;
+`;
+
+const BoxContainer = styled.div`
+  position: relative;
+  width: 80vw;
+`;
+
+const BoxImage = styled.div`
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(136, 200, 255, 0.2);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(136, 200, 255, 0.2);
+  backdrop-filter: blur(5px);
+`;
+
+const BoxContent = styled.div`
+  text-align: center;
+  font-family: 'REM', sans-serif;
+  line-height: 1.5;
+  width: 100%;
+  padding: 1rem;
+
+  .title {
+    color: #FFD700;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+
+  .text {
+    color: white;
+    font-size: 1.2rem;
+  }
+
+  .highlight {
+    color: #0FF;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+`;
+
+const EndGamePage: React.FC<EndGamePageProps> = ({ 
+  reason, 
+  score, 
+  nextPlayTime = "tomorrow",
+  playsFromStreak = 0,
+  onShare,
+  onClose 
+}) => {
+  return (
+    <StyledEndGame>
+      <Container>
+        <BoxContainer>
+          <BoxImage>
+            <BoxContent>
+              <div className="title">GAME OVER</div>
+              <div className="text">
+                {reason === 'no-plays' ? (
+                  'NO TICKETS LEFT!'
+                ) : (
+                  <>
+                    YOU HAVE <span className="highlight">{playsFromStreak}</span>
+                    {playsFromStreak === 1 ? ' TICKET' : ' TICKETS'} LEFT!
+                  </>
+                )}
               </div>
-            </div>
-          )}
-  
-          <div className="card bg-blue-900/20 p-4 mb-6">
-            <h3 className="text-lg text-glow mb-3">Get More Plays!</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span>👥 Invite friends</span>
-                <span className="text-glow">+2 plays/friend</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>🎯 Complete tasks</span>
-                <span className="text-glow">+1 play/task</span>
-              </div>
-            </div>
-          </div>
-          </div>
-  
-        {playsFromStreak > 0 && (
-          <div className="card mt-4 text-center bg-blue-900/20">
-            <div className="text-glow">
-              <span className="text-lg">🎉 Streak Bonus!</span>
-              <p className="text-sm text-info mt-1">Keep your streak for more bonuses!</p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-  
-  export default EndGamePage;
+              {score !== undefined && (
+                <div className="text" style={{ marginTop: '1rem' }}>
+                  FINAL SCORE: <span className="highlight">{score}</span>
+                </div>
+              )}
+            </BoxContent>
+          </BoxImage>
+        </BoxContainer>
+      </Container>
+    </StyledEndGame>
+  );
+};
+
+export default EndGamePage;
