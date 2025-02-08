@@ -207,15 +207,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
       <HeroContainer>
       <HeroImage src={hero} alt="Hero" />
         {isFirstVisit ? (
-          <WelcomeContainer>
-          <WelcomeImage src={welcomeBox} alt="Welcome Box" />
-          <WelcomeContent>
-            <div>🎮 Visit daily to build your <span className="highlight">streak</span></div>
-            <div>⚡ Each day you play adds to your streak</div>
-            <div>❌ Miss a day and streak resets</div>
-            <div>🏆 Compete for the highest streak!</div>
-          </WelcomeContent>
-        </WelcomeContainer>
+          <WelcomeText>
+            Welcome to
+            <span>MoonStones</span>
+            {telegramUser && (
+              <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
+                {telegramUser.first_name}
+              </div>
+            )}
+          </WelcomeText>
         ) : null}
       </HeroContainer>
 
