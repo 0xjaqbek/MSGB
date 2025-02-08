@@ -111,8 +111,8 @@ const FirstVisitInfo = styled.div`
 const StartButton = styled.button`
   width: 80%;
   background: transparent;
-  border: 2px solid #0FF;
-  color: #0FF;
+  border: 2px solid #9D4EDD; // Changed to purple
+  color: #9D4EDD; // Changed to purple
   padding: 1rem 2rem;
   font-size: 1rem;
   border-radius: 30px;
@@ -120,10 +120,10 @@ const StartButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #0FF;
+    background: #9D4EDD; // Changed to purple
     color: #000;
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);
+    box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); // Changed to purple with opacity
   }
 `;
 
