@@ -2873,12 +2873,12 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   left: 50%;
   transform: translateX(-50%);
 `,gj=Mr.img`
-  width: 90vw;
+  width: 45vw;
   height: auto;
   margin-bottom: 1rem;
 `,mj=Mr.div`
   position: relative;
-  width: 90vw;
+  width: 80vw;
 `,yj=Mr.img`
   width: 100%;
   height: auto;
