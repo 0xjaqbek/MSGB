@@ -52,7 +52,7 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  height: 30%;
+  height: 40%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -153,10 +153,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
   const handleStartPlaying = () => {
     setShow(false);
     setTimeout(() => {
-      // Remove onStart() call since that's what sends us to main page
-      window.dispatchEvent(new CustomEvent('start-game', { 
-        detail: { skipAnimation: true } 
-      }));
+      onStart(); 
+      const event = new CustomEvent('start-adventure', {
+        detail: { skipAnimation: true }
+      });
+      window.dispatchEvent(event);
     }, 500);
   };
 

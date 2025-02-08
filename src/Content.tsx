@@ -187,9 +187,10 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
     
     initApp();
 
-    const startGameHandler = async (event: Event) => {
+    // Handler for direct game start (no animation)
+    const startGameHandler = async () => {
       if (!telegramUser?.id) return;
-    
+  
       try {
         const remainingPlays = await updatePlayCount(telegramUser.id.toString());
         
@@ -198,11 +199,8 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
           setShowEndGame(true);
           return;
         }
-    
+  
         setPlaysRemaining(remainingPlays);
-        // Start game immediately
-        setShowEndGame(false);
-        setIsStartAnimating(false); // Ensure animation is off
         setIsPlaying(true);
         setScore(0);
         setGameOver(false);
@@ -210,7 +208,7 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         setCurrentStones([]);
         setStoneIdCounter(0);
         setRemainingTime(GAME_DURATION);
-    
+
         const tg = window.Telegram?.WebApp;
         if (tg) {
           tg.MainButton.hide();
@@ -222,11 +220,20 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       }
     };
 
-    window.addEventListener('start-game', startGameHandler);
+    // Handler for animated game start
+    const startAdventureHandler = () => {
+      const tg = window.Telegram?.WebApp;
+      if (!tg?.initDataUnsafe?.user?.id) return;
+      
+      setIsStartAnimating(true);
+    };
 
-    // Cleanup the event listener
+    window.addEventListener('start-game', startGameHandler);
+    window.addEventListener('start-adventure', startAdventureHandler);
+
     return () => {
       window.removeEventListener('start-game', startGameHandler);
+      window.removeEventListener('start-adventure', startAdventureHandler);
     };
   }, [telegramUser]);
 
