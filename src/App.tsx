@@ -15,6 +15,44 @@ function App() {
   const [userStats, setUserStats] = useState<VisitStats | null>(null);
   const [currentPage, setCurrentPage] = useState<NavigationPage>('main');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMobileTelegram, setIsMobileTelegram] = useState(true);
+
+  // Fallback component for non-mobile environments
+  const MobileAppFallback = () => (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      padding: '20px',
+      textAlign: 'center',
+      backgroundColor: '#000',
+      color: '#0FF',
+      fontFamily: 'REM, sans-serif'
+    }}>
+      <h1 style={{ fontSize: '2rem', marginBottom: '20px' }}>MoonStones</h1>
+      <p style={{ marginBottom: '10px' }}>This app is only available in the Telegram mobile app.</p>
+      <p style={{ marginBottom: '20px' }}>Please open this link in the Telegram mobile app.</p>
+      <div style={{ 
+        marginTop: '20px', 
+        border: '2px solid #0FF', 
+        padding: '10px', 
+        borderRadius: '10px' 
+      }}>
+        <a 
+          href="https://t.me/moonstones_bot" 
+          style={{ 
+            color: '#0FF', 
+            textDecoration: 'none',
+            fontSize: '1.2rem'
+          }}
+        >
+          Open in Telegram
+        </a>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -22,6 +60,11 @@ function App() {
       if (tg) {
         tg.ready();
         tg.expand();
+        
+        // Detect mobile environment
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        setIsMobileTelegram(isMobile);
+  
         (tg as any).requestFullscreen?.();
         const user = tg.initDataUnsafe?.user;
         
@@ -81,6 +124,11 @@ function App() {
     }
   };
 
+  // If not a mobile Telegram environment, show fallback
+  if (!isMobileTelegram) {
+    return <MobileAppFallback />;
+  }
+
   return (
     <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
       {/* Background container */}
@@ -105,7 +153,7 @@ function App() {
       <LandingPage 
         telegramUser={telegramUser}
         onStart={handleStart}
-        onDirectStart={handleDirectGameStart} // Add this
+        onDirectStart={handleDirectGameStart}
         userStats={userStats}
       />
       );
