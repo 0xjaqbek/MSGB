@@ -2983,13 +2983,13 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   100% { transform: translateY(0px); }
 `,Ij=Yt.div`
   position: fixed;
-  top: 30px;
+  top: 40px;
   left: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
