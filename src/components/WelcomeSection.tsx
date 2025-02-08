@@ -15,14 +15,14 @@ const Container = styled.div`
 `;
 
 const HeroImage = styled.img`
-  width: 90vw;
+  width: 45vw;
   height: auto;
   margin-bottom: 1rem;
 `;
 
 const BoxContainer = styled.div`
   position: relative;
-  width: 90vw;
+  width: 80vw;
 `;
 
 const BoxImage = styled.img`
