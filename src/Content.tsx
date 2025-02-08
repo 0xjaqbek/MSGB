@@ -186,7 +186,35 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
     };
     
     initApp();
-  }, []);
+
+    // Add event listener for game start
+    const startGameHandler = async () => {
+      if (!telegramUser?.id) return;
+  
+      try {
+        const remainingPlays = await updatePlayCount(telegramUser.id.toString());
+        
+        if (remainingPlays < 0) {
+          setEndGameReason('no-plays');
+          setShowEndGame(true);
+          return;
+        }
+  
+        setPlaysRemaining(remainingPlays);
+        setIsStartAnimating(true);
+      } catch (error) {
+        console.error('Error starting game:', error);
+        alert("There was an error starting the game. Please try again.");
+      }
+    };
+
+    window.addEventListener('start-game', startGameHandler);
+
+    // Cleanup the event listener
+    return () => {
+      window.removeEventListener('start-game', startGameHandler);
+    };
+  }, [telegramUser]);
 
   useEffect(() => {
     onGameStateChange(isPlaying);

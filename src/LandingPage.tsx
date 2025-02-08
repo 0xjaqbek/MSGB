@@ -112,14 +112,48 @@ const StartButton = styled.button`
   }
 `;
 
+const StartPlayingButton = styled.button`
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0FF;
+  color: #000;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  }
+`;
+
+
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userStats }) => {
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
 
-  const handleStart = () => {
+  const handleGoToMainPage = () => {
     setShow(false);
     setTimeout(() => {
       onStart();
+    }, 500);
+  };
+
+  const handleStartPlaying = () => {
+    setShow(false);
+    setTimeout(() => {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.MainButton.text = "Start Game";
+        tg.MainButton.show();
+        // Use a custom event to trigger game start
+        window.dispatchEvent(new CustomEvent('start-game'));
+      }
     }, 500);
   };
 
@@ -157,7 +191,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
         </>
       )}
       
-      <StartButton onClick={handleStart}>
+      <StartPlayingButton onClick={handleStartPlaying}>
+        START PLAYING
+      </StartPlayingButton>
+      
+      <StartButton onClick={handleGoToMainPage}>
         {isFirstVisit ? 'GO TO MAIN PAGE' : 'GO TO MAIN PAGE'}
       </StartButton>
     </StyledLanding>
