@@ -2945,10 +2945,10 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: 30%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
-  gap: 15px;
+  gap: 10px;
 `,Aj=dr.div`
   color: #fff;
   font-size: 2.5rem;
