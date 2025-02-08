@@ -53,6 +53,7 @@ function App() {
       }
     }
     setShowLanding(false);
+    setCurrentPage('main'); // Explicitly set to main page
     console.log("showLanding set to false");
   };
   
