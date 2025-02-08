@@ -14,6 +14,15 @@ const AnimatedImage = styled.img`
   z-index: 100;
 `;
 
+// Hidden preload container
+const PreloadContainer = styled.div`
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+`;
+
 interface StartSequenceProps {
   onComplete: () => void;
   isAnimating: boolean;
@@ -26,19 +35,15 @@ const StartSequence: React.FC<StartSequenceProps> = ({ onComplete, isAnimating }
     if (!isAnimating) return;
     
     const sequence = async () => {
-      // Wait 200ms, then show blast.svg
       await new Promise(resolve => setTimeout(resolve, 100));
       setCurrentImage('blast');
       
-      // Wait 200ms, then show blast0.svg
       await new Promise(resolve => setTimeout(resolve, 100));
       setCurrentImage('blast0');
       
-      // Wait 200ms, then show blast1.svg
       await new Promise(resolve => setTimeout(resolve, 100));
       setCurrentImage('blast1');
       
-      // Wait 200ms, then complete
       await new Promise(resolve => setTimeout(resolve, 100));
       onComplete();
     };
@@ -51,7 +56,7 @@ const StartSequence: React.FC<StartSequenceProps> = ({ onComplete, isAnimating }
       case 'stone1':
         return stone1;
       case 'blast':
-        return blastImage; 
+        return blastImage;
       case 'blast0':
         return blastImage0;
       case 'blast1':
@@ -61,7 +66,19 @@ const StartSequence: React.FC<StartSequenceProps> = ({ onComplete, isAnimating }
     }
   };
 
-  return <AnimatedImage src={getImage()} alt="animation" />;
+  return (
+    <>
+      {/* Preload all images */}
+      <PreloadContainer>
+        <img src={stone1} alt="preload" />
+        <img src={blastImage} alt="preload" />
+        <img src={blastImage0} alt="preload" />
+        <img src={blastImage1} alt="preload" />
+      </PreloadContainer>
+      
+      <AnimatedImage src={getImage()} alt="animation" />
+    </>
+  );
 };
 
 export default StartSequence;
