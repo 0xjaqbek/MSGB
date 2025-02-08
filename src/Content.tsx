@@ -475,7 +475,7 @@ return (
                 </div>
                 <div style={{ 
                   color: '#0FF',      // Original cyan color
-                  fontSize: '1.2rem'  // Slightly bigger than label
+                  fontSize: '1.6rem'  // Slightly bigger than label
                 }}>
                   {playsRemaining}/{maxPlaysToday}
                 </div>
@@ -491,7 +491,7 @@ return (
                 </div>
                 <div style={{ 
                   color: '#FFD700',   // Gold color
-                  fontSize: '1.4rem'  // Bigger than tickets value
+                  fontSize: '2rem'  // Bigger than tickets value
                 }}>
                   {totalPoints}
                 </div>

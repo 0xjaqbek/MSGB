@@ -30,7 +30,7 @@ const StyledButton = styled.button`
   }
 
   span {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     line-height: 1.4;
     letter-spacing: 1px;
