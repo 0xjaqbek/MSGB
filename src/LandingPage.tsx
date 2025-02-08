@@ -167,7 +167,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
   const handleStartPlaying = () => {
     setShow(false);
     setTimeout(() => {
-      onDirectStart(); // Use the new function
+      if (userStats?.playsRemaining === 0) {
+        onStart(); // Use the same function as GO TO MAIN PAGE
+      } else {
+        onDirectStart(); // Original function for starting the game
+      }
     }, 500);
   };
 
