@@ -91,6 +91,10 @@ const StatsContainer = styled.div`
 `;
 
 const StartButton = styled.button`
+  position: fixed;  // Add this
+  bottom: 5%;      // Add this
+  left: 50%;       // Add this
+  transform: translateX(-50%);  // Add this
   background: transparent;
   border: 2px solid #0FF;
   color: #0FF;
@@ -99,12 +103,11 @@ const StartButton = styled.button`
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 2rem;
 
   &:hover {
     background: #0FF;
     color: #000;
-    transform: scale(1.05);
+    transform: translateX(-50%) scale(1.05);  // Modified to keep horizontal centering
     box-shadow: 0 0 20px rgba(136, 200, 255, 0.5);
   }
 `;
@@ -155,7 +158,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
       )}
       
       <StartButton onClick={handleStart}>
-        {isFirstVisit ? 'Begin Journey' : 'Continue Journey'}
+        {isFirstVisit ? 'GO TO MAIN PAGE' : 'GO TO MAIN PAGE'}
       </StartButton>
     </StyledLanding>
   );
