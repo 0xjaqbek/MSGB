@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { TelegramUser } from './types';
 import WelcomeSection from './components/WelcomeSection';
-import hero from '../src/assets/hero.svg';
-import welcomeBox from '../src/assets/welcomeBox.svg';
-
 
 interface LandingPageProps {
   telegramUser: TelegramUser | null;
@@ -38,7 +35,7 @@ const float = keyframes`
 `;
 
 const StyledLanding = styled.div<{ $show: boolean }>`
-  position: relative;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -56,49 +53,21 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  height: 65%; /* Ensures it takes proper space */
+  top: '30px';
+  height: 65%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 1rem;
-`;
-
-const HeroImage = styled.img`
-  width: 65vw;
-  height: auto;
-  margin-bottom: 1rem;
-`;
-
-const WelcomeImage = styled.img`
-  width: 100%;
-  height: auto;
-`;
-
-const WelcomeContent = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  font-family: 'REM', sans-serif;
-  line-height: 1.5;
-  width: 100%;
-  padding: 0 1rem;
-  color: white;
-  font-size: 1.2rem;
 `;
 
 const WelcomeContainer = styled.div`
-  position: relative;
-  top: 50%; /* Moves it below HeroContainer */
-  left: 0;
-  width: 100%;
-  height: auto;
+  top: 30px;
+  height: 30%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
 `;
 
 const ButtonContainer = styled.div`
@@ -205,7 +174,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
   return (
     <StyledLanding $show={show}>
       <HeroContainer>
-      <HeroImage src={hero} alt="Hero" />
         {isFirstVisit ? (
           <WelcomeText>
             Welcome to
