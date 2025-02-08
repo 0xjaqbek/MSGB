@@ -208,21 +208,11 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       }
     };
 
-    const triggerStartAdventureHandler = () => {
-      // Find the StartAdventureButton and simulate its click
-      const startAdventureButton = document.querySelector('[aria-label="Start Adventure"]') as HTMLButtonElement;
-      if (startAdventureButton) {
-        startAdventureButton.click();
-      }
-    };
-
     window.addEventListener('start-game', startGameHandler);
-    window.addEventListener('trigger-start-adventure', triggerStartAdventureHandler);
 
-    // Cleanup the event listeners
+    // Cleanup the event listener
     return () => {
       window.removeEventListener('start-game', startGameHandler);
-      window.removeEventListener('trigger-start-adventure', triggerStartAdventureHandler);
     };
   }, [telegramUser]);
 
