@@ -72,7 +72,7 @@ const WelcomeContainer = styled.div`
 
 const ButtonContainer = styled.div`
   position: fixed; 
-  bottom: 10px;       
+  bottom: 30px;       
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -209,12 +209,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
       <ButtonContainer>
         <StartPlayingButton onClick={handleStartPlaying}>
-          START PLAYING
-        </StartPlayingButton>
-        
-        <StartPlayingButton onClick={handleStartPlaying}>
           {userStats?.playsRemaining === 0 ? 'NO TICKETS LEFT' : 'START PLAYING'}
         </StartPlayingButton>
+        
+        <StartButton onClick={handleGoToMainPage}>
+          {isFirstVisit ? 'GO TO MAIN PAGE' : 'GO TO MAIN PAGE'}
+        </StartButton>
       </ButtonContainer>
     </StyledLanding>
   );
