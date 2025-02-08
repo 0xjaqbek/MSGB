@@ -3025,7 +3025,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   font-size: 1.2rem;
 `;const Pj=Wt.div`
   position: relative;
-  top: calc(20px + 100%); /* Moves it below HeroContainer */
+  top: 50%; /* Moves it below HeroContainer */
   left: 0;
   width: 100%;
   height: auto;
