@@ -31,7 +31,7 @@ const float = keyframes`
 
 const StyledEndGame = styled.div`
   position: fixed;
-  top: 0;
+  top: '30px';
   left: 0;
   width: 100vw;
   height: 100vh;

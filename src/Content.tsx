@@ -449,7 +449,7 @@ const updateScore = useCallback(async () => {
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
-  top: 3%;
+  top: 7%;
   left: 50%;
   transform: translateX(-50%);
   color: #0FF;

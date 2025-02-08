@@ -53,6 +53,7 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
+  top: '30px';
   height: 65%;
   display: flex;
   justify-content: center;

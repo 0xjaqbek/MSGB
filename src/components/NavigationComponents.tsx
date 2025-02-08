@@ -31,7 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
   return (
     <div style={{
       position: 'fixed',
-      bottom: 0, // Changed from '1%' to 0
+      bottom: '10px', 
       left: 0,
       right: 0,
       zIndex: 9999,
@@ -42,7 +42,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       background: 'transparent',
       maxWidth: '100vw', 
       overflow: 'hidden',
-      height: '64px' // Fixed height to prevent variable sizing
+      height: '64px' 
     }}>
       {[
         { page: 'main', activeImg: mainActive, defaultImg: mainDefault },
