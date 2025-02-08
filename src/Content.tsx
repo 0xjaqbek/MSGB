@@ -469,17 +469,17 @@ return (
 
         {!isPlaying && telegramUser && visitStats && (
           <PlaysInfoContainer>
-            <div>🎮 {playsRemaining} of {maxPlaysToday} plays remaining</div>
+            <div>🎫 Tickets left: {playsRemaining}/{maxPlaysToday}</div>
             {userStreak > 1 && (
-            <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-            +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'play' : 'plays'} from streak!
-            </div>
-        )}
+              <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+                +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
+              </div>
+            )}
             <div style={{ fontSize: '1.1rem', marginTop: '0.3rem' }}>
-              🏆 Total Points: {totalPoints}
+              💰 Coin Balance: {totalPoints}
             </div>
-  </PlaysInfoContainer>
-)}
+          </PlaysInfoContainer>
+        )}
 
         {!isPlaying && telegramUser && (
           <WelcomeInfo className="scoreboard">
