@@ -2998,7 +2998,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: ${e=>e.$show?1:0};
   pointer-events: ${e=>e.$show?"auto":"none"};
 `,Rj=Yt.div`
-  position: relative;  /* Required for top to work */
+  position: absolute;  /* Required for top to work */
   top: 20px;  /* Moves the section 30px lower */
   height: 65%;
   display: flex;
@@ -3006,12 +3006,14 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 100%;
 `,Tj=Yt.div`
-  position: relative;
+  position: absolute;
+  top: calc(65% + 20px); /* Places it below HeroContainer */
+  left: 0;
+  width: 100%;
   height: 30%;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
 `,Pj=Yt.div`
   position: fixed; 
   bottom: 10px;       
