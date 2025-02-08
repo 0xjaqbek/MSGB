@@ -2941,7 +2941,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   left: 50%;
   transform: translateX(-50%);
 `,Sj=Yt.img`
-  width: 45vw;
+  width: 65vw;
   height: auto;
   margin-bottom: 1rem;
 `,Cj=Yt.div`
