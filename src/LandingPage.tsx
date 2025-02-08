@@ -71,10 +71,10 @@ const ButtonContainer = styled.div`
   height: 30%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
-  gap: 15px;
+  gap: 10px;
 `;
 
 const WelcomeText = styled.div`
