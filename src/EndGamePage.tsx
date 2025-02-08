@@ -50,7 +50,7 @@ const StyledEndGame = styled.div`
 const HeroContainer = styled.div`
   height: 65%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;

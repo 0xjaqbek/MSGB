@@ -57,7 +57,7 @@ const HeroContainer = styled.div`
   top: 20px;  /* Moves the section 30px lower */
   height: 65%;
   display: flex;
-  justify-content: top;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
 `;
