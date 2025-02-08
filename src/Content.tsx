@@ -469,14 +469,45 @@ return (
 
         {!isPlaying && telegramUser && visitStats && (
           <PlaysInfoContainer>
-            <div>🎫 Tickets left: {playsRemaining}/{maxPlaysToday}</div>
-            {userStreak > 1 && (
-              <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-                +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Tickets Section */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <div style={{ 
+                  color: 'white', 
+                  fontSize: '0.9rem'  // Smaller white text
+                }}>
+                  Tickets left
+                </div>
+                <div style={{ 
+                  color: '#0FF',      // Original cyan color
+                  fontSize: '1.2rem'  // Slightly bigger than label
+                }}>
+                  {playsRemaining}/{maxPlaysToday}
+                </div>
               </div>
-            )}
-            <div style={{ fontSize: '1.1rem', marginTop: '0.3rem' }}>
-              💰 Coin Balance: {totalPoints}
+
+              {/* Coin Balance Section */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <div style={{ 
+                  color: 'white', 
+                  fontSize: '0.9rem'  // Smaller white text
+                }}>
+                  Coin Balance
+                </div>
+                <div style={{ 
+                  color: '#FFD700',   // Gold color
+                  fontSize: '1.4rem'  // Bigger than tickets value
+                }}>
+                  {totalPoints}
+                </div>
+              </div>
+
+              {/* Streak Bonus if applicable */}
+              {userStreak > 1 && (
+                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+                  +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
+                </div>
+              )}
             </div>
           </PlaysInfoContainer>
         )}
