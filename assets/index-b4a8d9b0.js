@@ -1137,12 +1137,14 @@ PERFORMANCE OF THIS SOFTWARE.
   align-items: center;
   height: 100vh;
   width: 100vw;
-  position: relative;
+  position: fixed;
   overflow: hidden;
   touch-action: none;
   font-family: 'REM';
   background: -webkit-linear-gradient(white, #38495a);
   -webkit-background-clip: text;
+  top: 0;
+  left: 0;
 `,aD=Yt.div`
   position: absolute;
   top: 0;
