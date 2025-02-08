@@ -2998,7 +2998,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: ${e=>e.$show?1:0};
   pointer-events: ${e=>e.$show?"auto":"none"};
 `,Rj=Yt.div`
-  top: '30px';
+  top: 30px;
   height: 65%;
   display: flex;
   justify-content: center;
