@@ -13,6 +13,7 @@ import { initializeApp } from "firebase/app";
 import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 import EndGamePage from "./EndGamePage";
 import StartAdventureButton from './components/StartAdventureButton';
+import StartSequence from "./StartSequence";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -134,6 +135,7 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
   const [showEndGame, setShowEndGame] = useState(false);
   const [endGameReason, setEndGameReason] = useState<'no-plays' | 'game-over'>('game-over');
   const [totalPoints, setTotalPoints] = useState<number>(0);
+  const [isStartAnimating, setIsStartAnimating] = useState(false);
 
   const getTotalPoints = async (playerId: string) => {
     const db = getDatabase();
@@ -191,16 +193,18 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
   }, [isPlaying, onGameStateChange]);
 
   const handleStartClick = async () => {
-    console.log("handleStartClick called");  // Debug
     const tg = window.Telegram?.WebApp;
-    if (!tg?.initDataUnsafe?.user?.id) {
-      console.log("No Telegram user found");  // Debug
-      return;
-    }
+    if (!tg?.initDataUnsafe?.user?.id) return;
+  
+    setIsStartAnimating(true); // Start animation
+  };
+  
+  const handleAnimationComplete = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (!tg?.initDataUnsafe?.user?.id) return;
   
     try {
       const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
-      console.log("Remaining plays:", remainingPlays);  // Debug
       
       if (remainingPlays < 0) {
         setEndGameReason('no-plays');
@@ -208,7 +212,6 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         return;
       }
   
-      console.log("Starting game...");  // Debug
       setPlaysRemaining(remainingPlays);
       setIsPlaying(true);
       setScore(0);
@@ -507,6 +510,29 @@ return (
           </PlaysInfoContainer>
         )}
 
+        {!isPlaying && !isStartAnimating && (
+          <img 
+            src={stone1} 
+            alt="Stone"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '15vh',
+              height: '15vh',
+              zIndex: 50
+            }}
+          />
+        )}
+
+        {isStartAnimating && !isPlaying && (
+          <StartSequence 
+            onComplete={handleAnimationComplete} 
+            isAnimating={isStartAnimating}
+          />
+        )}
+
         {!isPlaying && telegramUser && (
           <WelcomeInfo className="scoreboard">
             {/* Empty for spacing */}
@@ -519,7 +545,7 @@ return (
           </WelcomeInfo>
         )}
 
-        {!isPlaying && (
+        {!isPlaying && !isStartAnimating && (
           <StartAdventureButton onClick={handleStartClick} />
         )}
 
