@@ -31,7 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
   return (
     <div style={{
       position: 'fixed',
-      bottom: '1%',
+      bottom: 0, // Changed from '1%' to 0
       left: 0,
       right: 0,
       zIndex: 9999,
@@ -41,79 +41,45 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       alignItems: 'center',
       background: 'transparent',
       maxWidth: '100vw', 
-      overflow: 'hidden'
+      overflow: 'hidden',
+      height: '64px' // Fixed height to prevent variable sizing
     }}>
-      <button 
-        onClick={() => onNavigate('main')}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'transparent',
-          border: 'none',
-          padding: '2px',
-          cursor: 'pointer'
-        }}
-      >
-        <img 
-          src={currentPage === 'main' ? mainActive : mainDefault} 
-          alt="Main"
-          style={{ width: '13vh', height: '13vh' }}
-        />
-      </button>
-
-      <button 
-        onClick={() => onNavigate('friends')}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'transparent',
-          border: 'none',
-          padding: '2px',
-          cursor: 'pointer'
-        }}
-      >
-        <img 
-          src={currentPage === 'friends' ? friendsActive : friendsDefault} 
-          alt="Friends"
-          style={{ width: '13vh', height: '13vh' }}
-        />
-      </button>
-
-      <button 
-        onClick={() => onNavigate('account')}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'transparent',
-          border: 'none',
-          padding: '2px',
-          cursor: 'pointer'
-        }}
-      >
-        <img 
-          src={currentPage === 'account' ? accountActive : accountDefault} 
-          alt="Account"
-          style={{ width: '13vh', height: '13vh' }}
-        />
-      </button>
-
-      <button 
-        onClick={() => onNavigate('tasks')}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'transparent',
-          border: 'none',
-          padding: '2px',
-          cursor: 'pointer'
-        }}
-      >
-        <img 
-          src={currentPage === 'tasks' ? tasksActive : tasksDefault} 
-          alt="Tasks"
-          style={{ width: '13vh', height: '13vh' }}
-        />
-      </button>
+      {[
+        { page: 'main', activeImg: mainActive, defaultImg: mainDefault },
+        { page: 'friends', activeImg: friendsActive, defaultImg: friendsDefault },
+        { page: 'account', activeImg: accountActive, defaultImg: accountDefault },
+        { page: 'tasks', activeImg: tasksActive, defaultImg: tasksDefault }
+      ].map(({ page, activeImg, defaultImg }) => (
+        <button 
+          key={page}
+          onClick={() => onNavigate(page as NavigationPage)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            margin: 0,
+            width: '13vh',
+            height: '13vh',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}
+        >
+          <img 
+            src={currentPage === page ? activeImg : defaultImg} 
+            alt={page}
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              maxHeight: '100%'
+            }}
+          />
+        </button>
+      ))}
     </div>
   );
 };
