@@ -64,7 +64,6 @@ const HeroContainer = styled.div`
 
 const WelcomeContainer = styled.div`
   position: relative;
-  top: 30px;  /* Moves this section 30px lower */
   height: 30%;
   display: flex;
   justify-content: center;
