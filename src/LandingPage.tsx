@@ -153,8 +153,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
   const handleStartPlaying = () => {
     setShow(false);
     setTimeout(() => {
-      onStart();
-      // The order here matters - send to main content and start game immediately
+      // Remove onStart() call since that's what sends us to main page
       window.dispatchEvent(new CustomEvent('start-game', { 
         detail: { skipAnimation: true } 
       }));

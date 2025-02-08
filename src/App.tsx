@@ -40,7 +40,6 @@ function App() {
   }, []);
 
   const handleStart = async () => {
-    console.log("handleStart called");
     if (userStats?.isFirstVisit && telegramUser) {
       try {
         const updatedStats = await trackUserVisit(
@@ -53,8 +52,7 @@ function App() {
       }
     }
     setShowLanding(false);
-    setCurrentPage('main'); // Explicitly set to main page
-    console.log("showLanding set to false");
+    setCurrentPage('main');
   };
   
   const handleGameStateChange = (isGamePlaying: boolean) => {

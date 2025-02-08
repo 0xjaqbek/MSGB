@@ -200,7 +200,9 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         }
     
         setPlaysRemaining(remainingPlays);
-        // Directly start the game without animation
+        // Start game immediately
+        setShowEndGame(false);
+        setIsStartAnimating(false); // Ensure animation is off
         setIsPlaying(true);
         setScore(0);
         setGameOver(false);
