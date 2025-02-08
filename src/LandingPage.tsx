@@ -6,6 +6,7 @@ import WelcomeSection from './components/WelcomeSection';
 interface LandingPageProps {
   telegramUser: TelegramUser | null;
   onStart: () => void;
+  onDirectStart: () => void; // Add this
   userStats: {
     currentStreak: number;
     highestStreak: number;
@@ -52,7 +53,7 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  height: 40%;
+  height: 55%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -139,7 +140,7 @@ const StartPlayingButton = styled(StartButton)`
   }
 `;
 
-const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userStats }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDirectStart, userStats }) => {
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
 
@@ -153,8 +154,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
   const handleStartPlaying = () => {
     setShow(false);
     setTimeout(() => {
-      // Direct game start without redirecting to main page
-      window.dispatchEvent(new CustomEvent('start-game'));
+      onDirectStart(); // Use the new function
     }, 500);
   };
 

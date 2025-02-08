@@ -59,6 +59,14 @@ function App() {
     setIsPlaying(isGamePlaying);
   };
 
+  const handleDirectGameStart = () => {
+    setShowLanding(false);
+    const event = new CustomEvent('start-game');
+    setTimeout(() => {
+      window.dispatchEvent(event);
+    }, 100);
+  };
+
   return (
     <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
       {/* Background container */}
@@ -80,11 +88,12 @@ function App() {
     console.log("renderCurrentPage called, showLanding:", showLanding);
     if (showLanding) {
       return (
-        <LandingPage 
-          telegramUser={telegramUser}
-          onStart={handleStart}
-          userStats={userStats}
-        />
+      <LandingPage 
+        telegramUser={telegramUser}
+        onStart={handleStart}
+        onDirectStart={handleDirectGameStart} // Add this
+        userStats={userStats}
+      />
       );
     }
   
