@@ -54,7 +54,6 @@ declare global {
   interface Window {
     Telegram?: {
       WebApp: {
-        requestFullscreen(): unknown;
         ready: () => void;
         expand: () => void;
         disableVerticalSwipes: () => void;
@@ -167,7 +166,6 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         tg.disableVerticalSwipes();
         tg.setHeaderColor("#000000");
         tg.setBottomBarColor("#000000");
-        tg.requestFullscreen();
   
         const user = tg.initDataUnsafe?.user;
         if (user) {

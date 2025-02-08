@@ -22,7 +22,6 @@ function App() {
       if (tg) {
         tg.ready();
         tg.expand();
-        tg.requestFullscreen();
         const user = tg.initDataUnsafe?.user;
         
         if (user) {
