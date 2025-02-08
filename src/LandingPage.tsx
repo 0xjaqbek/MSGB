@@ -154,8 +154,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
     setShow(false);
     setTimeout(() => {
       onStart();
-      // Directly start the game without animation
-      window.dispatchEvent(new CustomEvent('start-game'));
+      // The order here matters - send to main content and start game immediately
+      window.dispatchEvent(new CustomEvent('start-game', { 
+        detail: { skipAnimation: true } 
+      }));
     }, 500);
   };
 
