@@ -519,8 +519,7 @@ return (
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '15vh',
-              height: '15vh',
+              width: '50vh',
               zIndex: 50
             }}
           />

@@ -26,19 +26,19 @@ const StartSequence: React.FC<StartSequenceProps> = ({ onComplete, isAnimating }
     
     const sequence = async () => {
       // Wait 200ms, then show blast.svg
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 100));
       setCurrentImage('blast');
       
       // Wait 200ms, then show blast0.svg
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 100));
       setCurrentImage('blast0');
       
       // Wait 200ms, then show blast1.svg
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 100));
       setCurrentImage('blast1');
       
       // Wait 200ms, then complete
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 100));
       onComplete();
     };
     
