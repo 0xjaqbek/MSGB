@@ -37,7 +37,7 @@ const StyledEndGame = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
@@ -48,11 +48,12 @@ const StyledEndGame = styled.div`
 `;
 
 const HeroContainer = styled.div`
-  height: 65%;
+  height: 35%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
+  margin-bottom: 1rem;
 `;
 
 const HeroImage = styled.img`
@@ -85,6 +86,7 @@ const BoxContent = styled.div`
   .text {
     color: white;
     font-size: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .highlight {
