@@ -163,6 +163,9 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       if (tg) {
         tg.ready();
         tg.expand();
+        if ('requestFullscreen' in tg) {
+          (tg as any).requestFullscreen();
+        }
         tg.disableVerticalSwipes();
         tg.setHeaderColor("#000000");
         tg.setBottomBarColor("#000000");
