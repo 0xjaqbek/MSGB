@@ -2837,7 +2837,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,uj=Yt.div`
   height: 65%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
@@ -2982,7 +2982,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   50% { transform: translateY(-20px); }
   100% { transform: translateY(0px); }
 `,Ij=Yt.div`
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   width: 100vw;
@@ -2998,20 +2998,23 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: ${e=>e.$show?1:0};
   pointer-events: ${e=>e.$show?"auto":"none"};
 `,Rj=Yt.div`
-  position: absolute;  /* Required for top to work */
-  top: 20px;  /* Moves the section 30px lower */
-  height: 65%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-`,Tj=Yt.div`
   position: absolute;
-  top: calc(65% + 20px); /* Places it below HeroContainer */
+  top: 20px; /* Moves it exactly 20px from the top */
   left: 0;
   width: 100%;
-  height: 30%;
+  height: auto; /* Allow it to adjust based on content */
   display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  justify-content: flex-start; /* Align content to the top */
+  align-items: center;
+`,Tj=Yt.div`
+  position: absolute;
+  top: calc(20px + 100%); /* Moves it below HeroContainer */
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 `,Pj=Yt.div`
