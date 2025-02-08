@@ -3007,7 +3007,6 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   width: 100%;
 `,Tj=Yt.div`
   position: relative;
-  top: 30px;  /* Moves this section 30px lower */
   height: 30%;
   display: flex;
   justify-content: center;
