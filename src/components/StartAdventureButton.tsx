@@ -1,25 +1,46 @@
 import React from 'react';
+import styled from 'styled-components';
 
 interface StartAdventureButtonProps {
   onClick: () => void;
 }
 
+const StyledButton = styled.button`
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  border: 2px solid #0FF;
+  color: #0FF;
+  padding: 12px 32px;
+  border-radius: 12px;
+  z-index: 50;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  font-family: 'REM', sans-serif;
+
+  &:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  span {
+    font-size: 18px;
+    font-weight: bold;
+  }
+`;
+
 const StartAdventureButton: React.FC<StartAdventureButtonProps> = ({ onClick }) => {
   return (
-    <button 
-      onClick={onClick}
-      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50
-        bg-transparent border-2 border-cyan-400 text-cyan-400
-        px-8 py-3 rounded-lg
-        shadow-[0_0_15px_rgba(0,255,255,0.3)]
-        hover:shadow-[0_0_20px_rgba(0,255,255,0.5)]
-        transition-all duration-300
-        flex flex-col items-center
-        font-rem"
-    >
-      <span className="text-lg">Start</span>
-      <span className="text-lg">Adventure</span>
-    </button>
+    <StyledButton onClick={onClick}>
+      <span>Start</span>
+      <span>Adventure</span>
+    </StyledButton>
   );
 };
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes, css } from 'styled-components';
-import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './components/StyledComponents';
-import startImage from './assets/start.png';
+import { StyledContent, BlinkScreen, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './components/StyledComponents';
 import stone1 from './assets/stone1.svg';
 import stone2 from './assets/stone2.svg';
 import stone3 from './assets/stone3.svg';
@@ -163,11 +162,10 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
         tg.ready();
         tg.expand();
         tg.disableVerticalSwipes();
-        tg.setHeaderColor("#000000"); // Header color: Black
-        tg.setBottomBarColor("#000000"); // Bottom bar color: Black
+        tg.setHeaderColor("#000000");
+        tg.setBottomBarColor("#000000");
   
         const user = tg.initDataUnsafe?.user;
-  
         if (user) {
           setTelegramUser(user);
           try {
@@ -182,54 +180,55 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
             console.error('Error loading user stats:', error);
           }
         }
-  
-      // Apply styles directly (if supported by your runtime)
-      try {
-        tg.MainButton.color = "#0FF"; // Background color
-        tg.MainButton.textColor = "#000080"; // Text color
-      } catch (error) {
-        console.warn("MainButton styling may not be supported:", error);
       }
-    }
-  };
-  
+    };
+    
     initApp();
   }, []);
-  
 
   useEffect(() => {
     onGameStateChange(isPlaying);
   }, [isPlaying, onGameStateChange]);
 
   const handleStartClick = async () => {
+    console.log("handleStartClick called");  // Debug
     const tg = window.Telegram?.WebApp;
-    if (!tg?.initDataUnsafe?.user?.id) return;
+    if (!tg?.initDataUnsafe?.user?.id) {
+      console.log("No Telegram user found");  // Debug
+      return;
+    }
   
     try {
       const remainingPlays = await updatePlayCount(tg.initDataUnsafe.user.id.toString());
+      console.log("Remaining plays:", remainingPlays);  // Debug
       
       if (remainingPlays < 0) {
         setEndGameReason('no-plays');
         setShowEndGame(true);
         return;
       }
-
+  
+      console.log("Starting game...");  // Debug
       setPlaysRemaining(remainingPlays);
-      setIsPlaying(true); // This will trigger the useEffect above
+      setIsPlaying(true);
       setScore(0);
       setGameOver(false);
       setDifficulty(1);
       setCurrentStones([]);
       setStoneIdCounter(0);
       setRemainingTime(GAME_DURATION);
-      tg.MainButton.hide();
-      tg.sendData(JSON.stringify({ action: 'gameStarted' }));
+  
+      try {
+        tg.MainButton.hide();
+        tg.sendData(JSON.stringify({ action: 'gameStarted' }));
+      } catch (telegramError) {
+        console.warn('Telegram UI operation failed:', telegramError);
+      }
     } catch (error) {
       console.error('Error starting game:', error);
       alert("There was an error starting the game. Please try again.");
     }
   };
-
 
 // Timer logic to reduce time by 1 second every interval and increase difficulty
 useEffect(() => {

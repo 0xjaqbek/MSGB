@@ -40,6 +40,7 @@ function App() {
   }, []);
 
   const handleStart = async () => {
+    console.log("handleStart called");
     if (userStats?.isFirstVisit && telegramUser) {
       try {
         const updatedStats = await trackUserVisit(
@@ -52,8 +53,9 @@ function App() {
       }
     }
     setShowLanding(false);
+    console.log("showLanding set to false");
   };
-
+  
   const handleGameStateChange = (isGamePlaying: boolean) => {
     setIsPlaying(isGamePlaying);
   };
@@ -76,6 +78,7 @@ function App() {
   );
 
   function renderCurrentPage() {
+    console.log("renderCurrentPage called, showLanding:", showLanding);
     if (showLanding) {
       return (
         <LandingPage 
@@ -85,7 +88,8 @@ function App() {
         />
       );
     }
-
+  
+    console.log("currentPage:", currentPage);
     switch (currentPage) {
       case 'main':
         return <Content onGameStateChange={handleGameStateChange} />;
