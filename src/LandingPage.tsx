@@ -74,7 +74,7 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: 15px;
+  gap: 10px;
 `;
 
 const WelcomeText = styled.div`
@@ -113,7 +113,7 @@ const StartButton = styled.button`
   border: 2px solid #0FF;
   color: #0FF;
   padding: 1rem 2rem;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -151,17 +151,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userSt
   };
 
   const handleStartPlaying = () => {
+    const tg = window.Telegram?.WebApp;
+    if (!tg?.initDataUnsafe?.user?.id) return;
+  
     setShow(false);
-    setTimeout(() => {
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.MainButton.text = "Start Game";
-        tg.MainButton.show();
-        // Use a custom event to trigger game start
-        window.dispatchEvent(new CustomEvent('start-game'));
-      }
-    }, 500);
+    
+    // Dispatch a custom event to trigger the StartAdventureButton click behavior
+    window.dispatchEvent(new CustomEvent('trigger-start-adventure'));
   };
+
 
   return (
     <StyledLanding $show={show}>

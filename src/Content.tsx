@@ -187,7 +187,7 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
     
     initApp();
 
-    // Add event listener for game start
+    // Add event listener for alternative game start methods
     const startGameHandler = async () => {
       if (!telegramUser?.id) return;
   
@@ -208,11 +208,21 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
       }
     };
 
-    window.addEventListener('start-game', startGameHandler);
+    const triggerStartAdventureHandler = () => {
+      // Find the StartAdventureButton and simulate its click
+      const startAdventureButton = document.querySelector('[aria-label="Start Adventure"]') as HTMLButtonElement;
+      if (startAdventureButton) {
+        startAdventureButton.click();
+      }
+    };
 
-    // Cleanup the event listener
+    window.addEventListener('start-game', startGameHandler);
+    window.addEventListener('trigger-start-adventure', triggerStartAdventureHandler);
+
+    // Cleanup the event listeners
     return () => {
       window.removeEventListener('start-game', startGameHandler);
+      window.removeEventListener('trigger-start-adventure', triggerStartAdventureHandler);
     };
   }, [telegramUser]);
 

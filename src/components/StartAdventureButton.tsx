@@ -38,12 +38,15 @@ const StyledButton = styled.button`
 `;
 
 const StartAdventureButton: React.FC<StartAdventureButtonProps> = ({ onClick }) => {
-  return (
-    <StyledButton onClick={onClick}>
-      <span>START</span>
-      <span>ADVENTURE</span>
-    </StyledButton>
-  );
-};
+    return (
+      <StyledButton 
+        onClick={onClick} 
+        aria-label="Start Adventure"
+      >
+        <span>START</span>
+        <span>ADVENTURE</span>
+      </StyledButton>
+    );
+  };
 
 export default StartAdventureButton;
