@@ -22,7 +22,7 @@ const StyledButton = styled.button`
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
-  font-family: 'REM', sans-serif;
+  font-family: 'REM', monospace;
 
   &:hover {
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
@@ -32,14 +32,16 @@ const StyledButton = styled.button`
   span {
     font-size: 18px;
     font-weight: bold;
+    line-height: 1.4;
+    letter-spacing: 1px;
   }
 `;
 
 const StartAdventureButton: React.FC<StartAdventureButtonProps> = ({ onClick }) => {
   return (
     <StyledButton onClick={onClick}>
-      <span>Start</span>
-      <span>Adventure</span>
+      <span>START</span>
+      <span>ADVENTURE</span>
     </StyledButton>
   );
 };
