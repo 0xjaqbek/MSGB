@@ -2999,10 +2999,10 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   pointer-events: ${e=>e.$show?"auto":"none"};
 `,Rj=Yt.div`
   position: relative;  /* Required for top to work */
-  top: 10px;  /* Moves the section 30px lower */
+  top: 20px;  /* Moves the section 30px lower */
   height: 65%;
   display: flex;
-  justify-content: center;
+  justify-content: top;
   align-items: center;
   width: 100%;
 `,Tj=Yt.div`
