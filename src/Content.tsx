@@ -14,7 +14,6 @@ import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking
 import EndGamePage from "./EndGamePage";
 import StartAdventureButton from './components/StartAdventureButton';
 import StartSequence from "./StartSequence";
-import WelcomeSection from './components/WelcomeSection';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -468,11 +467,6 @@ return (
 
         {!isPlaying && telegramUser && visitStats && (
 
-          <>
-          <WelcomeSection 
-            userName={telegramUser.first_name}
-            ticketsLeft={playsRemaining || 0}
-          />  
 
           <PlaysInfoContainer>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -516,7 +510,6 @@ return (
               )}
             </div>
           </PlaysInfoContainer>
-          </>
         )}
 
         {!isPlaying && !isStartAnimating && (

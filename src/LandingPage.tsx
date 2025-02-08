@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { TelegramUser } from './types';
+import WelcomeSection from './components/WelcomeSection';
 
 interface LandingPageProps {
-    telegramUser: TelegramUser | null;
-    onStart: () => void;
-    userStats: {
-      currentStreak: number;
-      highestStreak: number;
-      totalVisits: number;
-      todayVisits: number;
-      isFirstVisit: boolean;
-    } | null;
-  }
+  telegramUser: TelegramUser | null;
+  onStart: () => void;
+  userStats: {
+    currentStreak: number;
+    highestStreak: number;
+    totalVisits: number;
+    todayVisits: number;
+    isFirstVisit: boolean;
+    playsRemaining: number; 
+  } | null;
+}
   
 
 const fadeIn = keyframes`
@@ -97,7 +99,6 @@ const StartButton = styled.button`
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  animation: ${fadeIn} 1s ease-out 0.5s backwards;
   margin-top: 2rem;
 
   &:hover {
@@ -109,67 +110,55 @@ const StartButton = styled.button`
 `;
 
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, userStats }) => {
-    const [show, setShow] = useState(true);
-    const isFirstVisit = userStats?.isFirstVisit;
-  
-    const handleStart = () => {
-      setShow(false);
-      setTimeout(() => {
-        onStart();
-      }, 500);
-    };
-  
-    return (
-      <StyledLanding $show={show}>
-        {isFirstVisit ? (
-          // First Visit Content
-          <>
-            <WelcomeText>
-              Welcome to
-              <span>MoonStones</span>
-              {telegramUser && (
-                <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
-                  {telegramUser.first_name}
-                </div>
-              )}
-            </WelcomeText>
-            
-            <FirstVisitInfo>
-              <div>🎮 Visit daily to build your <span className="highlight">streak</span></div>
-              <div>⚡ Each day you play adds to your streak</div>
-              <div>❌ Miss a day and streak resets</div>
-              <div>🏆 Compete for the highest streak!</div>
-            </FirstVisitInfo>
-          </>
-        ) : (
-          // Returning User Content
-          <>
-            <WelcomeText>
-              Welcome back to
-              <span>MoonStones</span>
-              {telegramUser && (
-                <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
-                  {telegramUser.first_name}
-                </div>
-              )}
-            </WelcomeText>
-            
-            {userStats && (
-              <StatsContainer>
-                <div>🔥 Current Streak: {userStats.currentStreak} days</div>
-                <div>⭐ Highest Streak: {userStats.highestStreak} days</div>
-                <div>🎮 Total Visits: {userStats.totalVisits}</div>
-                <div>📅 Today's Visits: {userStats.todayVisits}</div>
-              </StatsContainer>
-            )}
-          </>
-        )}
-        
-        <StartButton onClick={handleStart}>
-          {isFirstVisit ? 'Begin Journey' : 'Continue Journey'}
-        </StartButton>
-      </StyledLanding>
-    );
+  const [show, setShow] = useState(true);
+  const isFirstVisit = userStats?.isFirstVisit;
+
+  const handleStart = () => {
+    setShow(false);
+    setTimeout(() => {
+      onStart();
+    }, 500);
   };
-  
-  export default LandingPage;
+
+  return (
+    <StyledLanding $show={show}>
+      {isFirstVisit ? (
+        // First Visit Content
+        <>
+          <WelcomeText>
+            Welcome to
+            <span>MoonStones</span>
+            {telegramUser && (
+              <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
+                {telegramUser.first_name}
+              </div>
+            )}
+          </WelcomeText>
+          
+          <FirstVisitInfo>
+            <div>🎮 Visit daily to build your <span className="highlight">streak</span></div>
+            <div>⚡ Each day you play adds to your streak</div>
+            <div>❌ Miss a day and streak resets</div>
+            <div>🏆 Compete for the highest streak!</div>
+          </FirstVisitInfo>
+        </>
+      ) : (
+        // Returning User Content - Show WelcomeSection here
+        <>
+          {telegramUser && userStats && (
+            <WelcomeSection 
+              userName={telegramUser.first_name}
+              ticketsLeft={userStats.playsRemaining}
+            />
+          )}
+        </>
+      )}
+      
+      <StartButton onClick={handleStart}>
+        {isFirstVisit ? 'Begin Journey' : 'Continue Journey'}
+      </StartButton>
+    </StyledLanding>
+  );
+};
+
+export default LandingPage;
