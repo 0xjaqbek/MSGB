@@ -457,12 +457,13 @@ const HUDTop = styled.div`
   right: 0;
   z-index: 9999;
   display: flex;
-  justifyContent: 'space-around',
-  alignItems: 'flex-start',
+  justify-content: center;
+  align-items: center;
   background: url(${hudTop}) no-repeat center top;
   background-size: 100% 100%;
   width: 100vw;
   max-width: 100vw;
+  height: 100px;
   pointer-events: none;
 `;
 
