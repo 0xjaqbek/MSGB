@@ -77,7 +77,7 @@ const Nebula: React.FC<NebulaProps> = ({ src, index }) => {
 const NebulaEffect: React.FC = () => {
   const nebulae = [plamy, plamy1, plamy2];
   const [instances] = useState(() => 
-    Array.from({ length: 6 }, (_, i) => ({
+    Array.from({ length: 3 }, (_, i) => ({
       id: i,
       src: nebulae[Math.floor(Math.random() * nebulae.length)]
     }))
