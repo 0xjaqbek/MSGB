@@ -44,8 +44,7 @@ const Game: React.FC = () => {
 
       tg.MainButton.text = "Start Game";
       tg.MainButton.onClick(() => handleStartClick());
-      tg.MainButton.show();
-    }
+      tg.MainButton.hide
   }, []);
 
   // Game timer and difficulty
@@ -84,7 +83,7 @@ const Game: React.FC = () => {
       const tg = window.Telegram?.WebApp;
       if (tg) {
         tg.MainButton.text = "Play Again";
-        tg.MainButton.show();
+        tg.MainButton.hide();
         updateScore();
         tg.sendData(JSON.stringify({ action: 'gameOver', score }));
       }

@@ -308,7 +308,7 @@ useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.MainButton.text = "Play Again";
-      tg.MainButton.show();
+      tg.MainButton.hide();
       updateScore();
       tg.sendData(JSON.stringify({ action: 'gameOver', score }));
     }
@@ -484,7 +484,7 @@ const handleClose = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.MainButton.text = "Start Game";
-    tg.MainButton.show();
+    tg.MainButton.hide();
   }
 };
 
