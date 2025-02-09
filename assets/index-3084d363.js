@@ -3010,7 +3010,6 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: center;
   align-items: center;
   width: 100%;
-  position: relative; // Added to handle z-index properly
   z-index: 2; // Higher z-index to ensure it stays on top
 `,Pj=Gt.div`
   position: fixed; 
