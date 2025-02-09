@@ -38,13 +38,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       zIndex: 9999,
       display: 'flex',
       justifyContent: 'space-around',
-      alignItems: 'center',
+      alignItems: 'flex-start',  // Changed from center to flex-start
       background: `url(${hudBackground}) no-repeat center bottom`,
       backgroundSize: '100% 100%',
       maxWidth: '100vw', 
       overflow: 'hidden',
       height: '100px',
-      padding: '0 10px'
+      padding: '15px 10px 0'  // Added top padding to push icons down
     }}>
       {[
         { page: 'main', activeImg: mainActive, defaultImg: mainDefault },
@@ -63,6 +63,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
             border: 'none',
             padding: 0,
             margin: 0,
+            marginTop: '5px',  // Added margin top to push down icons
             width: '10vh',
             height: '10vh',
             overflow: 'hidden',
