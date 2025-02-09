@@ -2820,7 +2820,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   100% { transform: translateY(0px); }
 `;const lj=Gt.div`
   position: fixed;
-  top: '30px';
+  top: 100px; // Adjusted like in LandingPage
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -2830,24 +2830,25 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
-  padding: 5% 0;
   transition: opacity 0.5s ease-in-out;
   opacity: 1;
   pointer-events: auto;
 `,uj=Gt.div`
-  height: 65%;
+  margin-top: 30px;
+  margin-bottom: -40px; // Added negative margin for overlap
+  height: 60%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 1rem;
+  z-index: 1; // Lower z-index so it goes under the box
 `,fj=Gt.img`
   width: 65vw;
   height: auto;
-  margin-bottom: 1rem;
 `,cj=Gt.div`
   position: relative;
   width: 80vw;
+  z-index: 2;
 `,dj=Gt.img`
   width: 100%;
   height: auto;
