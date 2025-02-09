@@ -164,19 +164,22 @@ const handleStart = async () => {
     console.log("renderCurrentPage called, showLanding:", showLanding);
     if (showLanding) {
       return (
-      <LandingPage 
-        telegramUser={telegramUser}
-        onStart={handleStart}
-        onDirectStart={handleDirectGameStart}
-        userStats={userStats}
-      />
+        <LandingPage 
+          telegramUser={telegramUser}
+          onStart={handleStart}
+          onDirectStart={handleDirectGameStart}
+          userStats={userStats}
+        />
       );
     }
   
     console.log("currentPage:", currentPage);
     switch (currentPage) {
       case 'main':
-        return <Content onGameStateChange={handleGameStateChange} />;
+        return <Content 
+          onGameStateChange={handleGameStateChange}
+          userStats={userStats}  // Add this
+        />;
       case 'friends':
         return <FriendsPage telegramUser={telegramUser} />;
       case 'account':
@@ -184,7 +187,10 @@ const handleStart = async () => {
       case 'tasks':
         return <TasksPage />;
       default:
-        return <Content onGameStateChange={handleGameStateChange} />;
+        return <Content 
+          onGameStateChange={handleGameStateChange}
+          userStats={userStats}  // Add this here too
+        />;
     }
   }
 }

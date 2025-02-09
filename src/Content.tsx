@@ -97,6 +97,14 @@ interface VisitHistoryEntry {
 
 interface ContentProps {
   onGameStateChange: (isPlaying: boolean) => void;
+  userStats?: {
+    currentStreak: number;
+    highestStreak: number;
+    totalVisits: number;
+    todayVisits: number;
+    isFirstVisit: boolean;
+    playsRemaining: number;
+  } | null;
 }
 
 
@@ -118,7 +126,7 @@ export const getUserVisitStats = async (userId: string): Promise<UserVisit | nul
 
 const GAME_DURATION = 60; // 60 seconds for the game
 
-const Content: React.FC<ContentProps> = ({ onGameStateChange }) => {
+const Content: React.FC<ContentProps> = ({ onGameStateChange, userStats }) => {
   const [showBlink, setShowBlink] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
@@ -488,15 +496,23 @@ const handleClose = () => {
   }
 };
 
+const handlePlayAgain = () => {
+  setShowEndGame(false);
+  const event = new CustomEvent('start-game');
+  window.dispatchEvent(event);
+};
+
 return (
   <StyledContent>
     {showEndGame ? (
       <EndGamePage
         reason={endGameReason}
         score={endGameReason === 'game-over' ? score : undefined}
-        playsFromStreak={userStreak > 1 ? userStreak - 1 : 0}
+        ticketsLeft={userStats?.playsRemaining || 0}
+        onPlayAgain={handlePlayAgain}
         onShare={handleShare}
-        onClose={handleClose} ticketsLeft={0}      />
+        onClose={handleClose}
+      />
     ) : (
       <>
         {showBlast && blastPosition && (
