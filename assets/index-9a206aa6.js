@@ -2984,7 +2984,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: space-between;
   align-items: center;
   background: url(${Tj}) no-repeat center top;
-  background-size: 100% 100%;
+  background-size: cover;
   width: 100%;
   max-width: 100vw;
   height: auto;
