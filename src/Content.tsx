@@ -52,36 +52,6 @@ type TelegramUser = {
   is_premium?: boolean;
 };
 
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp: {
-        ready: () => void;
-        expand: () => void;
-        disableVerticalSwipes: () => void;
-        setHeaderColor: (color: string) => void;
-        setBottomBarColor: (color: string) => void;
-        lockOrientation(): unknown;  // Changed to match existing declaration
-        isOrientationLocked: boolean;
-        initDataUnsafe?: {
-          user?: TelegramUser;
-        };
-        MainButton: {
-          color: string;
-          textColor: string;
-          text: string;
-          onClick: (callback: () => void) => void;
-          show: () => void;
-          hide: () => void;
-        };
-        sendData: (data: string) => void;
-        requestFullscreen?: () => void;
-      };
-    };
-  }
-}
-
-
 interface UserVisit {
   lastVisit: string;
   currentStreak: number;
