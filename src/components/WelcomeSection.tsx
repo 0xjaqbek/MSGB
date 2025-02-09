@@ -9,7 +9,7 @@ const Container = styled.div`
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 3%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -17,7 +17,6 @@ const Container = styled.div`
 const HeroImage = styled.img`
   width: 65vw;
   height: auto;
-  margin-bottom: 1rem;
 `;
 
 const BoxContainer = styled.div`
