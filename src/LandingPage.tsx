@@ -179,20 +179,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   const handleGoToMainPage = () => {
     setShow(false);
-    setTimeout(() => {
-      onStart();
-    }, 500);
+    onStart(); // Remove the timeout
   };
 
   const handleStartPlaying = () => {
-    setShow(false);
-    setTimeout(() => {
-      if (userStats?.playsRemaining === 0) {
-        onStart(); // Use the same function as GO TO MAIN PAGE
-      } else {
-        onDirectStart(); // Original function for starting the game
-      }
-    }, 500);
+    if (userStats?.playsRemaining === 0) {
+      handleGoToMainPage(); // Use handleGoToMainPage directly
+    } else {
+      setShow(false);
+      onDirectStart(); // Direct call without timeout
+    }
   };
 
   return (
