@@ -36,7 +36,7 @@ const float = keyframes`
 
 const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
-  top: 50px;
+  top: 90px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -46,7 +46,6 @@ const StyledLanding = styled.div<{ $show: boolean }>`
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
-  padding-top: 20px; // Added specific top padding
   transition: opacity 0.5s ease-in-out;
   opacity: ${props => props.$show ? 1 : 0};
   pointer-events: ${props => props.$show ? 'auto' : 'none'};
@@ -72,7 +71,7 @@ const WelcomeContainer = styled.div`
 
 const ButtonContainer = styled.div`
   position: fixed; 
-  bottom: 30px;       
+  bottom: 60px;       
   display: flex;
   flex-direction: column;
   justify-content: center;
