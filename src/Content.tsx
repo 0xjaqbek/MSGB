@@ -460,7 +460,7 @@ const HUDTop = styled.div`
   justify-content: space-between;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
-  background-size: 100% 100%;
+  background-size: cover;
   width: 100%;
   max-width: 100vw;
   height: auto;
