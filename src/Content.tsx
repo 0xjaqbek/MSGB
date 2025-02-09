@@ -463,7 +463,7 @@ const HUDTop = styled.div`
   background-size: 100% 100%;
   width: 100%;
   max-width: 100vw;
-  height: 140px; // Adjusted to be more compact
+
   overflow: hidden;
   pointer-events: none;
   padding: 0 10px; // Add some padding
