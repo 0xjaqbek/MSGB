@@ -2937,13 +2937,12 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 3%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
 `,Sj=Gt.img`
   width: 65vw;
   height: auto;
-  margin-bottom: 1rem;
 `,Cj=Gt.div`
   position: relative;
   width: 80vw;
