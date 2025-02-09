@@ -112,8 +112,8 @@ const FirstVisitInfo = styled.div`
 const StartButton = styled.button`
   width: 80%;
   background: transparent;
-  border: 2px solid #9D4EDD; // Changed to purple
-  color: #9D4EDD; // Changed to purple
+  border: 2px solid #9D4EDD; 
+  color: #9D4EDD; 
   padding: 1rem 2rem;
   font-size: 1rem;
   border-radius: 20px;
@@ -121,25 +121,25 @@ const StartButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: #9D4EDD; // Changed to purple
+    background: #9D4EDD; 
     color: #000;
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); // Changed to purple with opacity
+    box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); 
   }
 `;
 
 const StartPlayingButton = styled(StartButton)`
-  background: #0FF; 
-  color: #000;
+  background: transparent;
+  color: #0FF; 
   border: 2px solid #0FF; 
 
   &:hover {
-    background: #0FF;
+    background: #0FF; 
     color: #000;
+    transform: scale(1.05);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); // Cyan glow
   }
 `;
-
 
 const StreakMessage = styled.div`
   color: #FFD700;
