@@ -2843,6 +2843,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: auto;
   margin-bottom: -20%; /* This will push the hero image under the box */
 `,cj=Gt.div`
+  top: 70%;
+  left: 50%;
   position: relative; /* Add this to make it a positioning context */
   width: 80vw;
   z-index: 2;
