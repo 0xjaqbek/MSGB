@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import hero from '../assets/hero.png';
-import welcomeBox from '../assets/welcomeBox.svg';
+import hero from '../src/assets/hero.png';
+import welcomeBox from '../src/assets/welcomeBox.svg';
 
 interface EndGamePageProps {
   reason: 'no-plays' | 'game-over';
