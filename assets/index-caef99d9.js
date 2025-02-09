@@ -2951,7 +2951,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: auto;
 `,Mj=Gt.div`
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -3047,8 +3047,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,zS=Gt.button`
   width: 80%;
   background: transparent;
-  border: 2px solid #9D4EDD; // Changed to purple
-  color: #9D4EDD; // Changed to purple
+  border: 2px solid #9D4EDD; 
+  color: #9D4EDD; 
   padding: 1rem 2rem;
   font-size: 1rem;
   border-radius: 20px;
@@ -3056,19 +3056,20 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   transition: all 0.3s ease;
 
   &:hover {
-    background: #9D4EDD; // Changed to purple
+    background: #9D4EDD; 
     color: #000;
     transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); // Changed to purple with opacity
+    box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); 
   }
 `,Oj=Gt(zS)`
-  background: #0FF; 
-  color: #000;
+  background: transparent;
+  color: #0FF; 
   border: 2px solid #0FF; 
 
   &:hover {
-    background: #0FF;
+    background: #0FF; 
     color: #000;
+    transform: scale(1.05);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); // Cyan glow
   }
 `,Lj=Gt.div`
