@@ -50,6 +50,7 @@ type TelegramUser = {
   username?: string;
   language_code?: string;
   is_premium?: boolean;
+  photo_url?: string;
 };
 
 interface UserVisit {
@@ -454,8 +455,8 @@ const HUDTop = styled.div`
   top: 0;
   left: 0;
   right: 0;
+  maxWidth: 100vw;
   width: 100vw;
-  height: 100px;
   z-index: 9999;
   display: flex;
   justify-content: center;
