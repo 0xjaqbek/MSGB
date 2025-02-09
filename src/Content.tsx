@@ -54,12 +54,13 @@ declare global {
   interface Window {
     Telegram?: {
       WebApp: {
-        lockOrientation(): unknown;
         ready: () => void;
         expand: () => void;
         disableVerticalSwipes: () => void;
         setHeaderColor: (color: string) => void;
         setBottomBarColor: (color: string) => void;
+        lockOrientation(): unknown;  // Changed to match existing declaration
+        isOrientationLocked: boolean;
         initDataUnsafe?: {
           user?: TelegramUser;
         };
@@ -72,6 +73,7 @@ declare global {
           hide: () => void;
         };
         sendData: (data: string) => void;
+        requestFullscreen?: () => void;
       };
     };
   }

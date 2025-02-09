@@ -60,7 +60,10 @@ function App() {
       if (tg) {
         tg.ready();
         tg.expand();
-        tg.lockOrientation();
+        
+        if (!tg.isOrientationLocked) {
+          tg.lockOrientation();  // Call without parameters
+        }
         
         // Detect mobile environment
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);

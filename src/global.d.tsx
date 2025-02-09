@@ -1,32 +1,7 @@
 // Ensure this file is treated as a module
 export {};
 
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp: {
-        ready: () => void;
-        expand: () => void;
-        disableVerticalSwipes: () => void;
-        setHeaderColor: (color: string) => void;
-        setBottomBarColor: (color: string) => void;
-        isOrientationLocked: boolean;
-        initDataUnsafe?: {
-          user?: TelegramUser;
-        };
-        MainButton: {
-          color: string;
-          textColor: string;
-          text: string;
-          onClick: (callback: () => void) => void;
-          show: () => void;
-          hide: () => void;
-        };
-        sendData: (data: string) => void;
-      };
-    };
-  }
-}
+
 
 interface TelegramUser {
   id: number;

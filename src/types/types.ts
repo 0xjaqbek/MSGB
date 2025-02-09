@@ -20,7 +20,6 @@ export type Stone = {
     is_premium?: boolean;
   };
   
-  // Add this to enable Telegram types globally
   declare global {
     interface Window {
       Telegram?: {
@@ -30,6 +29,8 @@ export type Stone = {
           disableVerticalSwipes: () => void;
           setHeaderColor: (color: string) => void;
           setBottomBarColor: (color: string) => void;
+          lockOrientation(): unknown;  // Changed to match existing declaration
+          isOrientationLocked: boolean;
           initDataUnsafe?: {
             user?: TelegramUser;
           };
@@ -42,6 +43,7 @@ export type Stone = {
             hide: () => void;
           };
           sendData: (data: string) => void;
+          requestFullscreen?: () => void;
         };
       };
     }
