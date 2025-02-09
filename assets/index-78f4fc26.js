@@ -2983,7 +2983,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   100% { transform: translateY(0px); }
 `,Ij=Gt.div`
   position: fixed;
-  top: 50px;
+  top: 90px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -2993,7 +2993,6 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
-  padding-top: 20px; // Added specific top padding
   transition: opacity 0.5s ease-in-out;
   opacity: ${e=>e.$show?1:0};
   pointer-events: ${e=>e.$show?"auto":"none"};
@@ -3013,7 +3012,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   width: 100%;
 `,Pj=Gt.div`
   position: fixed; 
-  bottom: 30px;       
+  bottom: 60px;       
   display: flex;
   flex-direction: column;
   justify-content: center;
