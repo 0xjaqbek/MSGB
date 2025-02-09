@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import hero from '../src/assets/hero.svg';
+import hero from '../src/assets/hero.png';
 import welcomeBox from '../src/assets/welcomeBox.svg';
 
 interface EndGamePageProps {
@@ -63,7 +63,6 @@ const HeroImage = styled.img`
 `;
 
 const BoxContainer = styled.div`
-  position: relative;
   width: 80vw;
   z-index: 2;
 `;
