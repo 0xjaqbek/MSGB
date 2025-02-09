@@ -459,13 +459,15 @@ const HUDTop = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: url(${hudTop}) no-repeat center center;
-  background-size: 100% 100%; // Ensures the entire image covers the area
+  background: url(${hudTop}) no-repeat center top;
+  background-size: cover; // This will make the image cover the entire area
   width: 100%;
-  height: auto; // Fixed height to match your design
-  overflow: visible; // Change from hidden to visible
+  height: auto; 
+  background-position: center;
+  background-repeat: no-repeat;
   pointer-events: none;
   padding: 10px;
+  overflow: hidden;
 `;
 
 const ProfileContainer = styled.div`
