@@ -2811,7 +2811,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 20%;
+  top: 5%;  // Changed to match WelcomeSection
   left: 50%;
   transform: translateX(-50%);
 `,cj=Gt.img`
@@ -2821,7 +2821,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,dj=Gt.div`
   position: relative;
   width: 80vw;
-  z-index: 2;
+  z-index: 2; // Higher z-index to stay on top
 `,hj=Gt.img`
   width: 100%;
   height: auto;
@@ -2874,7 +2874,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     line-height: 1.4;
     letter-spacing: 1px;
   }
-`,gj=({reason:e,score:t,ticketsLeft:r,onPlayAgain:n})=>st(fj,{children:[Pe(cj,{src:zS,alt:"Hero"}),st(dj,{children:[Pe(hj,{src:HS,alt:"Welcome Box"}),st(pj,{children:[Pe("div",{className:"text",children:"GAME OVER"}),e==="no-plays"?Pe("div",{className:"text",children:"NO TICKETS LEFT!"}):st(go,{children:[st("div",{className:"text",children:["YOU HAVE ",Pe("span",{className:"highlight",children:r}),r===1?" TICKET":" TICKETS"," LEFT!"]}),t!==void 0&&st("div",{className:"text",children:["FINAL SCORE: ",Pe("span",{className:"highlight",children:t})]})]})]})]}),r>0&&n&&st(vj,{onClick:n,children:[Pe("span",{children:"PLAY"}),Pe("span",{children:"AGAIN"})]})]}),mj=Gt.button`
+`,gj=({reason:e,score:t,ticketsLeft:r,onPlayAgain:n})=>st(fj,{children:[Pe(cj,{src:zS,alt:"Hero"}),st(dj,{children:[Pe(hj,{src:HS,alt:"Welcome Box"}),st(pj,{children:[Pe("div",{className:"text",children:"GAME OVER"}),e==="no-plays"?Pe("div",{className:"text",children:"NO TICKETS LEFT!"}):st(go,{children:[t!==void 0&&st("div",{className:"text",children:["FINAL SCORE: ",Pe("span",{className:"highlight",children:t})]}),st("div",{className:"text",children:["YOU HAVE ",Pe("span",{className:"highlight",children:r}),r===1?" TICKET":" TICKETS"," LEFT!"]})]})]})]}),r>0&&n&&st(vj,{onClick:n,children:[Pe("span",{children:"PLAY"}),Pe("span",{children:"AGAIN"})]})]}),mj=Gt.button`
   position: fixed;
   bottom: 100px;
   left: 50%;
