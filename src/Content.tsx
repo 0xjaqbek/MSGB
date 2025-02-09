@@ -452,18 +452,21 @@ const PlaysInfoContainer = styled.div`
 const HUDTop = styled.div`
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
   background-size: 100% 100%;
-  width: 100vw;
-  max-width: 100vw;
+  width: 100%;
   height: 100px;
   pointer-events: none;
+  color: white;
+  font-family: 'REM', monospace;
+  font-size: 1.2rem;
+  padding-top: 20px;  // Adjust based on your HUD image
 `;
 
 const handleShare = () => {
@@ -603,12 +606,9 @@ return (
         )}
 
         {isPlaying && (
-          <>
-            <HUDTop />
-            <ScoreBoard className="scoreboard" style={{ zIndex: 10000 }}>
-              Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
-            </ScoreBoard>
-          </>
+          <HUDTop>
+            Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+          </HUDTop>
         )}
 
         {isPlaying && !gameOver && currentStones.map((stone) => (
