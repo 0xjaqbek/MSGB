@@ -2986,7 +2986,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   background: url(${Tj}) no-repeat center top;
   background-size: cover; // This will make the image cover the entire area
   width: 100%;
-  height: auto; 
+  height: 120px; 
   background-position: center;
   background-repeat: no-repeat;
   pointer-events: none;
