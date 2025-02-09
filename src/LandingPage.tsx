@@ -209,13 +209,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
       <HeroContainer>
         {isFirstVisit ? (
           <WelcomeText>
-            Welcome to
-            <span>MoonStones</span>
-            {telegramUser && (
-              <div style={{ fontSize: '1.8rem', marginTop: '1rem' }}>
-                {telegramUser.first_name}
-              </div>
-            )}
+
           </WelcomeText>
         ) : null}
       </HeroContainer>
