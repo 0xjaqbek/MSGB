@@ -3059,6 +3059,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  z-index: 2;
 
   &:hover {
     background: #9D4EDD; 
