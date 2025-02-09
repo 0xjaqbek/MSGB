@@ -2942,7 +2942,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   .highlight {
     color: #FFD700;
   }
-`,Wb=({userName:e,ticketsLeft:t,isFirstVisit:r})=>lt(Sj,{children:[Pe(Cj,{src:zS,alt:"Hero"}),lt(Ej,{children:[Pe(Mj,{src:HS,alt:"Welcome Box"}),Pe(Aj,{children:r?lt(go,{children:[lt("div",{className:"text",children:["Play daily to grow your ",Pe("span",{className:"highlight",children:"streak"}),"."]}),Pe("div",{className:"text",children:"Miss a day, and it resets."}),Pe("div",{className:"text",children:"More streak, more tickets, more points!"})]}):lt(go,{children:[lt("div",{className:"text",children:["Hello ",e]}),lt("div",{className:"text",children:["You got ",lt("span",{className:"highlight",children:[t," tickets"]})]}),Pe("div",{className:"text",children:t>0?"Use them wisely.":lt(go,{children:["Invite a Friend",Pe("br",{}),"or get back Tomorrow."]})})]})})]})]}),Am=Ha`
+`,Wb=({userName:e,ticketsLeft:t,isFirstVisit:r})=>lt(Sj,{children:[Pe(Cj,{src:zS,alt:"Hero"}),lt(Ej,{children:[Pe(Mj,{src:HS,alt:"Welcome Box"}),Pe(Aj,{children:r?lt(go,{children:[lt("div",{className:"text",children:["Play daily to grow your ",Pe("span",{className:"highlight",children:"streak"}),"."]}),Pe("div",{className:"text",children:"Miss a day, and it resets."}),Pe("div",{className:"text",children:"More streak = more points!"})]}):lt(go,{children:[lt("div",{className:"text",children:["Hello ",e]}),lt("div",{className:"text",children:["You got ",lt("span",{className:"highlight",children:[t," tickets"]})]}),Pe("div",{className:"text",children:t>0?"Use them wisely.":lt(go,{children:["Invite a Friend",Pe("br",{}),"or get back Tomorrow."]})})]})})]})]}),Am=Ha`
   from {
     opacity: 0;
     transform: translateY(20px);
