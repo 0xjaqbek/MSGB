@@ -48,7 +48,7 @@ const StyledLanding = styled.div<{ $show: boolean }>`
   z-index: 1000;
   transition: opacity 0.5s ease-in-out;
   opacity: ${props => props.$show ? 1 : 0};
-  pointer-events: ${props => props.$show ? 'auto' : 'none'};
+  pointer-events: auto;
 `;
 
 const HeroContainer = styled.div`
