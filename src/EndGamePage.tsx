@@ -20,7 +20,7 @@ const Container = styled.div`
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 5%;  // Changed to match WelcomeSection
+  top: 25%;  // Changed to match WelcomeSection
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -126,8 +126,7 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
 
       {ticketsLeft > 0 && onPlayAgain && (
         <PlayAgainButton onClick={onPlayAgain}>
-          <span>PLAY</span>
-          <span>AGAIN</span>
+          <span>PLAY AGAIN</span>
         </PlayAgainButton>
       )}
     </Container>
