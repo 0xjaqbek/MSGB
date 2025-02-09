@@ -496,8 +496,7 @@ return (
         score={endGameReason === 'game-over' ? score : undefined}
         playsFromStreak={userStreak > 1 ? userStreak - 1 : 0}
         onShare={handleShare}
-        onClose={handleClose}
-      />
+        onClose={handleClose} ticketsLeft={0}      />
     ) : (
       <>
         {showBlast && blastPosition && (

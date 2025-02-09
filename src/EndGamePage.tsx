@@ -11,6 +11,7 @@ interface EndGamePageProps {
   onShare?: () => void;
   onClose?: () => void;
   onPlayAgain?: () => void;
+  ticketsLeft: number;
 }
 
 const Container = styled.div`
@@ -96,8 +97,8 @@ const PlayAgainButton = styled.button`
 
 const EndGamePage: React.FC<EndGamePageProps> = ({ 
   reason, 
-  score, 
-  playsFromStreak = 0,
+  score,
+  ticketsLeft,
   onPlayAgain
 }) => {
   return (
@@ -112,8 +113,8 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
           ) : (
             <>
               <div className="text">
-                YOU HAVE <span className="highlight">{playsFromStreak}</span>
-                {playsFromStreak === 1 ? ' TICKET' : ' TICKETS'} LEFT!
+                YOU HAVE <span className="highlight">{ticketsLeft}</span>
+                {ticketsLeft === 1 ? ' TICKET' : ' TICKETS'} LEFT!
               </div>
               {score !== undefined && (
                 <div className="text">
@@ -125,7 +126,7 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
         </BoxContent>
       </BoxContainer>
 
-      {playsFromStreak > 0 && onPlayAgain && (
+      {ticketsLeft > 0 && onPlayAgain && (
         <PlayAgainButton onClick={onPlayAgain}>
           <span>PLAY</span>
           <span>AGAIN</span>
