@@ -2834,7 +2834,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: 1;
   pointer-events: auto;
 `,uj=Gt.div`
-  position: absolute;
+  position: fixed;
   margin-top: 30px;
   margin-bottom: -40px; // Added negative margin for overlap
   height: 60%;
@@ -2853,7 +2853,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   width: 100%;
   height: auto;
 `,hj=Gt.div`
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -3023,6 +3023,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 100%;
   gap: 10px;
+  z-index: 1001;
+  padding-bottom: env(safe-area-inset-bottom);
 `,Bj=Gt.div`
   color: #fff;
   font-size: 2.5rem;
