@@ -36,7 +36,7 @@ const float = keyframes`
 
 const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
-  top: 120px;
+  top: 100px; 
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -52,12 +52,14 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  margin-top: 30px; // Added margin to push it down
-  height: 60%; // Slightly reduced height to accommodate the streak message
+  margin-top: 40px; // Increased from 30px to push hero down
+  margin-bottom: -10px; // Added negative margin to create overlap
+  height: 60%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
+  z-index: 1; // Lower z-index to ensure it goes under
 `;
 
 const WelcomeContainer = styled.div`
@@ -67,6 +69,8 @@ const WelcomeContainer = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
+  position: relative; // Added to handle z-index properly
+  z-index: 2; // Higher z-index to ensure it stays on top
 `;
 
 const ButtonContainer = styled.div`
@@ -145,8 +149,10 @@ const StreakMessage = styled.div`
   color: #FFD700;
   font-size: 1.2rem;
   text-align: center;
+  margin-top: -10px; // Added negative margin to move it up
   animation: ${fadeIn} 1s ease-out;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  z-index: 2; // Higher z-index to ensure it stays on top
 `;
 
 const getOrdinalSuffix = (number: number): string => {
