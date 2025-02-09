@@ -462,8 +462,7 @@ const HUDTop = styled.div`
   background: url(${hudTop}) no-repeat center center;
   background-size: 100% 100%; // Ensures the entire image covers the area
   width: 100%;
-  height: 100px; // Fixed height to match your design
-  max-height: 100px;
+  height: auto; // Fixed height to match your design
   overflow: visible; // Change from hidden to visible
   pointer-events: none;
   padding: 10px;
