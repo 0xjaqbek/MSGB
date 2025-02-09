@@ -12,6 +12,7 @@ import accountDefault from '../assets/accountD.svg';
 import tasksActive from '../assets/taskasA.svg';
 import tasksDefault from '../assets/tasksD.svg';
 import { get, getDatabase, ref } from 'firebase/database';
+import hudBackground from '../assets/HUDbottom.svg';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -31,18 +32,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
   return (
     <div style={{
       position: 'fixed',
-      bottom: '10px', 
+      bottom: '0', 
       left: 0,
       right: 0,
       zIndex: 9999,
-      padding: '2px',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
-      background: 'transparent',
+      background: `url(${hudBackground}) no-repeat center bottom`,
+      backgroundSize: 'contain',
       maxWidth: '100vw', 
       overflow: 'hidden',
-      height: '64px' 
+      height: '80px',
+      padding: '0 10px'
     }}>
       {[
         { page: 'main', activeImg: mainActive, defaultImg: mainDefault },
@@ -61,8 +63,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
             border: 'none',
             padding: 0,
             margin: 0,
-            width: '13vh',
-            height: '13vh',
+            width: '11vh',
+            height: '11vh',
             overflow: 'hidden',
             cursor: 'pointer'
           }}
@@ -83,6 +85,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
     </div>
   );
 };
+
+export default NavigationBar;
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (
@@ -209,6 +213,7 @@ const TasksPage: React.FC = () => {
     </div>
   );
 };
+
 export {
   NavigationBar,
   FriendsPage,
