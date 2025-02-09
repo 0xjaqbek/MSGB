@@ -44,7 +44,8 @@ const Game: React.FC = () => {
 
       tg.MainButton.text = "Start Game";
       tg.MainButton.onClick(() => handleStartClick());
-      tg.MainButton.hide
+      tg.MainButton.hide();
+    }
   }, []);
 
   // Game timer and difficulty
