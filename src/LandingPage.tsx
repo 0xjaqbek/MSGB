@@ -36,7 +36,7 @@ const float = keyframes`
 
 const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
-  top: 100px; 
+  top: 100px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -52,14 +52,13 @@ const StyledLanding = styled.div<{ $show: boolean }>`
 `;
 
 const HeroContainer = styled.div`
-  margin-top: 40px; // Increased from 30px to push hero down
-  margin-bottom: -10px; // Added negative margin to create overlap
-  height: 60%;
+  margin-top: 30px; 
+  margin-bottom: -10px;
+  height: 60%; // Slightly reduced height to accommodate the streak message
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  z-index: 1; // Lower z-index to ensure it goes under
 `;
 
 const WelcomeContainer = styled.div`
