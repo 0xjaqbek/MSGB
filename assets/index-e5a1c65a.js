@@ -2986,7 +2986,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: center;
   align-items: center;
   background: url(${Tj}) no-repeat center top;
-  background-size: contain;
+  background-size: 100% 100%; // This ensures the background covers the full width
   pointer-events: none;
   color: white;
   font-family: 'REM', monospace;
