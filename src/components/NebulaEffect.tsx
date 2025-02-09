@@ -4,24 +4,43 @@ import plamy from '../assets/plamy.svg';
 import plamy1 from '../assets/plamy1.svg';
 import plamy2 from '../assets/plamy2.svg';
 
-const float = keyframes`
+const move = keyframes`
   0% {
-    transform: translate(0, 0) rotate(0deg);
+    transform: translate(var(--startX), var(--startY)) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
   }
   100% {
-    transform: translate(var(--moveX), var(--moveY)) rotate(var(--rotation));
+    transform: translate(var(--endX), var(--endY)) rotate(var(--rotation));
+    opacity: 0;
   }
 `;
 
-const NebulaImage = styled.img<{ $duration: number; $delay: number; $moveX: number; $moveY: number; $rotation: number }>`
+const NebulaImage = styled.img<{ 
+  $duration: number; 
+  $delay: number; 
+  $startX: number;
+  $startY: number;
+  $endX: number;
+  $endY: number;
+  $rotation: number 
+}>`
   position: fixed;
   width: 25vh;
   height: 25vh;
   pointer-events: none;
-  --moveX: ${props => props.$moveX}px;
-  --moveY: ${props => props.$moveY}px;
+  opacity: 0.4;
+  --startX: ${props => props.$startX}px;
+  --startY: ${props => props.$startY}px;
+  --endX: ${props => props.$endX}px;
+  --endY: ${props => props.$endY}px;
   --rotation: ${props => props.$rotation}deg;
-  animation: ${float} ${props => props.$duration}s linear ${props => props.$delay}s infinite alternate;
+  animation: ${move} ${props => props.$duration}s linear ${props => props.$delay}s infinite;
 `;
 
 interface NebulaProps {
@@ -34,27 +53,55 @@ const Nebula: React.FC<NebulaProps> = ({ src, index }) => {
   const [config, setConfig] = useState({
     duration: 0,
     delay: 0,
-    moveX: 0,
-    moveY: 0,
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
     rotation: 0
   });
 
   useEffect(() => {
-    // Random initial position
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const x = Math.random() * screenWidth;
-    const y = Math.random() * screenHeight;
-    
-    // Random movement configuration
-    const moveX = (Math.random() - 0.5) * 200; // -100 to 100px
-    const moveY = (Math.random() - 0.5) * 200; // -100 to 100px
-    const duration = 15 + Math.random() * 10; // 15-25 seconds
-    const delay = Math.random() * -20; // Negative delay for immediate start at different positions
-    const rotation = (Math.random() - 0.5) * 90; // -45 to 45 degrees
+    const generatePath = () => {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      
+      // Generate random diagonal path
+      const paths = [
+        // Bottom-left to top-right
+        {
+          startX: -screenWidth * 0.2,
+          startY: screenHeight * 1.2,
+          endX: screenWidth * 1.2,
+          endY: -screenHeight * 0.2
+        },
+        // Top-left to bottom-right
+        {
+          startX: -screenWidth * 0.2,
+          startY: -screenHeight * 0.2,
+          endX: screenWidth * 1.2,
+          endY: screenHeight * 1.2
+        },
+        // Right to left
+        {
+          startX: screenWidth * 1.2,
+          startY: screenHeight * 0.5,
+          endX: -screenWidth * 0.2,
+          endY: screenHeight * 0.3
+        }
+      ];
 
-    setPosition({ x, y });
-    setConfig({ duration, delay, moveX, moveY, rotation });
+      const path = paths[Math.floor(Math.random() * paths.length)];
+      
+      return {
+        ...path,
+        duration: 20 + Math.random() * 10, // 20-30 seconds
+        delay: Math.random() * -15, // Stagger start times
+        rotation: 360 + Math.random() * 360 // 360-720 degrees rotation
+      };
+    };
+
+    const newConfig = generatePath();
+    setConfig(newConfig);
   }, []);
 
   return (
@@ -67,8 +114,10 @@ const Nebula: React.FC<NebulaProps> = ({ src, index }) => {
       }}
       $duration={config.duration}
       $delay={config.delay}
-      $moveX={config.moveX}
-      $moveY={config.moveY}
+      $startX={config.startX}
+      $startY={config.startY}
+      $endX={config.endX}
+      $endY={config.endY}
       $rotation={config.rotation}
     />
   );

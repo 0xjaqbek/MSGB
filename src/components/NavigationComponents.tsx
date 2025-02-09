@@ -43,7 +43,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       backgroundSize: '100% 100%',
       maxWidth: '100vw', 
       overflow: 'hidden',
-      height: '100px',
+      // height: '100px',
       padding: '15px 10px 0'  // Added top padding to push icons down
     }}>
       {[
