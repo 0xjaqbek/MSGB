@@ -463,7 +463,7 @@ const HUDTop = styled.div`
   background-size: 100% 100%;
   width: 100%;
   max-width: 100vw;
-  height: 60px; // Adjusted to be more compact
+  height: 140px; // Adjusted to be more compact
   overflow: hidden;
   pointer-events: none;
   padding: 0 10px; // Add some padding
@@ -650,7 +650,7 @@ return (
               <UserName>{telegramUser?.first_name}</UserName>
             </ProfileContainer>
             <div style={{ color: '#0FF', marginRight: '10px' }}>
-              Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+              Score: {score}  Time: {remainingTime}s
             </div>
           </HUDTop>
         )}
