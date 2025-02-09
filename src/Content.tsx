@@ -14,6 +14,7 @@ import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking
 import EndGamePage from "./EndGamePage";
 import StartAdventureButton from './components/StartAdventureButton';
 import StartSequence from "./StartSequence";
+import NebulaEffect from './components/NebulaEffect';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -515,6 +516,8 @@ return (
       />
     ) : (
       <>
+        {isPlaying && <NebulaEffect />}  {/* Add this line */}
+        
         {showBlast && blastPosition && (
           <Blast 
             key={currentBlastImage}
