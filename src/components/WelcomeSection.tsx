@@ -17,11 +17,13 @@ const Container = styled.div`
 const HeroImage = styled.img`
   width: 65vw;
   height: auto;
+  margin-bottom: -10px;
 `;
 
 const BoxContainer = styled.div`
   position: relative;
   width: 80vw;
+  z-index: 2; // Higher z-index to stay on top
 `;
 
 const BoxImage = styled.img`
