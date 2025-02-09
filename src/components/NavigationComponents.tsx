@@ -32,7 +32,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
   return (
     <div style={{
       position: 'fixed',
-      bottom: '0', 
+      bottom: '-20px',  // Pull it down slightly to show more of the HUD
       left: 0,
       right: 0,
       zIndex: 9999,
@@ -40,48 +40,59 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       justifyContent: 'space-around',
       alignItems: 'center',
       background: `url(${hudBackground}) no-repeat center bottom`,
-      backgroundSize: '100% 100%',
+      backgroundSize: '120% auto',  // Make background wider than container
       maxWidth: '100vw', 
-      overflow: 'hidden',
-      height: '120px',
-      padding: '0 10px'
+      overflow: 'visible',  // Changed from hidden to allow background to extend
+      height: '140px',  // Increased height
+      padding: '0 10px',
+      paddingBottom: '20px'  // Add padding at bottom
     }}>
-      {[
-        { page: 'main', activeImg: mainActive, defaultImg: mainDefault },
-        { page: 'friends', activeImg: friendsActive, defaultImg: friendsDefault },
-        { page: 'account', activeImg: accountActive, defaultImg: accountDefault },
-        { page: 'tasks', activeImg: tasksActive, defaultImg: tasksDefault }
-      ].map(({ page, activeImg, defaultImg }) => (
-        <button 
-          key={page}
-          onClick={() => onNavigate(page as NavigationPage)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            margin: 0,
-            width: '11vh',
-            height: '11vh',
-            overflow: 'hidden',
-            cursor: 'pointer'
-          }}
-        >
-          <img 
-            src={currentPage === page ? activeImg : defaultImg} 
-            alt={page}
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'contain',
-              maxWidth: '100%',
-              maxHeight: '100%'
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: '500px',  // Limit the width of the button container
+        margin: '0 auto',
+        paddingBottom: '15px'  // Move icons up slightly
+      }}>
+        {[
+          { page: 'main', activeImg: mainActive, defaultImg: mainDefault },
+          { page: 'friends', activeImg: friendsActive, defaultImg: friendsDefault },
+          { page: 'account', activeImg: accountActive, defaultImg: accountDefault },
+          { page: 'tasks', activeImg: tasksActive, defaultImg: tasksDefault }
+        ].map(({ page, activeImg, defaultImg }) => (
+          <button 
+            key={page}
+            onClick={() => onNavigate(page as NavigationPage)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: '0 10px',
+              width: '9vh',  // Reduced from 11vh
+              height: '9vh',  // Reduced from 11vh
+              overflow: 'hidden',
+              cursor: 'pointer'
             }}
-          />
-        </button>
-      ))}
+          >
+            <img 
+              src={currentPage === page ? activeImg : defaultImg} 
+              alt={page}
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain',
+                maxWidth: '100%',
+                maxHeight: '100%'
+              }}
+            />
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
