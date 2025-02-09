@@ -2987,7 +2987,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   background-size: 100% 100%;
   width: 100%;
   max-width: 100vw;
-  height: 140px; // Adjusted to be more compact
+
   overflow: hidden;
   pointer-events: none;
   padding: 0 10px; // Add some padding
