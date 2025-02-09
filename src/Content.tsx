@@ -490,7 +490,8 @@ const HUDTop = styled.div`
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
   background-size: 100% 100%;
-  width: 100%;
+  width: 100vw;
+  max-width: 100vw;
   height: 100px;
   pointer-events: none;
 `;
