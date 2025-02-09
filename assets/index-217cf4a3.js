@@ -2981,14 +2981,16 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   right: 0;
   z-index: 9999;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background: url(${Tj}) no-repeat center top;
   background-size: 100% 100%;
-  width: 100vw;
+  width: 100%;
   max-width: 100vw;
-  height: 100px;
+  height: 60px; // Adjusted to be more compact
+  overflow: hidden;
   pointer-events: none;
+  padding: 0 10px; // Add some padding
 `,K=kt.div`
   display: flex;
   align-items: center;
