@@ -20,7 +20,7 @@ const Container = styled.div`
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 25%;  // Changed to match WelcomeSection
+  top: 15%;  // Changed to match WelcomeSection
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -65,7 +65,7 @@ const BoxContent = styled.div`
 
 const PlayAgainButton = styled.button`
   position: relative;
-  margin-top: 20px;
+  margin-top: 30px;
   background: transparent;
   border: 2px solid #0FF;
   color: #0FF;
