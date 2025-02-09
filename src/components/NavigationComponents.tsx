@@ -40,7 +40,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
       justifyContent: 'space-around',
       alignItems: 'center',
       background: `url(${hudBackground}) no-repeat center bottom`,
-      backgroundSize: 'contain',
+      backgroundSize: '100% 100%',
       maxWidth: '100vw', 
       overflow: 'hidden',
       height: '100px',
