@@ -66,9 +66,9 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName, ticketsLeft, 
         <BoxContent>
           {isFirstVisit ? (
             <>
-              <div className="text">Play daily to build your <span className="highlight">streak</span>.  </div>
+              <div className="text">Play daily to grow your <span className="highlight">streak</span>.</div>
               <div className="text">Miss a day, and it resets.</div>
-              <div className="text">Longer streaks more tickets and points!</div>
+              <div className="text">More streak, more tickets, more points!</div>
             </>
           ) : (
             <>
