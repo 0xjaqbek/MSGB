@@ -62,7 +62,7 @@ const HeroContainer = styled.div`
 `;
 
 const WelcomeContainer = styled.div`
-  top: 30px;
+  top: 25px;
   height: 30%;
   display: flex;
   justify-content: center;
