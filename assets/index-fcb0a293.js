@@ -2997,7 +2997,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   z-index: 1000;
   transition: opacity 0.5s ease-in-out;
   opacity: ${e=>e.$show?1:0};
-  pointer-events: ${e=>e.$show?"auto":"none"};
+  pointer-events: auto;
 `,Tj=Gt.div`
   margin-top: 30px; 
   margin-bottom: -10px;
