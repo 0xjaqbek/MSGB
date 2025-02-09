@@ -60,6 +60,8 @@ const HeroImage = styled.img`
 `;
 
 const BoxContainer = styled.div`
+  top: 70%;
+  left: 50%;
   position: relative; /* Add this to make it a positioning context */
   width: 80vw;
   z-index: 2;
