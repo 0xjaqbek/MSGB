@@ -201,15 +201,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   return (
     <StyledLanding $show={show}>
-      {!isFirstVisit && userStats && userStats.currentStreak > 0 && (
+      {isFirstVisit ? (
         <StreakMessage>
-          It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
+          Welcome {telegramUser?.first_name}
         </StreakMessage>
+      ) : (
+        userStats && userStats.currentStreak > 0 && (
+          <StreakMessage>
+            It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
+          </StreakMessage>
+        )
       )}
+      
       <HeroContainer>
         {isFirstVisit ? (
           <WelcomeText>
-
           </WelcomeText>
         ) : null}
       </HeroContainer>
