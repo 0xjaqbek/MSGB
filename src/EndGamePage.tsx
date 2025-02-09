@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import hero from '../src/assets/hero.png';
 import welcomeBox from '../src/assets/welcomeBox.svg';
 
@@ -12,58 +12,25 @@ interface EndGamePageProps {
   onClose?: () => void;
 }
 
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const float = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
-`;
-
-const StyledEndGame = styled.div`
-  position: fixed;
-  top: 100px;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+const Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  background: rgba(0, 0, 0, 0);
-  z-index: 1000;
-`;
-
-const HeroContainer = styled.div`
-  margin-top: 30px;
-  margin-bottom: -40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  z-index: 1;
+  width: 90vw;
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const HeroImage = styled.img`
   width: 65vw;
   height: auto;
-  margin-bottom: -20%; /* This will push the hero image under the box */
+  margin-bottom: -10px;
 `;
 
 const BoxContainer = styled.div`
-  position: absolute; /* Change to absolute */
-  top: 70%;
-  left: 50%;
-  transform: translateX(-50%); /* Center horizontally */
+  position: relative;
   width: 80vw;
   z-index: 2;
 `;
@@ -71,12 +38,11 @@ const BoxContainer = styled.div`
 const BoxImage = styled.img`
   width: 100%;
   height: auto;
-  display: block; /* This helps prevent unwanted spacing */
 `;
 
 const BoxContent = styled.div`
-  position: absolute; /* Changed from fixed to absolute */
-  top: 50%;
+  position: absolute;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -84,11 +50,9 @@ const BoxContent = styled.div`
   line-height: 1.5;
   width: 100%;
   padding: 0 1rem;
-  z-index: 3;
 
   .text {
     color: white;
-    font-size: 1rem;
     margin-bottom: 0.5rem;
   }
 
@@ -103,11 +67,8 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
   playsFromStreak = 0
 }) => {
   return (
-    <StyledEndGame>
-      <HeroContainer>
-        <HeroImage src={hero} alt="Hero" />
-      </HeroContainer>
-
+    <Container>
+      <HeroImage src={hero} alt="Hero" />
       <BoxContainer>
         <BoxImage src={welcomeBox} alt="Welcome Box" />
         <BoxContent>
@@ -129,7 +90,7 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
           )}
         </BoxContent>
       </BoxContainer>
-    </StyledEndGame>
+    </Container>
   );
 };
 
