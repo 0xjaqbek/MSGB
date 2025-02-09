@@ -2834,8 +2834,9 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: 1;
   pointer-events: auto;
 `,uj=Gt.div`
+  position: absolute;
   margin-top: 30px;
-  margin-bottom: -20px; // Added negative margin for overlap
+  margin-bottom: -40px; // Added negative margin for overlap
   height: 60%;
   display: flex;
   justify-content: center;
@@ -2852,7 +2853,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   width: 100%;
   height: auto;
 `,hj=Gt.div`
-
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
