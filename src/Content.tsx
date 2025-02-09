@@ -455,21 +455,37 @@ const HUDTop = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  maxWidth: 100vw;
-  width: 100vw;
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
-  background-size: 100% 100%; // This ensures the background covers the full width
+  background-size: 100% 100%;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100px;
   pointer-events: none;
-  color: white;
-  font-family: 'REM', monospace;
+`;
+
+const ProfileContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+`;
+
+const ProfilePicture = styled.img`
+  width: 10vh;
+  height: 10vh;
+  border: 2px solid #0FF; // Cyan border
+  border-radius: 10px;
+  object-fit: cover;
+`;
+
+const UserName = styled.div`
+  color: #0FF; // Cyan text color
   font-size: 1.2rem;
-  padding-top: 20px;
-  margin: 0;
-  overflow: hidden;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 `;
 
 const handleShare = () => {
@@ -610,7 +626,30 @@ return (
 
         {isPlaying && (
           <HUDTop>
-            Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+            <ProfileContainer>
+              {telegramUser?.photo_url ? (
+                <ProfilePicture 
+                  src={telegramUser.photo_url} 
+                  alt={`${telegramUser.first_name}'s profile`} 
+                />
+              ) : (
+                <ProfilePicture 
+                  as="div" 
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: 'rgba(0,255,255,0.2)'
+                  }}
+                >
+                  {telegramUser?.first_name?.[0] || '?'}
+                </ProfilePicture>
+              )}
+              <UserName>{telegramUser?.first_name}</UserName>
+            </ProfileContainer>
+            <div style={{ color: '#0FF', marginRight: '10px' }}>
+              Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+            </div>
           </HUDTop>
         )}
 
