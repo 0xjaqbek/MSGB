@@ -3,6 +3,24 @@ import { useGameLogic } from '@hooks/useGameLogic';
 import { GAME_DURATION, STONE_IMAGES, BLAST_IMAGES, START_IMAGE } from '@constants/constants';
 import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, WelcomeInfo, GameOverScreen } from './StyledComponents';
 import { Stone as StoneType, TelegramUser } from '../types/types';
+import hudTop from '../assets/HUDtop.svg';
+import styled from 'styled-components';
+
+const HUDTop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url(${hudTop}) no-repeat center top;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 100px;
+  pointer-events: none;
+`;
 
 const Game: React.FC = () => {
   const {
@@ -126,9 +144,12 @@ const Game: React.FC = () => {
       )}
       
       {isPlaying && (
-        <ScoreBoard>
-          Score: {score} LVL: {difficulty.toFixed(1)} Time: {remainingTime}s
-        </ScoreBoard>
+        <>
+          <HUDTop />
+          <ScoreBoard className="scoreboard">
+            Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+          </ScoreBoard>
+        </>
       )}
 
       {isPlaying && !gameOver && currentStones.map((stone) => (

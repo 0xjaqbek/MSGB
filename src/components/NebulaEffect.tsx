@@ -10,10 +10,10 @@ const move = keyframes`
     opacity: 0;
   }
   10% {
-    opacity: 0.4;
+    opacity: 1;
   }
   90% {
-    opacity: 0.4;
+    opacity: 1;
   }
   100% {
     transform: translate(var(--endX), var(--endY)) rotate(var(--rotation));

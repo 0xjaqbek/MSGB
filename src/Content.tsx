@@ -15,6 +15,7 @@ import EndGamePage from "./EndGamePage";
 import StartAdventureButton from './components/StartAdventureButton';
 import StartSequence from "./StartSequence";
 import NebulaEffect from './components/NebulaEffect';
+import hudTop from './assets/HUDtop.svg';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -478,6 +479,22 @@ const PlaysInfoContainer = styled.div`
   gap: 0.5rem;
 `;
 
+const HUDTop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url(${hudTop}) no-repeat center top;
+  background-size: 100% 100%;
+  width: 100%;
+  height: 100px;
+  pointer-events: none;
+`;
+
 const handleShare = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
@@ -615,9 +632,12 @@ return (
         )}
 
         {isPlaying && (
-          <ScoreBoard className="scoreboard">
-            Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
-          </ScoreBoard>
+          <>
+            <HUDTop />
+            <ScoreBoard className="scoreboard" style={{ zIndex: 10000 }}>
+              Score: {score}  LVL: {difficulty.toFixed(1)}  Time: {remainingTime}s
+            </ScoreBoard>
+          </>
         )}
 
         {isPlaying && !gameOver && currentStones.map((stone) => (
