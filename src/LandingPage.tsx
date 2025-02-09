@@ -188,7 +188,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   const handleStartPlaying = () => {
     if (userStats?.playsRemaining === 0) {
-      handleGoToMainPage();
+      onDirectStart();
     } else {
       setShow(false);
       setTimeout(() => {
