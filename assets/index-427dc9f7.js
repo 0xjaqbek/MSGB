@@ -3004,7 +3004,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 100%;
 `,Tj=Gt.div`
-  top: 30px;
+  top: 25px;
   height: 30%;
   display: flex;
   justify-content: center;
