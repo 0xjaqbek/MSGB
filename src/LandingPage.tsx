@@ -121,6 +121,7 @@ const StartButton = styled.button`
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  z-index: 2;
 
   &:hover {
     background: #9D4EDD; 
