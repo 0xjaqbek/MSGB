@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import hero from '../src/assets/hero.png';
-import welcomeBox from '../src/assets/welcomeBox.svg';
+import hero from '../assets/hero.png';
+import welcomeBox from '../assets/welcomeBox.svg';
 
 interface EndGamePageProps {
   reason: 'no-plays' | 'game-over';
@@ -20,7 +20,7 @@ const Container = styled.div`
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 20%;
+  top: 5%;  // Changed to match WelcomeSection
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -34,7 +34,7 @@ const HeroImage = styled.img`
 const BoxContainer = styled.div`
   position: relative;
   width: 80vw;
-  z-index: 2;
+  z-index: 2; // Higher z-index to stay on top
 `;
 
 const BoxImage = styled.img`
@@ -112,15 +112,15 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
             <div className="text">NO TICKETS LEFT!</div>
           ) : (
             <>
-              <div className="text">
-                YOU HAVE <span className="highlight">{ticketsLeft}</span>
-                {ticketsLeft === 1 ? ' TICKET' : ' TICKETS'} LEFT!
-              </div>
               {score !== undefined && (
                 <div className="text">
                   FINAL SCORE: <span className="highlight">{score}</span>
                 </div>
               )}
+              <div className="text">
+                YOU HAVE <span className="highlight">{ticketsLeft}</span>
+                {ticketsLeft === 1 ? ' TICKET' : ' TICKETS'} LEFT!
+              </div>
             </>
           )}
         </BoxContent>
