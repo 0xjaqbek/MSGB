@@ -31,7 +31,7 @@ const float = keyframes`
 
 const StyledEndGame = styled.div`
   position: fixed;
-  top: 100px; // Adjusted like in LandingPage
+  top: 100px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -41,29 +41,26 @@ const StyledEndGame = styled.div`
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
-  transition: opacity 0.5s ease-in-out;
-  opacity: 1;
-  pointer-events: auto;
 `;
 
 const HeroContainer = styled.div`
-  position: fixed;
   margin-top: 30px;
-  margin-bottom: -40px; // Added negative margin for overlap
-  height: 60%;
+  margin-bottom: -40px;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  z-index: 1; // Lower z-index so it goes under the box
+  z-index: 1;
 `;
 
 const HeroImage = styled.img`
   width: 65vw;
   height: auto;
+  margin-bottom: -20%; /* This will push the hero image under the box */
 `;
 
 const BoxContainer = styled.div`
+  position: relative; /* Add this to make it a positioning context */
   width: 80vw;
   z-index: 2;
 `;
@@ -71,10 +68,11 @@ const BoxContainer = styled.div`
 const BoxImage = styled.img`
   width: 100%;
   height: auto;
+  display: block; /* This helps prevent unwanted spacing */
 `;
 
 const BoxContent = styled.div`
-  position: fixed;
+  position: absolute; /* Changed from fixed to absolute */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -83,6 +81,7 @@ const BoxContent = styled.div`
   line-height: 1.5;
   width: 100%;
   padding: 0 1rem;
+  z-index: 3;
 
   .text {
     color: white;

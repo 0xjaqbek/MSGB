@@ -10,6 +10,7 @@ declare global {
         disableVerticalSwipes: () => void;
         setHeaderColor: (color: string) => void;
         setBottomBarColor: (color: string) => void;
+        isOrientationLocked: boolean;
         initDataUnsafe?: {
           user?: TelegramUser;
         };

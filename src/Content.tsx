@@ -54,6 +54,7 @@ declare global {
   interface Window {
     Telegram?: {
       WebApp: {
+        lockOrientation(): unknown;
         ready: () => void;
         expand: () => void;
         disableVerticalSwipes: () => void;
