@@ -2982,7 +2982,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   100% { transform: translateY(0px); }
 `,Ij=Gt.div`
   position: fixed;
-  top: 100px; 
+  top: 100px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -2996,14 +2996,13 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   opacity: ${e=>e.$show?1:0};
   pointer-events: ${e=>e.$show?"auto":"none"};
 `,Rj=Gt.div`
-  margin-top: 40px; // Increased from 30px to push hero down
-  margin-bottom: -10px; // Added negative margin to create overlap
-  height: 60%;
+  margin-top: 30px; 
+  margin-bottom: -10px;
+  height: 60%; // Slightly reduced height to accommodate the streak message
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  z-index: 1; // Lower z-index to ensure it goes under
 `,Tj=Gt.div`
   top: 30px;
   height: 30%;
