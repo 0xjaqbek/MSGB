@@ -46,15 +46,15 @@ const StyledLanding = styled.div<{ $show: boolean }>`
   align-items: center;
   background: rgba(0, 0, 0, 0);
   z-index: 1000;
-  padding: 5% 0;
+  padding-top: 20px; // Added specific top padding
   transition: opacity 0.5s ease-in-out;
   opacity: ${props => props.$show ? 1 : 0};
   pointer-events: ${props => props.$show ? 'auto' : 'none'};
 `;
 
 const HeroContainer = styled.div`
-  top: 30px;
-  height: 65%;
+  margin-top: 30px; // Added margin to push it down
+  height: 60%; // Slightly reduced height to accommodate the streak message
   display: flex;
   justify-content: center;
   align-items: center;
@@ -144,11 +144,11 @@ const StartPlayingButton = styled(StartButton)`
 
 const StreakMessage = styled.div`
   color: #FFD700;
-  font-size: 1rem;
+  font-size: 1.2rem;
   text-align: center;
-  margin-top: 20px;
+  padding-top: 10px; // Added padding at top
   animation: ${fadeIn} 1s ease-out;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 `;
 
 const getOrdinalSuffix = (number: number): string => {
