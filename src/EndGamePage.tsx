@@ -153,9 +153,9 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
       ) : (
         <>
           <InviteButton>
-            <span>INVITE FRIEND</span>
+            <span>INVITE A FREN</span>
           </InviteButton>
-          <LoginText>or log in tomorrow</LoginText>
+          <LoginText>OR LOGIN TOMORROW</LoginText>
         </>
       )}
     </Container>
