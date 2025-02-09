@@ -64,8 +64,8 @@ const BoxContent = styled.div`
 `;
 
 const PlayAgainButton = styled.button`
-  position: fixed;
-  bottom: 100px;
+  position: relative;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   background: transparent;
