@@ -2845,8 +2845,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     color: #FFD700;
   }
 `,vj=Gt.button`
-  position: fixed;
-  bottom: 100px;
+  position: relative;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   background: transparent;
