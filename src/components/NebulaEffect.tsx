@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import plamy from '../src/assets/plamy.svg';
-import plamy1 from '../src/assets/plamy1.svg';
-import plamy2 from '../src/assets/plamy2.svg';
+import plamy from '../assets/plamy.svg';
+import plamy1 from '../assets/plamy1.svg';
+import plamy2 from '../assets/plamy2.svg';
 
 const float = keyframes`
   0% {
