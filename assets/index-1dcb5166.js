@@ -2979,8 +2979,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   top: 0;
   left: 0;
   right: 0;
+  maxWidth: 100vw;
   width: 100vw;
-  height: 100px;
   z-index: 9999;
   display: flex;
   justify-content: center;
