@@ -18,7 +18,7 @@ const Container = styled.div`
   align-items: center;
   width: 90vw;
   position: absolute;
-  top: 5%;
+  top: 20%;
   left: 50%;
   transform: translateX(-50%);
 `;
