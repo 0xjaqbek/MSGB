@@ -80,7 +80,10 @@ const ButtonContainer = styled.div`
   align-items: center;
   width: 100%;
   gap: 10px;
+  z-index: 1001;
+  padding-bottom: env(safe-area-inset-bottom);
 `;
+
 const WelcomeText = styled.div`
   color: #fff;
   font-size: 2.5rem;
