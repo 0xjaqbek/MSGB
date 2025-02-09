@@ -462,7 +462,7 @@ const HUDTop = styled.div`
   justify-content: center;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
-  background-size: contain;
+  background-size: 100% 100%; // This ensures the background covers the full width
   pointer-events: none;
   color: white;
   font-family: 'REM', monospace;
