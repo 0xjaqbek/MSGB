@@ -63,27 +63,19 @@ const BoxContent = styled.div`
   }
 `;
 
-const PlayAgainButton = styled.button`
+const BaseButton = styled.button`
   position: relative;
   margin-top: 30px;
   background: transparent;
-  border: 2px solid #0FF;
-  color: #0FF;
   padding: 12px 32px;
   border-radius: 12px;
   z-index: 50;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
   font-family: 'REM', monospace;
-
-  &:hover {
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-    transform: translateX(-50%) scale(1.05);
-  }
 
   span {
     font-size: 22px;
@@ -92,6 +84,36 @@ const PlayAgainButton = styled.button`
     letter-spacing: 1px;
   }
 `;
+
+const PlayAgainButton = styled(BaseButton)`
+  border: 2px solid #0FF;
+  color: #0FF;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+
+  &:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
+`;
+
+const InviteButton = styled(BaseButton)`
+  border: 2px solid #FFD700;
+  color: #FFD700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+
+  &:hover {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    transform: scale(1.05);
+  }
+`;
+
+const LoginText = styled.p`
+  color: white;
+  margin-top: 10px;
+  font-family: 'REM', sans-serif;
+  font-size: 1rem;
+`;
+
 
 const EndGamePage: React.FC<EndGamePageProps> = ({ 
   reason, 
@@ -124,10 +146,17 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
         </BoxContent>
       </BoxContainer>
 
-      {ticketsLeft > 0 && onPlayAgain && (
+      {ticketsLeft > 0 ? (
         <PlayAgainButton onClick={onPlayAgain}>
           <span>PLAY AGAIN</span>
         </PlayAgainButton>
+      ) : (
+        <>
+          <InviteButton>
+            <span>INVITE FRIEND</span>
+          </InviteButton>
+          <LoginText>or log in tomorrow</LoginText>
+        </>
       )}
     </Container>
   );
