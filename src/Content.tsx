@@ -457,14 +457,16 @@ const HUDTop = styled.div`
   right: 0;
   z-index: 9999;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
   background-size: 100% 100%;
-  width: 100vw;
+  width: 100%;
   max-width: 100vw;
-  height: 100px;
+  height: 60px; // Adjusted to be more compact
+  overflow: hidden;
   pointer-events: none;
+  padding: 0 10px; // Add some padding
 `;
 
 const ProfileContainer = styled.div`
