@@ -179,7 +179,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   const handleGoToMainPage = () => {
     setShow(false);
-    onStart(); // Remove the timeout
+    onDirectStart(); // Remove the timeout
   };
 
   const handleStartPlaying = () => {

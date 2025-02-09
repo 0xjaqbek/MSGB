@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import hero from '../assets/hero.svg';
+import hero from '../assets/hero.png';
 import welcomeBox from '../assets/welcomeBox.svg';
 
 const Container = styled.div`
