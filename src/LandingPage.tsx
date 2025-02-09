@@ -178,11 +178,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
   }, []);
 
   const handleGoToMainPage = () => {
-    setShow(false);
-    // Add a small delay to ensure state updates properly
-    setTimeout(() => {
-      onStart(); // Use onStart instead of onDirectStart for main page navigation
-    }, 100);
+    // Remove the setShow state update since we're using the parent's state
+    onStart(); // Directly call onStart without setTimeout
   };
 
   const handleStartPlaying = () => {

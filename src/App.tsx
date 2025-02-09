@@ -83,22 +83,31 @@ function App() {
     initializeApp();
   }, []);
 
-  const handleStart = async () => {
-    if (userStats?.isFirstVisit && telegramUser) {
-      try {
-        const updatedStats = await trackUserVisit(
-          telegramUser.id.toString(),
-          telegramUser.first_name
-        );
-        setUserStats(updatedStats);
-      } catch (error) {
-        console.error('Error updating user stats:', error);
-      }
+// In App.tsx
+const handleStart = async () => {
+  // First update user stats if needed
+  if (userStats?.isFirstVisit && telegramUser) {
+    try {
+      const updatedStats = await trackUserVisit(
+        telegramUser.id.toString(),
+        telegramUser.first_name
+      );
+      setUserStats(updatedStats);
+    } catch (error) {
+      console.error('Error updating user stats:', error);
     }
-    await new Promise(resolve => setTimeout(resolve, 100));
-    setShowLanding(false);
-    setCurrentPage('main');
-  };
+  }
+  
+  // Directly update the states without setTimeout
+  setShowLanding(false);
+  setCurrentPage('main');
+
+  // Update Telegram UI if needed
+  const tg = window.Telegram?.WebApp;
+  if (tg?.MainButton) {
+    tg.MainButton.hide();
+  }
+};
   
   const handleGameStateChange = (isGamePlaying: boolean) => {
     setIsPlaying(isGamePlaying);
