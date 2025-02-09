@@ -95,6 +95,7 @@ function App() {
         console.error('Error updating user stats:', error);
       }
     }
+    await new Promise(resolve => setTimeout(resolve, 100));
     setShowLanding(false);
     setCurrentPage('main');
   };

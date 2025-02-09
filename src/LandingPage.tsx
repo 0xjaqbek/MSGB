@@ -179,17 +179,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   const handleGoToMainPage = () => {
     setShow(false);
-    onDirectStart(); // Remove the timeout
+    // Add a small delay to ensure state updates properly
+    setTimeout(() => {
+      onStart(); // Use onStart instead of onDirectStart for main page navigation
+    }, 100);
   };
 
   const handleStartPlaying = () => {
     if (userStats?.playsRemaining === 0) {
-      handleGoToMainPage(); // Use handleGoToMainPage directly
+      handleGoToMainPage();
     } else {
       setShow(false);
-      onDirectStart(); // Direct call without timeout
+      setTimeout(() => {
+        onDirectStart();
+      }, 100);
     }
   };
+
+  if (!show) return null;
 
   return (
     <StyledLanding $show={show}>
