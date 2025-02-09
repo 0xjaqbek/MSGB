@@ -54,27 +54,38 @@ const BoxContent = styled.div`
 interface WelcomeSectionProps {
   userName: string;
   ticketsLeft: number;
+  isFirstVisit?: boolean;
 }
 
-const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName, ticketsLeft }) => {
+const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName, ticketsLeft, isFirstVisit }) => {
   return (
     <Container>
       <HeroImage src={hero} alt="Hero" />
       <BoxContainer>
         <BoxImage src={welcomeBox} alt="Welcome Box" />
         <BoxContent>
-          <div className="text">Hello {userName}</div>
-          <div className="text">You got <span className="highlight">{ticketsLeft} tickets</span></div>
-          <div className="text">
-            {ticketsLeft > 0 ? (
-              "Use them wisely."
-            ) : (
-              <>
-                Invite a Friend<br/>
-                or get back Tomorrow.
-              </>
-            )}
-          </div>
+          {isFirstVisit ? (
+            <>
+              <div className="text">Play daily to keep your streak alive.</div>
+              <div className="text">Miss a day, and it resets.</div>
+              <div className="text">Compete for the longest streak!</div>
+            </>
+          ) : (
+            <>
+              <div className="text">Hello {userName}</div>
+              <div className="text">You got <span className="highlight">{ticketsLeft} tickets</span></div>
+              <div className="text">
+                {ticketsLeft > 0 ? (
+                  "Use them wisely."
+                ) : (
+                  <>
+                    Invite a Friend<br/>
+                    or get back Tomorrow.
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </BoxContent>
       </BoxContainer>
     </Container>

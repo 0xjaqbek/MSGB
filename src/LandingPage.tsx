@@ -222,18 +222,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
       <WelcomeContainer>
         {isFirstVisit ? (
-          <FirstVisitInfo>
-            <div>🎮 Visit daily to build your <span className="highlight">streak</span></div>
-            <div>⚡ Each day you play adds to your streak</div>
-            <div>❌ Miss a day and streak resets</div>
-            <div>🏆 Compete for the highest streak!</div>
-          </FirstVisitInfo>
+          <WelcomeSection 
+            userName={telegramUser?.first_name || ''}
+            ticketsLeft={userStats?.playsRemaining || 0}
+            isFirstVisit={true}  // Add this prop
+          />
         ) : (
           <>
             {telegramUser && userStats && (
               <WelcomeSection 
                 userName={telegramUser.first_name}
                 ticketsLeft={userStats.playsRemaining}
+                isFirstVisit={false}
               />
             )}
           </>
