@@ -452,21 +452,23 @@ const PlaysInfoContainer = styled.div`
 const HUDTop = styled.div`
   position: fixed;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100px;
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
-  background-size: 100% 100%;
-  width: 100%;
-  height: 100px;
+  background-size: contain;
   pointer-events: none;
   color: white;
   font-family: 'REM', monospace;
   font-size: 1.2rem;
-  padding-top: 20px;  // Adjust based on your HUD image
+  padding-top: 20px;
+  margin: 0;
+  overflow: hidden;
 `;
 
 const handleShare = () => {
