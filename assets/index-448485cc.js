@@ -2977,21 +2977,23 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,de=Lt.div`
   position: fixed;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 100px;
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
   background: url(${Tj}) no-repeat center top;
-  background-size: 100% 100%;
-  width: 100%;
-  height: 100px;
+  background-size: contain;
   pointer-events: none;
   color: white;
   font-family: 'REM', monospace;
   font-size: 1.2rem;
-  padding-top: 20px;  // Adjust based on your HUD image
+  padding-top: 20px;
+  margin: 0;
+  overflow: hidden;
 `,K=()=>{var te;const q=(te=window.Telegram)==null?void 0:te.WebApp;q&&q.sendData(JSON.stringify({action:"share",score:x==="game-over"?s:void 0}))},B=()=>{var te;R(!1);const q=(te=window.Telegram)==null?void 0:te.WebApp;q&&(q.MainButton.text="Start Game",q.MainButton.hide())},O=()=>{R(!1);const q=new CustomEvent("start-game");window.dispatchEvent(q)};return Ie(uD,{children:A?Ie(yj,{reason:x,score:x==="game-over"?s:void 0,ticketsLeft:(t==null?void 0:t.playsRemaining)||0,onPlayAgain:O,onShare:K,onClose:B}):st(Si,{children:[o&&Ie(Rj,{}),"  ",k&&N&&Ie(dD,{src:j,posX:N.posX,posY:N.posY},j),Ie(fD,{isVisible:r}),!o&&z&&_&&Ie(fe,{children:st("div",{style:{display:"flex",flexDirection:"column",gap:"1rem"},children:[st("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[Ie("div",{style:{color:"white",fontSize:"0.9rem"},children:"Tickets left"}),st("div",{style:{color:"#0FF",fontSize:"1.6rem"},children:[ie,"/",w]})]}),st("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[Ie("div",{style:{color:"white",fontSize:"0.9rem"},children:"Coin Balance"}),Ie("div",{style:{color:"#FFD700",fontSize:"2rem"},children:v})]}),l>1&&st("div",{style:{fontSize:"0.9rem",marginTop:"0.3rem"},children:["+",l-1," bonus ",l-1===1?"ticket":"tickets"," from streak!"]})]})}),!o&&!X&&Ie("img",{src:Ll,alt:"Stone",style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%, -50%)",width:"30vh",zIndex:50}}),X&&!o&&Ie(Sj,{onComplete:G,isAnimating:X}),!o&&z&&Ie(Zb,{className:"scoreboard"}),!o&&!z&&st(Zb,{className:"scoreboard",children:["Welcome",Ie("br",{}),"in"]}),!o&&!X&&Ie(wj,{onClick:ne}),o&&st(de,{children:["Score: ",s,"  LVL: ",d.toFixed(1),"  Time: ",M,"s"]}),o&&!u&&c.map(q=>Ie(cD,{id:`stone-${q.id}`,src:[Ll,pD,vD,gD][q.type],alt:`Stone ${q.type+1}`,speed:q.speed,startX:q.startX,endX:q.endX,startY:q.startY,endY:q.endY,posX:q.posX,posY:q.posY,direction:q.direction,onClick:()=>oe(q.id,q.type,q.posX,q.posY),onAnimationEnd:()=>h(te=>te.filter(le=>le.id!==q.id))},`stone-${q.id}`)),u&&Ie(hD,{className:"scoreboard1",children:Ie("h2",{children:"Game Over"})})]})})},Nj=Lt.div`
   display: flex;
   flex-direction: column;
