@@ -47,8 +47,9 @@ const StyledEndGame = styled.div`
 `;
 
 const HeroContainer = styled.div`
+  position: absolute;
   margin-top: 30px;
-  margin-bottom: -20px; // Added negative margin for overlap
+  margin-bottom: -40px; // Added negative margin for overlap
   height: 60%;
   display: flex;
   justify-content: center;
@@ -73,7 +74,7 @@ const BoxImage = styled.img`
 `;
 
 const BoxContent = styled.div`
-
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
