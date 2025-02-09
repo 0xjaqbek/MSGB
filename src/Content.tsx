@@ -463,7 +463,7 @@ const HUDTop = styled.div`
   background-size: 100% 100%;
   width: 100%;
   max-width: 100vw;
-
+  height: auto;
   overflow: hidden;
   pointer-events: none;
   padding: 0 10px; // Add some padding
@@ -474,12 +474,13 @@ const ProfileContainer = styled.div`
   align-items: center;
   gap: 10px;
   margin-left: 10px;
+  margin-top: 10px;
 `;
 
 const ProfilePicture = styled.img`
   width: 8vh;
   height: 8vh;
-  border: 2px solid #0FF; // Cyan border
+  border: 1px solid #0FF; // Cyan border
   border-radius: 10px;
   object-fit: cover;
 `;
