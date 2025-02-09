@@ -455,15 +455,16 @@ const HUDTop = styled.div`
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: 100%;
   z-index: 9999;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background: url(${hudTop}) no-repeat center top;
   background-size: 100% 100%;
-  width: 100vw;
-  max-width: 100vw;
-  height: 100px;
+  height: 60px; // Reduced height to be more compact
+  padding: 0 10px;
   pointer-events: none;
 `;
 
@@ -475,8 +476,8 @@ const ProfileContainer = styled.div`
 `;
 
 const ProfilePicture = styled.img`
-  width: 10vh;
-  height: 10vh;
+  width: 8vh;
+  height: 8vh;
   border: 2px solid #0FF; // Cyan border
   border-radius: 10px;
   object-fit: cover;
@@ -484,7 +485,7 @@ const ProfilePicture = styled.img`
 
 const UserName = styled.div`
   color: #0FF; // Cyan text color
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 `;
 
