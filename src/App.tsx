@@ -17,8 +17,8 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMobileTelegram, setIsMobileTelegram] = useState(true);
 
-  // Fallback component for non-mobile environments
-  const MobileAppFallback = () => (
+//  // Fallback component for non-mobile environments
+//  const MobileAppFallback = () => (
     <div style={{
       display: 'flex',
       flexDirection: 'column',
@@ -37,8 +37,8 @@ function App() {
       <div style={{ 
         marginTop: '20px', 
         border: '2px solid #0FF', 
-        padding: '10px', 
-        borderRadius: '10px' 
+        padding: '10px'
+     //   borderRadius: '10px' 
       }}>
         <a 
           href="https://t.me/moonstonesgamebot" 
@@ -51,9 +51,9 @@ function App() {
           Open in Telegram
         </a>
       </div>
-    </div>
-  );
-
+//    </div>
+//  );
+//
   useEffect(() => {
     const initializeApp = async () => {
       const tg = window.Telegram?.WebApp;
@@ -135,10 +135,10 @@ const handleStart = async () => {
   };
 
   // If not a mobile Telegram environment, show fallback
-  if (!isMobileTelegram) {
-    return <MobileAppFallback />;
-  }
-
+//  if (!isMobileTelegram) {
+//    return <MobileAppFallback />;
+//  }
+//
   return (
     <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
       {/* Background container */}
