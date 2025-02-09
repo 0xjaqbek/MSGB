@@ -31,7 +31,7 @@ const BoxImage = styled.img`
 
 const BoxContent = styled.div`
   position: absolute;
-  top: 40%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
