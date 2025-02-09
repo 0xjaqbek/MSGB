@@ -36,7 +36,7 @@ const float = keyframes`
 
 const StyledLanding = styled.div<{ $show: boolean }>`
   position: fixed;
-  top: 90px;
+  top: 120px;
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -129,23 +129,22 @@ const StartButton = styled.button`
 `;
 
 const StartPlayingButton = styled(StartButton)`
-  background: #0FF;
+  background: #0FF; 
   color: #000;
-  border: none;
+  border: 2px solid #0FF; 
 
   &:hover {
     background: #0FF;
     color: #000;
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); // Cyan glow
   }
 `;
+
 
 const StreakMessage = styled.div`
   color: #FFD700;
   font-size: 1.2rem;
   text-align: center;
-  padding-top: 10px; // Added padding at top
   animation: ${fadeIn} 1s ease-out;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 `;
