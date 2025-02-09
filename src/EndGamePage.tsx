@@ -10,6 +10,7 @@ interface EndGamePageProps {
   playsFromStreak?: number;
   onShare?: () => void;
   onClose?: () => void;
+  onPlayAgain?: () => void;
 }
 
 const Container = styled.div`
@@ -61,10 +62,43 @@ const BoxContent = styled.div`
   }
 `;
 
+const PlayAgainButton = styled.button`
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  border: 2px solid #0FF;
+  color: #0FF;
+  padding: 12px 32px;
+  border-radius: 12px;
+  z-index: 50;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  font-family: 'REM', monospace;
+
+  &:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  span {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.4;
+    letter-spacing: 1px;
+  }
+`;
+
 const EndGamePage: React.FC<EndGamePageProps> = ({ 
   reason, 
   score, 
-  playsFromStreak = 0
+  playsFromStreak = 0,
+  onPlayAgain
 }) => {
   return (
     <Container>
@@ -90,6 +124,13 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
           )}
         </BoxContent>
       </BoxContainer>
+
+      {playsFromStreak > 0 && onPlayAgain && (
+        <PlayAgainButton onClick={onPlayAgain}>
+          <span>PLAY</span>
+          <span>AGAIN</span>
+        </PlayAgainButton>
+      )}
     </Container>
   );
 };
