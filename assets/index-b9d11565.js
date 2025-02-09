@@ -2887,7 +2887,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   margin-top: 10px;
   font-family: 'REM', sans-serif;
   font-size: 1rem;
-`,bj=({reason:e,score:t,ticketsLeft:r,onPlayAgain:n})=>st(cj,{children:[Te(dj,{src:zS,alt:"Hero"}),st(hj,{children:[Te(pj,{src:HS,alt:"Welcome Box"}),st(vj,{children:[Te("div",{className:"text",children:"GAME OVER"}),e==="no-plays"?Te("div",{className:"text",children:"NO TICKETS LEFT!"}):st(qi,{children:[t!==void 0&&st("div",{className:"text",children:["FINAL SCORE: ",Te("span",{className:"highlight",children:t})]}),st("div",{className:"text",children:["YOU HAVE ",Te("span",{className:"highlight",children:r}),r===1?" TICKET":" TICKETS"," LEFT!"]})]})]})]}),r>0?Te(gj,{onClick:n,children:Te("span",{children:"PLAY AGAIN"})}):st(qi,{children:[Te(mj,{children:Te("span",{children:"INVITE FRIEND"})}),Te(yj,{children:"or log in tomorrow"})]})]}),wj=Ut.button`
+`,bj=({reason:e,score:t,ticketsLeft:r,onPlayAgain:n})=>st(cj,{children:[Te(dj,{src:zS,alt:"Hero"}),st(hj,{children:[Te(pj,{src:HS,alt:"Welcome Box"}),st(vj,{children:[Te("div",{className:"text",children:"GAME OVER"}),e==="no-plays"?Te("div",{className:"text",children:"NO TICKETS LEFT!"}):st(qi,{children:[t!==void 0&&st("div",{className:"text",children:["FINAL SCORE: ",Te("span",{className:"highlight",children:t})]}),st("div",{className:"text",children:["YOU HAVE ",Te("span",{className:"highlight",children:r}),r===1?" TICKET":" TICKETS"," LEFT!"]})]})]})]}),r>0?Te(gj,{onClick:n,children:Te("span",{children:"PLAY AGAIN"})}):st(qi,{children:[Te(mj,{children:Te("span",{children:"INVITE A FREN"})}),Te(yj,{children:"OR LOGIN TOMORROW"})]})]}),wj=Ut.button`
   position: fixed;
   bottom: 100px;
   left: 50%;
