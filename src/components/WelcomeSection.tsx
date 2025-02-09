@@ -68,7 +68,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName, ticketsLeft, 
             <>
               <div className="text">Play daily to grow your <span className="highlight">streak</span>.</div>
               <div className="text">Miss a day, and it resets.</div>
-              <div className="text">More streak, more tickets, more points!</div>
+              <div className="text">More streak = more points!</div>
             </>
           ) : (
             <>
