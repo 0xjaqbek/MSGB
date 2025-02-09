@@ -142,6 +142,24 @@ const StartPlayingButton = styled(StartButton)`
   }
 `;
 
+const StreakMessage = styled.div`
+  color: #FFD700;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 20px;
+  animation: ${fadeIn} 1s ease-out;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+`;
+
+const getOrdinalSuffix = (number: number): string => {
+  const j = number % 10;
+  const k = number % 100;
+  if (j === 1 && k !== 11) return number + "st";
+  if (j === 2 && k !== 12) return number + "nd";
+  if (j === 3 && k !== 13) return number + "rd";
+  return number + "th";
+};
+
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDirectStart, userStats }) => {
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
@@ -177,6 +195,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   return (
     <StyledLanding $show={show}>
+      {!isFirstVisit && userStats && userStats.currentStreak > 0 && (
+        <StreakMessage>
+          It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
+        </StreakMessage>
+      )}
       <HeroContainer>
         {isFirstVisit ? (
           <WelcomeText>
