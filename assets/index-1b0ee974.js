@@ -2982,7 +2982,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   z-index: 9999;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   background: url(${Tj}) no-repeat center top;
   background-size: 100vw;
   width: 100vw;
