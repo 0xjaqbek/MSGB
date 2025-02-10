@@ -460,7 +460,7 @@ const HUDTop = styled.div`
   justify-content: space-between;
   align-items: center;
   background: url(${hudTop}) no-repeat center center;
-  background-size: cover;
+  background-size: contain;
   background-position: center bottom; // Ensures top of image is always visible
   width: 100%;
   aspect-ratio: 412 / 172;
