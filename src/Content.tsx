@@ -505,7 +505,7 @@ const UserName = styled.div`
   color: #0FF;
   font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  margin-bottom: 7px; // Slight adjustment to align with profile picture
+  margin-bottom: 10px; // Slight adjustment to align with profile picture
 `;
 
 const TotalPointsContainer = styled.div`
@@ -513,7 +513,7 @@ const TotalPointsContainer = styled.div`
   align-items: center;
   justify-content: flex-end;
   margin-right: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 `;
 
 const TotalPointsLabel = styled.div`
