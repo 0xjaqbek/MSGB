@@ -510,8 +510,8 @@ const UserName = styled.div`
 
 const TotalPointsContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: flex-end;
   margin-right: 10px;
   margin-bottom: 20px;
 `;
@@ -520,14 +520,14 @@ const TotalPointsLabel = styled.div`
   color: #0FF;
   font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  margin-right: 5px;
 `;
 
 const TotalPointsValue = styled.div`
   color: white;
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `;
-
 const handleShare = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
