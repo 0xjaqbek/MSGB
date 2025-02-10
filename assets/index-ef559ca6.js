@@ -2996,7 +2996,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: flex-end;
   gap: 10px;
   margin-left: 10px;
-  padding-bottom: 10px; // Add padding to content instead of the container
+  padding-bottom: 20px; // Add padding to content instead of the container
 `,B=kt.img`
   width: 6vh;
   height: 6vh;
