@@ -2983,12 +2983,11 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: url(${Tj}) no-repeat center top;
-  background-size: 100% 100%; // Ensure full image is visible
+  background: url(${Tj}) no-repeat center center;
+  background-size: cover;
+  background-position: center bottom; // Ensures top of image is always visible
   width: 100%;
-  aspect-ratio: 412 / 172; // Exact aspect ratio of the SVG
-  background-position: center;
-  background-repeat: no-repeat;
+  aspect-ratio: 412 / 172;
   pointer-events: none;
   padding: 10px;
   overflow: hidden;
