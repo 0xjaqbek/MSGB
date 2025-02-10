@@ -2984,7 +2984,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: space-between;
   align-items: center;
   background: url(${Tj}) no-repeat center center;
-  background-size: contain;
+  background-size: cover;
   background-position: center bottom; // Ensures top of image is always visible
   width: 100vw;
   aspect-ratio: 412 / 172;
