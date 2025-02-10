@@ -16,6 +16,7 @@ import StartAdventureButton from './components/StartAdventureButton';
 import StartSequence from "./StartSequence";
 import NebulaEffect from './components/NebulaEffect';
 import hudTop from './assets/HUDtop.svg';
+import ProgressBar from './ProgressBar';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -678,36 +679,39 @@ return (
           <StartAdventureButton onClick={handleStartClick} />
         )}
 
-{isPlaying && (
-  <HUDTop>
-    <MoonstoneTitle>MOONSTONES</MoonstoneTitle>
-    <ProfileContainer>
-      {telegramUser?.photo_url ? (
-        <ProfilePicture 
-          src={telegramUser.photo_url} 
-          alt={`${telegramUser.first_name}'s profile`} 
-        />
-      ) : (
-        <ProfilePicture 
-          as="div" 
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,255,255,0.2)'
-          }}
-        >
-          {telegramUser?.first_name?.[0] || '?'}
-        </ProfilePicture>
-      )}
-      <UserName>{telegramUser?.first_name}</UserName>
-    </ProfileContainer>
-    <TotalPointsContainer>
-      <TotalPointsLabel>TOTAL POINTS:</TotalPointsLabel>
-      <TotalPointsValue>{totalPoints}</TotalPointsValue>
-    </TotalPointsContainer>
-  </HUDTop>
-)}
+            {isPlaying && (
+              <>
+              <HUDTop>
+                <MoonstoneTitle>MOONSTONES</MoonstoneTitle>
+                <ProfileContainer>
+                  {telegramUser?.photo_url ? (
+                    <ProfilePicture 
+                      src={telegramUser.photo_url} 
+                      alt={`${telegramUser.first_name}'s profile`} 
+                    />
+                  ) : (
+                    <ProfilePicture 
+                      as="div" 
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0,255,255,0.2)'
+                      }}
+                    >
+                      {telegramUser?.first_name?.[0] || '?'}
+                    </ProfilePicture>
+                  )}
+                  <UserName>{telegramUser?.first_name}</UserName>
+                </ProfileContainer>
+                <TotalPointsContainer>
+                  <TotalPointsLabel>TOTAL POINTS:</TotalPointsLabel>
+                  <TotalPointsValue>{totalPoints}</TotalPointsValue>
+                </TotalPointsContainer>
+              </HUDTop>
+              <ProgressBar duration={GAME_DURATION} isPlaying={isPlaying} />
+              </>
+            )}
 
         {isPlaying && !gameOver && currentStones.map((stone) => (
           <Stone
