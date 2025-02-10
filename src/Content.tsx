@@ -459,12 +459,13 @@ const HUDTop = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: url(${hudTop}) no-repeat center center;
-  background-size: 100vw; // Change to exactly fill the container
+  background: url(${hudTop}) no-repeat center top;
+  background-size: 100vw;
   width: 100vw;
   aspect-ratio: 412 / 172;
   pointer-events: none;
-  padding: 10px;
+  padding: 0; // Remove padding
+  margin: 0; // Remove any margin
   overflow: hidden;
 `;
 
@@ -473,7 +474,7 @@ const ProfileContainer = styled.div`
   align-items: center;
   gap: 10px;
   margin-left: 10px;
-  margin-top: 10px;
+  padding-top: 10px; // Add padding to content instead of the container
 `;
 
 const ProfilePicture = styled.img`
