@@ -471,10 +471,10 @@ const HUDTop = styled.div`
 
 const ProfileContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   margin-left: 10px;
-  padding-top: 20px; // Add padding to content instead of the container
+  padding-bottom: 10px; // Add padding to content instead of the container
 `;
 
 const ProfilePicture = styled.img`
