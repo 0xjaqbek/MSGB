@@ -474,7 +474,6 @@ const ProfileContainer = styled.div`
   align-items: flex-end;
   gap: 10px;
   margin-left: 10px;
-  padding-bottom: 3px; // Add padding to content instead of the container
 `;
 
 const ProfilePicture = styled.img`
