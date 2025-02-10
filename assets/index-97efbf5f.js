@@ -3026,7 +3026,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,ge=_t.div`
   color: white;
   font-size: 1rem;
-  padding-top: 10px;
+  padding-top: 20px;
   text-align: center;
   width: 100%;
   position: absolute;
