@@ -7,8 +7,9 @@ export interface UserVisit {
   totalVisits: number;
   dailyVisits: { [key: string]: number };
   firstVisitComplete: boolean;
-  playsToday: number;  // Added for plays tracking
-  maxPlaysToday: number;  // Added for plays tracking
+  playsToday: number;
+  maxPlaysToday: number;
+  playsRemaining: number;
 }
 
 export interface VisitHistoryEntry {
@@ -121,34 +122,37 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     }
   };
 
-export const updatePlayCount = async (userId: string): Promise<number> => {
-  const db = getDatabase();
-  const userVisitsRef = ref(db, `users/${userId}/visits`);
-  
-  try {
-    const snapshot = await get(userVisitsRef);
-    if (!snapshot.exists()) {
-      throw new Error('User not found');
+  export const updatePlayCount = async (userId: string): Promise<number> => {
+    const db = getDatabase();
+    const userVisitsRef = ref(db, `users/${userId}/visits`);
+    
+    try {
+      const snapshot = await get(userVisitsRef);
+      if (!snapshot.exists()) {
+        throw new Error('User not found');
+      }
+      
+      const userData = snapshot.val() as UserVisit;
+      const maxPlays = calculateMaxPlays(userData.currentStreak);
+      const newPlaysCount = (userData.playsToday || 0) + 1;
+      
+      if (newPlaysCount > maxPlays) {
+        return -1; // No plays remaining
+      }
+      
+      await set(userVisitsRef, {
+        ...userData,
+        playsToday: newPlaysCount,
+        maxPlaysToday: maxPlays,
+        playsRemaining: maxPlays - newPlaysCount
+      });
+      
+      return maxPlays - newPlaysCount; // Return remaining plays
+    } catch (error) {
+      console.error('Error updating play count:', error);
+      throw error;
     }
-    
-    const userData = snapshot.val() as UserVisit;
-    const newPlaysCount = userData.playsToday + 1;
-    
-    if (newPlaysCount > userData.maxPlaysToday) {
-      return -1; // No plays remaining
-    }
-    
-    await set(userVisitsRef, {
-      ...userData,
-      playsToday: newPlaysCount
-    });
-    
-    return userData.maxPlaysToday - newPlaysCount; // Return remaining plays
-  } catch (error) {
-    console.error('Error updating play count:', error);
-    throw error;
-  }
-};
+  };
 
 export const getUserVisitStats = async (userId: string): Promise<VisitStats | null> => {
   const db = getDatabase();

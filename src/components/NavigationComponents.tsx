@@ -11,7 +11,7 @@ import accountActive from '../assets/accountA.svg';
 import accountDefault from '../assets/accountD.svg';
 import tasksActive from '../assets/taskasA.svg';
 import tasksDefault from '../assets/tasksD.svg';
-import { get, getDatabase, ref } from 'firebase/database';
+import { get, getDatabase, ref, set } from 'firebase/database';
 import hudBackground from '../assets/HUDbottom.svg';
 
 interface NavigationBarProps {
@@ -90,18 +90,150 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 export default NavigationBar;
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
+  const [friendCode, setFriendCode] = useState<string>('');
+  const [inputCode, setInputCode] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [friendCount, setFriendCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!telegramUser) return;
+    
+    const db = getDatabase();
+    const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+    
+    get(friendsRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        setFriendCount(Object.keys(snapshot.val()).length);
+      }
+    });
+  }, [telegramUser]);
+
+  const handleGenerateCode = async () => {
+    if (!telegramUser) return;
+    
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const db = getDatabase();
+    await set(ref(db, `friendCodes/${code}`), {
+      userId: telegramUser.id,
+      createdAt: Date.now()
+    });
+    
+    setFriendCode(code);
+  };
+
+  const handleInvite = () => {
+    if (!telegramUser) return;
+    const inviteLink = `https://t.me/moonstonesgamebot?start=invite_${telegramUser.id}`;
+    window.Telegram?.WebApp?.sendData(JSON.stringify({ 
+      action: 'share_invite',
+      link: inviteLink
+    }));
+  };
+
+  const handleRedeemCode = async () => {
+    if (!telegramUser || !inputCode) return;
+    
+    try {
+      const db = getDatabase();
+      const codeRef = ref(db, `friendCodes/${inputCode}`);
+      const snapshot = await get(codeRef);
+      
+      if (!snapshot.exists()) {
+        setMessage('Invalid code');
+        return;
+      }
+      
+      const codeData = snapshot.val();
+      if (codeData.userId === telegramUser.id) {
+        setMessage('Cannot use your own code');
+        return;
+      }
+      
+      // Add friends connection
+      await set(ref(db, `users/${telegramUser.id}/friends/${codeData.userId}`), {
+        addedAt: Date.now()
+      });
+      
+      await set(ref(db, `users/${codeData.userId}/friends/${telegramUser.id}`), {
+        addedAt: Date.now()
+      });
+      
+      // Increment invited friends count
+      const userRef = ref(db, `users/${codeData.userId}/invitedFriends`);
+      const userSnapshot = await get(userRef);
+      const currentInvites = userSnapshot.exists() ? userSnapshot.val() : 0;
+      await set(userRef, currentInvites + 1);
+      
+      // Remove used code
+      await set(codeRef, null);
+      
+      setMessage('Friend added successfully!');
+      setInputCode('');
+      setFriendCount(prev => prev + 1);
+    } catch (error) {
+      setMessage('Error redeeming code');
+    }
+  };
+
   return (
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
+      
       <div className="card">
-        <h2 className="text-glow text-lg mb-2">Welcome, {telegramUser?.first_name}</h2>
-        <h3 className="text-glow text-lg mb-2">Leaderboard</h3>
-        <p className="text-info">Coming soon...</p>
+        <div className="stat-row">
+          <span className="text-info">Friends Count:</span>
+          <span className="text-value">{friendCount}</span>
+        </div>
       </div>
       
       <div className="card">
-        <h2 className="text-glow text-lg mb-2">Friend Requests</h2>
-        <p className="text-info">No pending requests</p>
+        <h2 className="text-glow text-lg mb-2">Invite Friends</h2>
+        <button 
+          onClick={handleInvite}
+          className="w-full p-4 mb-4 border-2 border-cyan-400 text-cyan-400 rounded-xl hover:bg-cyan-400/10"
+        >
+          Share Game Link
+        </button>
+      </div>
+      
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Friend Code</h2>
+        <button 
+          onClick={handleGenerateCode}
+          className="w-full p-4 mb-4 border-2 border-purple-400 text-purple-400 rounded-xl hover:bg-purple-400/10"
+        >
+          Generate Code
+        </button>
+        
+        {friendCode && (
+          <div className="text-center p-4 bg-purple-400/10 rounded-xl mb-4">
+            <span className="text-purple-400 text-xl font-bold">{friendCode}</span>
+          </div>
+        )}
+        
+        <div className="flex flex-col gap-4">
+          <input
+            type="text"
+            value={inputCode}
+            onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+            placeholder="Enter friend code"
+            maxLength={6}
+            className="w-full p-4 border-2 border-yellow-400 text-yellow-400 rounded-xl bg-transparent focus:outline-none"
+          />
+          
+          <button 
+            onClick={handleRedeemCode}
+            className="w-full p-4 border-2 border-yellow-400 text-yellow-400 rounded-xl hover:bg-yellow-400/10"
+          >
+            Redeem Code
+          </button>
+          
+          {message && (
+            <div className={`text-center ${message.includes('Error') || message.includes('Invalid') ? 'text-red-400' : 'text-green-400'}`}>
+              {message}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
