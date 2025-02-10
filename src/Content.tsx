@@ -474,7 +474,7 @@ const ProfileContainer = styled.div`
   align-items: flex-end;
   gap: 10px;
   margin-left: 10px;
-  margin-bottom: 10px; // Use margin-bottom instead of padding
+  margin-bottom: 20px; // Use margin-bottom instead of padding
 `;
 
 const ProfilePicture = styled.img`
@@ -489,7 +489,7 @@ const UserName = styled.div`
   color: #0FF;
   font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  margin-bottom: 2px; // Slight adjustment to align with profile picture
+  margin-bottom: 7px; // Slight adjustment to align with profile picture
 `;
 
 const handleShare = () => {
