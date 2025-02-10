@@ -458,7 +458,7 @@ const HUDTop = styled.div`
   z-index: 9999;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   background: url(${hudTop}) no-repeat center top;
   background-size: 100vw;
   width: 100vw;
