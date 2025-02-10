@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 const ProgressBarContainer = styled.div`
   position: fixed;
-  top: calc(172px / 412 * 100vw);
+  top: 10%;
   transform: translateY(calc(100% + 10px));
   left: 0;
   width: 100%;
