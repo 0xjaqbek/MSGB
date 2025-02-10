@@ -2983,19 +2983,20 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: url(${Tj}) no-repeat center center;
-  background-size: 100vw; // Change to exactly fill the container
+  background: url(${Tj}) no-repeat center top;
+  background-size: 100vw;
   width: 100vw;
   aspect-ratio: 412 / 172;
   pointer-events: none;
-  padding: 10px;
+  padding: 0; // Remove padding
+  margin: 0; // Remove any margin
   overflow: hidden;
 `,K=kt.div`
   display: flex;
   align-items: center;
   gap: 10px;
   margin-left: 10px;
-  margin-top: 10px;
+  padding-top: 10px; // Add padding to content instead of the container
 `,B=kt.img`
   width: 8vh;
   height: 8vh;
