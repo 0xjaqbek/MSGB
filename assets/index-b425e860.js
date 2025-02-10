@@ -2984,9 +2984,9 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: space-between;
   align-items: center;
   background: url(${Tj}) no-repeat center top;
-  background-size: cover; // This will make the image cover the entire area
+  background-size: 100% 100%; // Ensure full image is visible
   width: 100%;
-  height: 120px; 
+  aspect-ratio: 412 / 172; // Exact aspect ratio of the SVG
   background-position: center;
   background-repeat: no-repeat;
   pointer-events: none;
