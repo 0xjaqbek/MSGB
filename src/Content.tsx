@@ -543,6 +543,18 @@ const MoonstoneTitle = styled.div`
   right: 0;
 `;
 
+const HUDContainer = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const ProgressBarWrapper = styled.div`
+  position: absolute;
+  bottom: -10px; // Adjust this value to move the progress bar up or down
+  left: 0;
+  width: 100%;
+`;
+
 const handleShare = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
@@ -680,7 +692,7 @@ return (
         )}
 
             {isPlaying && (
-              <>
+              <HUDContainer>
               <HUDTop>
                 <MoonstoneTitle>MOONSTONES</MoonstoneTitle>
                 <ProfileContainer>
@@ -709,8 +721,10 @@ return (
                   <TotalPointsValue>{totalPoints}</TotalPointsValue>
                 </TotalPointsContainer>
               </HUDTop>
-              <ProgressBar duration={GAME_DURATION} isPlaying={isPlaying} />
-              </>
+              <ProgressBarWrapper>
+                <ProgressBar duration={GAME_DURATION} isPlaying={isPlaying} />
+              </ProgressBarWrapper>
+              </HUDContainer>
             )}
 
         {isPlaying && !gameOver && currentStones.map((stone) => (
