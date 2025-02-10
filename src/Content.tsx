@@ -474,20 +474,22 @@ const ProfileContainer = styled.div`
   align-items: flex-end;
   gap: 10px;
   margin-left: 10px;
+  margin-bottom: 10px; // Use margin-bottom instead of padding
 `;
 
 const ProfilePicture = styled.img`
   width: 6vh;
   height: 6vh;
-  border: 1px solid #0FF; // Cyan border
+  border: 1px solid #0FF;
   border-radius: 10px;
   object-fit: cover;
 `;
 
 const UserName = styled.div`
-  color: #0FF; // Cyan text color
+  color: #0FF;
   font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  margin-bottom: 2px; // Slight adjustment to align with profile picture
 `;
 
 const handleShare = () => {
