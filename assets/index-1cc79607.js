@@ -3010,17 +3010,18 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   margin-bottom: 7px; // Slight adjustment to align with profile picture
 `,z=_t.div`
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: flex-end;
   margin-right: 10px;
   margin-bottom: 20px;
 `,oe=_t.div`
   color: #0FF;
   font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  margin-right: 5px;
 `,ce=_t.div`
   color: white;
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `,me=()=>{var he;const ve=(he=window.Telegram)==null?void 0:he.WebApp;ve&&ve.sendData(JSON.stringify({action:"share",score:x==="game-over"?s:void 0}))},Ee=()=>{var he;R(!1);const ve=(he=window.Telegram)==null?void 0:he.WebApp;ve&&(ve.MainButton.text="Start Game",ve.MainButton.hide())},ge=()=>{R(!1);const ve=new CustomEvent("start-game");window.dispatchEvent(ve)};return Pe(uD,{children:A?Pe(yj,{reason:x,score:x==="game-over"?s:void 0,ticketsLeft:(t==null?void 0:t.playsRemaining)||0,onPlayAgain:ge,onShare:me,onClose:Ee}):st(Si,{children:[o&&Pe(Rj,{}),"  ",k&&N&&Pe(dD,{src:q,posX:N.posX,posY:N.posY},q),Pe(fD,{isVisible:r}),!o&&W&&_&&Pe(ue,{children:st("div",{style:{display:"flex",flexDirection:"column",gap:"1rem"},children:[st("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[Pe("div",{style:{color:"white",fontSize:"0.9rem"},children:"Tickets left"}),st("div",{style:{color:"#0FF",fontSize:"1.6rem"},children:[ne,"/",w]})]}),st("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[Pe("div",{style:{color:"white",fontSize:"0.9rem"},children:"Coin Balance"}),Pe("div",{style:{color:"#FFD700",fontSize:"2rem"},children:v})]}),l>1&&st("div",{style:{fontSize:"0.9rem",marginTop:"0.3rem"},children:["+",l-1," bonus ",l-1===1?"ticket":"tickets"," from streak!"]})]})}),!o&&!X&&Pe("img",{src:Ll,alt:"Stone",style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%, -50%)",width:"30vh",zIndex:50}}),X&&!o&&Pe(Sj,{onComplete:G,isAnimating:X}),!o&&W&&Pe(Zb,{className:"scoreboard"}),!o&&!W&&st(Zb,{className:"scoreboard",children:["Welcome",Pe("br",{}),"in"]}),!o&&!X&&Pe(wj,{onClick:re}),o&&st(de,{children:[st(K,{children:[W!=null&&W.photo_url?Pe(B,{src:W.photo_url,alt:`${W.first_name}'s profile`}):Pe(B,{as:"div",style:{display:"flex",justifyContent:"center",alignItems:"center",backgroundColor:"rgba(0,255,255,0.2)"},children:((we=W==null?void 0:W.first_name)==null?void 0:we[0])||"?"}),Pe(O,{children:W==null?void 0:W.first_name})]}),st(z,{children:[Pe(oe,{children:"TOTAL POINTS:"}),Pe(ce,{children:v})]})]}),o&&!u&&c.map(ve=>Pe(cD,{id:`stone-${ve.id}`,src:[Ll,pD,vD,gD][ve.type],alt:`Stone ${ve.type+1}`,speed:ve.speed,startX:ve.startX,endX:ve.endX,startY:ve.startY,endY:ve.endY,posX:ve.posX,posY:ve.posY,direction:ve.direction,onClick:()=>ie(ve.id,ve.type,ve.posX,ve.posY),onAnimationEnd:()=>h(he=>he.filter(Ae=>Ae.id!==ve.id))},`stone-${ve.id}`)),u&&Pe(hD,{className:"scoreboard1",children:Pe("h2",{children:"Game Over"})})]})})},Nj=_t.div`
   display: flex;
