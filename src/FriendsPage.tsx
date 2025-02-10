@@ -35,6 +35,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   }, [telegramUser]);
 
   const handleGenerateCode = async () => {
+    console.log('Generate Code button clicked');
     if (!telegramUser || isGenerating) return;
     
     setIsGenerating(true);
@@ -62,6 +63,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   };
 
   const handleInvite = () => {
+    console.log('Share Game Link button clicked');
     if (!telegramUser) {
       console.log('No telegram user found');
       return;
@@ -93,6 +95,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   };
 
   const handleRedeemCode = async () => {
+    console.log('Redeem Code button clicked');
     if (!telegramUser || !inputCode || isRedeeming) return;
     
     setIsRedeeming(true);
