@@ -528,6 +528,19 @@ const TotalPointsValue = styled.div`
   font-size: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `;
+
+const MoonstoneTitle = styled.div`
+  color: white;
+  font-size: 1rem;
+  padding-top: 10px;
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+`;
+
 const handleShare = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
@@ -666,6 +679,7 @@ return (
 
 {isPlaying && (
   <HUDTop>
+    <MoonstoneTitle>MOONSTONES</MoonstoneTitle>
     <ProfileContainer>
       {telegramUser?.photo_url ? (
         <ProfilePicture 
