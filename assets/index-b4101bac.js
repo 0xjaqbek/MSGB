@@ -3050,8 +3050,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px; // Adjust based on your SVG size
-  height: 50px; // Adjust based on your SVG size
+  width: 202px; // Adjust based on your SVG size
+  height: 70px; // Adjust based on your SVG size
   background-image: url(${Oj});
   background-size: contain;
   background-repeat: no-repeat;
