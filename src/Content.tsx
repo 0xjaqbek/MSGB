@@ -121,25 +121,41 @@ const Content: React.FC<ContentProps> = ({ onGameStateChange, userStats }) => {
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [isStartAnimating, setIsStartAnimating] = useState(false);
 
-  const getTotalPoints = async (playerId: string) => {
-    const db = getDatabase();
-    const playerScoresRef = ref(db, `/${playerId}/scores`);
-    
-    try {
-      const snapshot = await get(playerScoresRef);
-      if (!snapshot.exists()) {
-        return 0;
+// Add this useEffect to fetch and update total points
+useEffect(() => {
+  const fetchTotalPoints = async () => {
+    if (telegramUser) {
+      try {
+        const points = await getTotalPoints(telegramUser.id.toString());
+        setTotalPoints(points);
+      } catch (error) {
+        console.error('Error fetching total points:', error);
       }
-      
-      const scores = snapshot.val();
-      return Object.values(scores).reduce((total: number, entry: any) => {
-        return total + (entry.score || 0);
-      }, 0);
-    } catch (error) {
-      console.error('Error getting total points:', error);
-      return 0;
     }
   };
+
+  fetchTotalPoints();
+}, [telegramUser]);
+
+const getTotalPoints = async (playerId: string) => {
+  const db = getDatabase();
+  const playerScoresRef = ref(db, `/${playerId}/scores`);
+  
+  try {
+    const snapshot = await get(playerScoresRef);
+    if (!snapshot.exists()) {
+      return 0;
+    }
+    
+    const scores = snapshot.val();
+    return Object.values(scores).reduce((total: number, entry: any) => {
+      return total + (entry.score || 0);
+    }, 0);
+  } catch (error) {
+    console.error('Error getting total points:', error);
+    return 0;
+  }
+};
 
   useEffect(() => {
     const initApp = async () => {
@@ -464,8 +480,8 @@ const HUDTop = styled.div`
   width: 100vw;
   aspect-ratio: 412 / 172;
   pointer-events: none;
-  padding: 0; // Remove padding
-  margin: 0; // Remove any margin
+  padding: 0;
+  margin: 0;
   overflow: hidden;
 `;
 
@@ -490,6 +506,26 @@ const UserName = styled.div`
   font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   margin-bottom: 7px; // Slight adjustment to align with profile picture
+`;
+
+const TotalPointsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 10px;
+  margin-bottom: 20px;
+`;
+
+const TotalPointsLabel = styled.div`
+  color: #0FF;
+  font-size: 0.8rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+`;
+
+const TotalPointsValue = styled.div`
+  color: white;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `;
 
 const handleShare = () => {
@@ -628,34 +664,35 @@ return (
           <StartAdventureButton onClick={handleStartClick} />
         )}
 
-        {isPlaying && (
-          <HUDTop>
-            <ProfileContainer>
-              {telegramUser?.photo_url ? (
-                <ProfilePicture 
-                  src={telegramUser.photo_url} 
-                  alt={`${telegramUser.first_name}'s profile`} 
-                />
-              ) : (
-                <ProfilePicture 
-                  as="div" 
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: 'rgba(0,255,255,0.2)'
-                  }}
-                >
-                  {telegramUser?.first_name?.[0] || '?'}
-                </ProfilePicture>
-              )}
-              <UserName>{telegramUser?.first_name}</UserName>
-            </ProfileContainer>
-            <div style={{ color: '#0FF', marginRight: '10px' }}>
-              Score: {score}  Time: {remainingTime}s
-            </div>
-          </HUDTop>
-        )}
+{isPlaying && (
+  <HUDTop>
+    <ProfileContainer>
+      {telegramUser?.photo_url ? (
+        <ProfilePicture 
+          src={telegramUser.photo_url} 
+          alt={`${telegramUser.first_name}'s profile`} 
+        />
+      ) : (
+        <ProfilePicture 
+          as="div" 
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,255,255,0.2)'
+          }}
+        >
+          {telegramUser?.first_name?.[0] || '?'}
+        </ProfilePicture>
+      )}
+      <UserName>{telegramUser?.first_name}</UserName>
+    </ProfileContainer>
+    <TotalPointsContainer>
+      <TotalPointsLabel>TOTAL POINTS:</TotalPointsLabel>
+      <TotalPointsValue>{totalPoints}</TotalPointsValue>
+    </TotalPointsContainer>
+  </HUDTop>
+)}
 
         {isPlaying && !gameOver && currentStones.map((stone) => (
           <Stone
