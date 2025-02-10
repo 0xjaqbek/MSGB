@@ -17,6 +17,7 @@ import StartSequence from "./StartSequence";
 import NebulaEffect from './components/NebulaEffect';
 import hudTop from './assets/HUDtop.svg';
 import ProgressBar from './ProgressBar';
+import pointsBg from './assets/points.svg';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -543,6 +544,29 @@ const MoonstoneTitle = styled.div`
   right: 0;
 `;
 
+const PointsDisplay = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px; // Adjust based on your SVG size
+  height: 50px; // Adjust based on your SVG size
+  background-image: url(${pointsBg});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const PointsText = styled.span`
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+`;
+
 const handleShare = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
@@ -710,6 +734,9 @@ return (
                 </TotalPointsContainer>
               </HUDTop>
               <ProgressBar duration={GAME_DURATION} isPlaying={isPlaying} />
+              <PointsDisplay>
+                <PointsText>{score}</PointsText>
+              </PointsDisplay>
               </>
             )}
 
