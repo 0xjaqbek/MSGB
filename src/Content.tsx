@@ -474,12 +474,12 @@ const ProfileContainer = styled.div`
   align-items: center;
   gap: 10px;
   margin-left: 10px;
-  padding-top: 10px; // Add padding to content instead of the container
+  padding-top: 20px; // Add padding to content instead of the container
 `;
 
 const ProfilePicture = styled.img`
-  width: 8vh;
-  height: 8vh;
+  width: 6vh;
+  height: 6vh;
   border: 1px solid #0FF; // Cyan border
   border-radius: 10px;
   object-fit: cover;
@@ -487,7 +487,7 @@ const ProfilePicture = styled.img`
 
 const UserName = styled.div`
   color: #0FF; // Cyan text color
-  font-size: 1rem;
+  font-size: 0.8rem;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 `;
 
