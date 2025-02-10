@@ -41,11 +41,16 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     try {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       const db = getDatabase();
+
+      // Log database write attempt
+      console.log('Attempting to write code to database:', code);
+      
       await set(ref(db, `friendCodes/${code}`), {
         userId: telegramUser.id,
         createdAt: Date.now()
       });
       
+      console.log('Successfully wrote code to database');
       setFriendCode(code);
       setMessage('Code generated successfully!');
     } catch (error) {
@@ -57,14 +62,33 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   };
 
   const handleInvite = () => {
-    if (!telegramUser) return;
-    const inviteLink = `https://t.me/moonstonesgamebot?start=invite_${telegramUser.id}`;
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.sendData(JSON.stringify({ 
-        action: 'share_invite',
-        link: inviteLink
-      }));
+    if (!telegramUser) {
+      console.log('No telegram user found');
+      return;
+    }
+
+    try {
+      const inviteLink = `https://t.me/moonstonesgamebot?start=invite_${telegramUser.id}`;
+      console.log('Generated invite link:', inviteLink);
+
+      // Get Telegram WebApp instance
+      const tg = window.Telegram?.WebApp;
+      console.log('Telegram WebApp object:', tg);
+
+      if (tg) {
+        // Send the share request
+        tg.sendData(JSON.stringify({ 
+          action: 'share_invite',
+          link: inviteLink
+        }));
+        console.log('Share request sent to Telegram');
+      } else {
+        console.error('Telegram WebApp not available');
+        setMessage('Error: Telegram WebApp not available');
+      }
+    } catch (error) {
+      console.error('Error in handleInvite:', error);
+      setMessage('Error sharing invite link');
     }
   };
 
@@ -136,6 +160,11 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         >
           Share Game Link
         </button>
+        {message && (
+          <div className="text-center text-sm text-cyan-400">
+            {message}
+          </div>
+        )}
       </div>
       
       <div className="card">
