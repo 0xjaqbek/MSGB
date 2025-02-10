@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 const ProgressBarContainer = styled.div`
+  position: fixed;
+  top: 20vh;
   left: 0;
   width: 100%;
   display: flex;
