@@ -4,7 +4,8 @@ import styled from 'styled-components';
 
 const ProgressBarContainer = styled.div`
   position: fixed;
-  top: calc(172px / 412 * 100vw); // Positioned just below the HUD
+  top: calc(172px / 412 * 100vw);
+  transform: translateY(calc(100% + 10px));
   left: 0;
   width: 100%;
   display: flex;
