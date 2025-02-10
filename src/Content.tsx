@@ -549,8 +549,8 @@ const PointsDisplay = styled.div`
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px; // Adjust based on your SVG size
-  height: 50px; // Adjust based on your SVG size
+  width: 202px; // Adjust based on your SVG size
+  height: 70px; // Adjust based on your SVG size
   background-image: url(${pointsBg});
   background-size: contain;
   background-repeat: no-repeat;
