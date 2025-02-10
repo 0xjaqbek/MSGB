@@ -2959,7 +2959,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   animation: ${Aj} ${e=>e.$duration}s linear ${e=>e.$delay}s infinite;
 `,Ij=({src:e,index:t})=>{const[r,n]=Qe.useState({x:0,y:0}),[o,i]=Qe.useState({duration:0,delay:0,startX:0,startY:0,endX:0,endY:0,rotation:0});return Qe.useEffect(()=>{const a=(()=>{const u=window.innerWidth,f=window.innerHeight,c=[{startX:-u*.2,startY:f*1.2,endX:u*1.2,endY:-f*.2},{startX:-u*.2,startY:-f*.2,endX:u*1.2,endY:f*1.2},{startX:u*1.2,startY:f*.5,endX:-u*.2,endY:f*.3}];return{...c[Math.floor(Math.random()*c.length)],duration:20+Math.random()*10,delay:Math.random()*-15,rotation:360+Math.random()*360}})();i(a)},[]),Se(kj,{src:e,alt:"nebula",style:{left:r.x,top:r.y},$duration:o.duration,$delay:o.delay,$startX:o.startX,$startY:o.startY,$endX:o.endX,$endY:o.endY,$rotation:o.rotation})},Rj=()=>{const e=[Cj,Ej,Mj],[t]=Qe.useState(()=>Array.from({length:3},(r,n)=>({id:n,src:e[Math.floor(Math.random()*e.length)]})));return Se(li,{children:t.map(r=>Se(Ij,{src:r.src,index:r.id},r.id))})},Tj="/MSGB/assets/HUDtop-8e42ad1f.svg",Pj=bt.div`
   position: fixed;
-  top: calc(172px / 412 * 100vw);
+  top: 10%;
   transform: translateY(calc(100% + 10px));
   left: 0;
   width: 100%;
