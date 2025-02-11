@@ -27,65 +27,51 @@ interface ReferralData {
     ticketsFromInvites: number;
   }
   
-  export const processInviteLink = async (userId: string, startParam: string) => {
+// In ticketManagement.ts
+export const processInviteLink = async (userId: string, startParam: string) => {
     const db = getDatabase();
     
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
+      console.log('Processing referral from:', referrerId, 'for user:', userId);
       
       // Don't allow self-referral
       if (referrerId === userId) {
         return;
       }
       
-      const referrerRef = ref(db, `users/${referrerId}/referrals`);
-      const userRef = ref(db, `users/${userId}/referrals`);
-      
       try {
-        // Get current referral data for both users
+        // Create full paths for database references
+        const referrerPath = `users/${referrerId}`;
+        const newUserPath = `users/${userId}`;
+        
+        // Get current data
         const [referrerSnapshot, userSnapshot] = await Promise.all([
-          get(referrerRef),
-          get(userRef)
+          get(ref(db, referrerPath)),
+          get(ref(db, newUserPath))
         ]);
   
-        const referrerData: ReferralData = referrerSnapshot.exists() ? 
-          referrerSnapshot.val() : 
-          { invitedUsers: [], ticketsFromInvites: 0 };
+        const referrerData = referrerSnapshot.val() || {};
+        const userData = userSnapshot.val() || {};
   
-        const userData: ReferralData = userSnapshot.exists() ? 
-          userSnapshot.val() : 
-          { invitedUsers: [], ticketsFromInvites: 0 };
+        console.log('Current data:', { referrerData, userData });
   
-        // If user hasn't been invited before
-        if (!userData.invitedBy) {
-          // Update referrer's data - they get a ticket for inviting
-          if (!referrerData.invitedUsers.includes(userId)) {
-            referrerData.invitedUsers.push(userId);
-            referrerData.ticketsFromInvites = (referrerData.ticketsFromInvites || 0) + 1;
+        // Update referrer data
+        await update(ref(db, referrerPath), {
+          'referrals/invitedUsers': [...(referrerData.referrals?.invitedUsers || []), userId],
+          'referrals/ticketsFromInvites': (referrerData.referrals?.ticketsFromInvites || 0) + 1,
+          'visits/maxPlaysToday': (referrerData.visits?.maxPlaysToday || 5) + 1
+        });
   
-            await set(referrerRef, referrerData);
-          }
+        // Update new user data
+        await update(ref(db, newUserPath), {
+          'referrals/invitedBy': referrerId,
+          'referrals/ticketsFromInvites': 1,
+          'referrals/invitedUsers': [],
+          'visits/maxPlaysToday': 6  // Base 5 + 1 from being invited
+        });
   
-          // Update new user's data - they get a ticket for being invited
-          userData.invitedBy = referrerId;
-          userData.ticketsFromInvites = 1;
-  
-          await set(userRef, userData);
-  
-          // Also update visits data to reflect new ticket count
-          const visitsRef = ref(db, `users/${userId}/visits`);
-          const visitsSnapshot = await get(visitsRef);
-          
-          if (visitsSnapshot.exists()) {
-            const visitsData = visitsSnapshot.val();
-            const maxPlays = visitsData.maxPlaysToday + 1; // Add one for the invite bonus
-            
-            await update(visitsRef, {
-              maxPlaysToday: maxPlays,
-              playsRemaining: maxPlays - (visitsData.playsToday || 0)
-            });
-          }
-        }
+        console.log('Successfully processed invite link');
       } catch (error) {
         console.error('Error processing invite:', error);
       }
