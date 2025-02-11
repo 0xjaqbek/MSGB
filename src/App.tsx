@@ -5,7 +5,8 @@ import "@twa-dev/sdk";
 import Content from "./Content";
 import LandingPage from "./LandingPage";
 import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
-import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
+import { NavigationBar, AccountPage, TasksPage } from './components/NavigationComponents';
+import FriendsPage from './FriendsPage';
 import { TelegramUser, NavigationPage } from './types';
 
 function App() {
