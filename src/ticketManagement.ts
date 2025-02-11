@@ -15,41 +15,7 @@ export const getCurrentPlayCount = async (userId: string): Promise<number> => {
   return userData.playsToday || 0;
 };
 
-export const updatePlayCount = async (userId: string): Promise<number> => {
-  const db = getDatabase();
-  const userVisitsRef = ref(db, `users/${userId}/visits`);
-  
-  try {
-    const snapshot = await get(userVisitsRef);
-    if (!snapshot.exists()) {
-      throw new Error('User not found');
-    }
-    
-    const userData = snapshot.val() as VisitStats;
-    const newPlaysCount = (userData.playsToday || 0) + 1;
-    const availableTickets = await calculateAvailableTickets(userId);
-    
-    if (newPlaysCount > availableTickets) {
-      return -1; // No plays remaining
-    }
-    
-    // Preserve all existing data while updating play count
-    await set(userVisitsRef, {
-      ...userData,
-      playsToday: newPlaysCount,
-      maxPlaysToday: availableTickets,
-      playsRemaining: availableTickets - newPlaysCount,
-      lastPlayed: Date.now()
-    });
-    
-    return availableTickets - newPlaysCount;
-  } catch (error) {
-    console.error('Error updating play count:', error);
-    throw error;
-  }
-};
 
-// Add to ticketManagement.ts
 
 interface InviteData {
     invitedBy?: string;
@@ -57,20 +23,14 @@ interface InviteData {
     timestamp: number;
   }
   
-// In ticketManagement.ts
-export const processInviteLink = async (userId: string, startParam: string) => {
-    console.log('Processing invite link:', {
-      userId,
-      startParam,
-      timestamp: new Date().toISOString()
-    });
-  
+  export const processInviteLink = async (userId: string, startParam: string) => {
+    console.log('Processing invite link:', { userId, startParam });
     const db = getDatabase();
     
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
-      console.log('Extracted referrer ID:', referrerId);
       
+      // Don't allow self-referral
       if (referrerId === userId) {
         console.log('Self-referral detected, ignoring');
         return;
@@ -80,99 +40,142 @@ export const processInviteLink = async (userId: string, startParam: string) => {
       const userRef = ref(db, `users/${userId}`);
       
       try {
-        // Log database references
-        console.log('Database paths:', {
-          referrerPath: referrerRef.toString(),
-          userPath: userRef.toString()
-        });
-  
-        // Get current data
         const [referrerSnapshot, userSnapshot] = await Promise.all([
           get(referrerRef),
           get(userRef)
         ]);
   
-        // Log current data state
-        console.log('Current database state:', {
-          referrerExists: referrerSnapshot.exists(),
+        console.log('Current data:', {
           referrerData: referrerSnapshot.val(),
-          userExists: userSnapshot.exists(),
           userData: userSnapshot.val()
         });
   
-        if (!referrerSnapshot.exists()) {
-          console.error('Referrer not found in database');
-          return;
-        }
-  
-        const referrerData = referrerSnapshot.val();
+        const referrerData = referrerSnapshot.val() || {};
         const userData = userSnapshot.val() || {};
   
+        // Check if user has already been invited
         if (userData.invitedBy) {
           console.log('User already invited by:', userData.invitedBy);
           return;
         }
   
-        // Prepare updates
-        const updates = {
-          [`users/${referrerId}/invites`]: {
+        // Update referrer data
+        const updatedReferrerData = {
+          ...referrerData,
+          permanentBonusTickets: (referrerData.permanentBonusTickets || 0) + 1,
+          invites: {
             invitedFriends: [...(referrerData.invites?.invitedFriends || []), userId],
             timestamp: Date.now()
-          },
-          [`users/${referrerId}/permanentBonusTickets`]: (referrerData.permanentBonusTickets || 0) + 1,
-          [`users/${userId}/invitedBy`]: referrerId,
-          [`users/${userId}/permanentBonusTickets`]: 1,
-          [`users/${userId}/invites`]: {
+          }
+        };
+  
+        // Update new user data
+        const updatedUserData = {
+          ...userData,
+          invitedBy: referrerId,
+          permanentBonusTickets: 1,
+          invites: {
             invitedFriends: [],
             timestamp: Date.now()
           }
         };
   
-        // Log updates before applying
-        console.log('Preparing to update database with:', updates);
+        console.log('Updating data:', {
+          referrer: updatedReferrerData,
+          user: updatedUserData
+        });
   
-        // Apply updates
-        await update(ref(db), updates);
+        // Update both users
+        await Promise.all([
+          set(referrerRef, updatedReferrerData),
+          set(userRef, updatedUserData)
+        ]);
   
-        console.log('Successfully updated database');
+        console.log('Invite processing complete');
       } catch (error) {
         console.error('Error processing invite:', error);
-        // Log detailed error
-        if (error instanceof Error) {
-          console.error({
-            message: error.message,
-            stack: error.stack,
-            name: error.name
-          });
-        }
       }
-    } else {
-      console.log('Not a referral link, skipping');
+    }
+  };
+
+export const calculateAvailableTickets = async (userId: string): Promise<number> => {
+    const db = getDatabase();
+    const userRef = ref(db, `users/${userId}`);
+    
+    try {
+      const snapshot = await get(userRef);
+      console.log('User data for ticket calculation:', {
+        userId,
+        data: snapshot.val()
+      });
+  
+      if (!snapshot.exists()) {
+        console.log('No user data found, returning base tickets (5)');
+        return 5;
+      }
+  
+      const userData = snapshot.val();
+      
+      // Calculate components
+      const baseTickets = 5;
+      const streakBonus = Math.max(0, (userData.visits?.currentStreak || 1) - 1);
+      const permanentBonus = userData.permanentBonusTickets || 0;
+      
+      const totalTickets = baseTickets + streakBonus + permanentBonus;
+      
+      console.log('Ticket calculation:', {
+        baseTickets,
+        streakBonus,
+        permanentBonus,
+        totalTickets
+      });
+      
+      return totalTickets;
+    } catch (error) {
+      console.error('Error calculating tickets:', error);
+      return 5;
     }
   };
   
-  // Update calculateAvailableTickets in ticketManagement.ts
-  export const calculateAvailableTickets = async (userId: string): Promise<number> => {
+  export const updatePlayCount = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const userRef = ref(db, `users/${userId}`);
     
     try {
       const snapshot = await get(userRef);
       if (!snapshot.exists()) {
-        return 5; // Base tickets for new users
+        throw new Error('User not found');
       }
-  
+      
       const userData = snapshot.val();
+      const visits = userData.visits || {};
+      const maxTickets = await calculateAvailableTickets(userId);
+      const currentPlays = visits.playsToday || 0;
+      const newPlaysCount = currentPlays + 1;
       
-      // Calculate total tickets:
-      // 5 (base) + streak bonus + permanent bonus from invites
-      const baseTickets = 5;
-      const streakBonus = (userData.visits?.currentStreak || 1) - 1;
-      const permanentBonus = userData.permanentBonusTickets || 0;
+      console.log('Play count update:', {
+        userId,
+        currentPlays,
+        newPlaysCount,
+        maxTickets,
+        permanentBonus: userData.permanentBonusTickets
+      });
       
-      return baseTickets + streakBonus + permanentBonus;
+      if (newPlaysCount > maxTickets) {
+        return -1; // No plays remaining
+      }
+      
+      // Update the plays count
+      await update(userRef, {
+        'visits/playsToday': newPlaysCount,
+        'visits/maxPlaysToday': maxTickets,
+        'visits/playsRemaining': maxTickets - newPlaysCount,
+        'visits/lastPlayed': Date.now()
+      });
+      
+      return maxTickets - newPlaysCount;
     } catch (error) {
-      console.error('Error calculating tickets:', error);
-      return 5; // Return base tickets on error
+      console.error('Error updating play count:', error);
+      throw error;
     }
   };
