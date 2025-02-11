@@ -59,6 +59,11 @@ useEffect(() => {
   const initializeApp = async () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
+      console.log('Telegram WebApp Data:', {
+        startParam: tg.initDataUnsafe?.start_param,
+        user: tg.initDataUnsafe?.user
+      });
+  
       tg.ready();
       tg.expand();
       
@@ -68,25 +73,33 @@ useEffect(() => {
       
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       setIsMobileTelegram(isMobile);
-
+  
       (tg as any).requestFullscreen?.();
       const user = tg.initDataUnsafe?.user;
-      const startParam = tg.initDataUnsafe?.start_param; // Add this line
+      const startParam = tg.initDataUnsafe?.start_param;
       
       if (user) {
         setTelegramUser(user as TelegramUser);
         try {
-          // Process invite link if it exists
           if (startParam) {
+            console.log('Found start parameter:', startParam);
+            console.log('Processing invite for user:', user.id.toString());
             await processInviteLink(user.id.toString(), startParam);
+            console.log('Invite processing completed');
+          } else {
+            console.log('No start parameter found');
           }
           
           const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
           setUserStats(visitStats);
         } catch (error) {
-          console.error('Error tracking user visit:', error);
+          console.error('Error in initialization:', error);
         }
+      } else {
+        console.log('No user data found');
       }
+    } else {
+      console.log('Telegram WebApp not found');
     }
   };
 

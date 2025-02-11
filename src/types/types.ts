@@ -34,9 +34,10 @@ declare global {
         setBottomBarColor: (color: string) => void;
         lockOrientation(): unknown;
         isOrientationLocked: boolean;
+        initData: string;  // Add this line
         initDataUnsafe?: {
           user?: TelegramUser;
-          start_param?: string;  // Added this line
+          start_param?: string;
           auth_date?: number;
           hash?: string;
           query_id?: string;

@@ -57,65 +57,97 @@ interface InviteData {
     timestamp: number;
   }
   
-  export const processInviteLink = async (userId: string, startParam: string) => {
+// In ticketManagement.ts
+export const processInviteLink = async (userId: string, startParam: string) => {
+    console.log('Processing invite link:', {
+      userId,
+      startParam,
+      timestamp: new Date().toISOString()
+    });
+  
     const db = getDatabase();
     
-    // Check if this is a referral link
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
+      console.log('Extracted referrer ID:', referrerId);
       
-      // Don't allow self-referral
-      if (referrerId === userId) return;
+      if (referrerId === userId) {
+        console.log('Self-referral detected, ignoring');
+        return;
+      }
       
       const referrerRef = ref(db, `users/${referrerId}`);
       const userRef = ref(db, `users/${userId}`);
       
       try {
-        // Get current data for both users
+        // Log database references
+        console.log('Database paths:', {
+          referrerPath: referrerRef.toString(),
+          userPath: userRef.toString()
+        });
+  
+        // Get current data
         const [referrerSnapshot, userSnapshot] = await Promise.all([
           get(referrerRef),
           get(userRef)
         ]);
   
-        const referrerData = referrerSnapshot.val() || {};
-        const userData = userSnapshot.val() || {};
+        // Log current data state
+        console.log('Current database state:', {
+          referrerExists: referrerSnapshot.exists(),
+          referrerData: referrerSnapshot.val(),
+          userExists: userSnapshot.exists(),
+          userData: userSnapshot.val()
+        });
   
-        // Check if user has already been invited
-        if (userData.invitedBy) {
+        if (!referrerSnapshot.exists()) {
+          console.error('Referrer not found in database');
           return;
         }
   
-        // Initialize invite data if it doesn't exist
-        if (!referrerData.invites) {
-          referrerData.invites = {
+        const referrerData = referrerSnapshot.val();
+        const userData = userSnapshot.val() || {};
+  
+        if (userData.invitedBy) {
+          console.log('User already invited by:', userData.invitedBy);
+          return;
+        }
+  
+        // Prepare updates
+        const updates = {
+          [`users/${referrerId}/invites`]: {
+            invitedFriends: [...(referrerData.invites?.invitedFriends || []), userId],
+            timestamp: Date.now()
+          },
+          [`users/${referrerId}/permanentBonusTickets`]: (referrerData.permanentBonusTickets || 0) + 1,
+          [`users/${userId}/invitedBy`]: referrerId,
+          [`users/${userId}/permanentBonusTickets`]: 1,
+          [`users/${userId}/invites`]: {
             invitedFriends: [],
             timestamp: Date.now()
-          };
-        }
+          }
+        };
   
-        // Add user to referrer's invited friends list
-        if (!referrerData.invites.invitedFriends.includes(userId)) {
-          referrerData.invites.invitedFriends.push(userId);
-          
-          // Update referrer data
-          await update(referrerRef, {
-            invites: referrerData.invites,
-            permanentBonusTickets: (referrerData.permanentBonusTickets || 0) + 1
-          });
+        // Log updates before applying
+        console.log('Preparing to update database with:', updates);
   
-          // Mark new user as invited and give them a bonus ticket
-          await update(userRef, {
-            invitedBy: referrerId,
-            permanentBonusTickets: 1,
-            invites: {
-              invitedFriends: [],
-              timestamp: Date.now()
-            }
-          });
-        }
+        // Apply updates
+        await update(ref(db), updates);
+  
+        console.log('Successfully updated database');
       } catch (error) {
         console.error('Error processing invite:', error);
+        // Log detailed error
+        if (error instanceof Error) {
+          console.error({
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          });
+        }
       }
+    } else {
+      console.log('Not a referral link, skipping');
     }
   };
   
