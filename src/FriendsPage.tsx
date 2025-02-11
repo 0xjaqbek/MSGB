@@ -11,38 +11,38 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [inputCode, setInputCode] = useState('');
   const [message, setMessage] = useState('');
   const [friendCount, setFriendCount] = useState(0);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
 
-  // Fetch existing friend code and friend count
+  // Fetch initial data
   useEffect(() => {
     if (!telegramUser) return;
 
     const fetchInitialData = async () => {
-      const db = getDatabase();
-      
-      // Fetch friend code
       try {
-        const codesRef = ref(db, 'friendCodes');
-        const codesSnapshot = await get(codesRef);
+        const db = getDatabase();
         
+        // Fetch friend count
+        const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+        const snapshot = await get(friendsRef);
+        if (snapshot.exists()) {
+          setFriendCount(Object.keys(snapshot.val()).length);
+        }
+
+        // Check for existing code
+        const allCodesRef = ref(db, 'friendCodes');
+        const codesSnapshot = await get(allCodesRef);
         if (codesSnapshot.exists()) {
-          const codes = codesSnapshot.val();
-          for (const [code, data] of Object.entries(codes)) {
+          const allCodes = codesSnapshot.val();
+          for (const [code, data] of Object.entries(allCodes)) {
             if (typeof data === 'object' && data !== null && 'userId' in data) {
               if (data.userId === telegramUser.id) {
-                setFriendCode(code as string);
+                setFriendCode(code);
                 break;
               }
             }
           }
-        }
-
-        // Fetch friend count
-        const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
-        const friendsSnapshot = await get(friendsRef);
-        
-        if (friendsSnapshot.exists()) {
-          setFriendCount(Object.keys(friendsSnapshot.val()).length);
         }
       } catch (error) {
         console.error('Error fetching initial data:', error);
@@ -52,93 +52,13 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     fetchInitialData();
   }, [telegramUser]);
 
-  const handleGenerateCode = async () => {
-    console.log('Generate Code button clicked');
-    if (!telegramUser) {
-        console.log('Error: No telegram user found');
-        setMessage('Error: Not authorized');
-        return;
-    }
-    
-    try {
-        console.log('Generating code for user:', telegramUser.id);
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-        console.log('Generated code:', code);
-        
-        const db = getDatabase();
-        console.log('Got database reference');
-
-        // First check if user already has a code
-        console.log('Checking existing codes for user');
-        const allCodesRef = ref(db, 'friendCodes');
-        const allCodesSnapshot = await get(allCodesRef);
-        
-        if (allCodesSnapshot.exists()) {
-            console.log('Found existing codes, checking for user codes');
-            const allCodes = allCodesSnapshot.val();
-            for (const [existingCode, data] of Object.entries(allCodes)) {
-                if (typeof data === 'object' && data !== null && 'userId' in data) {
-                    if (data.userId === telegramUser.id) {
-                        console.log('User already has code:', existingCode);
-                        setFriendCode(existingCode as string);
-                        setMessage('Your existing code was found');
-                        return;
-                    }
-                }
-            }
-        }
-        
-        // No existing code found, create new one
-        console.log('No existing code found, creating new one');
-        const codeRef = ref(db, `friendCodes/${code}`);
-        
-        // Check if this specific code already exists
-        const codeSnapshot = await get(codeRef);
-        if (codeSnapshot.exists()) {
-            console.log('Code collision detected, retrying');
-            setMessage('Please try again (code collision)');
-            return;
-        }
-
-        // Create the code entry
-        const codeData = {
-            userId: telegramUser.id,
-            userName: telegramUser.first_name,
-            createdAt: Date.now(),
-            status: 'active'
-        };
-        
-        console.log('Attempting to save code:', code, 'with data:', codeData);
-        await set(codeRef, codeData);
-        
-        console.log('Code saved successfully');
-        setFriendCode(code);
-        setMessage('New code generated successfully!');
-        
-        // Update user's reference to their code
-        const userCodesRef = ref(db, `users/${telegramUser.id}/activeCodes/${code}`);
-        await set(userCodesRef, {
-            code: code,
-            createdAt: Date.now()
-        });
-        console.log('Updated user code reference');
-
-    } catch (error) {
-        console.error('Error in handleGenerateCode:', error);
-        if (error instanceof Error) {
-            console.error('Error details:', {
-                message: error.message,
-                stack: error.stack,
-                name: error.name
-            });
-        }
-        setMessage('Error generating code. Please try again.');
-    }
-};
+  const addDebugInfo = (info: string) => {
+    setDebugInfo(prev => [...prev, info]);
+  };
 
   const handleInvite = () => {
     if (!telegramUser) {
-      setMessage('Error: User not found');
+      setMessage('Error: Not authorized');
       return;
     }
 
@@ -155,6 +75,94 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     } catch (error) {
       console.error('Error in handleInvite:', error);
       setMessage('Error sharing invite link');
+    }
+  };
+
+  const handleGenerateCode = async () => {
+    setDebugInfo([]);
+    setIsGenerating(true);
+    
+    if (!telegramUser) {
+      addDebugInfo('❌ Error: No telegram user found');
+      setMessage('Error: Not authorized');
+      setIsGenerating(false);
+      return;
+    }
+    
+    try {
+      addDebugInfo('👤 Checking user: ' + telegramUser.id);
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      addDebugInfo('🎲 Generated code: ' + code);
+      
+      const db = getDatabase();
+      addDebugInfo('📚 Connected to database');
+
+      // Check for existing codes
+      addDebugInfo('🔍 Checking existing codes...');
+      const allCodesRef = ref(db, 'friendCodes');
+      const allCodesSnapshot = await get(allCodesRef);
+      
+      if (allCodesSnapshot.exists()) {
+        addDebugInfo('📝 Found existing codes list');
+        const allCodes = allCodesSnapshot.val();
+        for (const [existingCode, data] of Object.entries(allCodes)) {
+          if (typeof data === 'object' && data !== null && 'userId' in data) {
+            if (data.userId === telegramUser.id) {
+              addDebugInfo('✨ Found your existing code: ' + existingCode);
+              setFriendCode(existingCode as string);
+              setMessage('Your existing code was found');
+              setIsGenerating(false);
+              return;
+            }
+          }
+        }
+      }
+      
+      addDebugInfo('🆕 Creating new code...');
+      const codeRef = ref(db, `friendCodes/${code}`);
+      
+      // Check code collision
+      const codeSnapshot = await get(codeRef);
+      if (codeSnapshot.exists()) {
+        addDebugInfo('⚠️ Code collision detected');
+        setMessage('Please try again (code collision)');
+        setIsGenerating(false);
+        return;
+      }
+
+      // Save new code
+      const codeData = {
+        userId: telegramUser.id,
+        userName: telegramUser.first_name,
+        createdAt: Date.now(),
+        status: 'active'
+      };
+      
+      addDebugInfo('💾 Saving new code...');
+      await set(codeRef, codeData);
+      
+      addDebugInfo('✅ Code saved successfully!');
+      setFriendCode(code);
+      setMessage('New code generated successfully!');
+      
+      // Update user reference
+      const userCodesRef = ref(db, `users/${telegramUser.id}/activeCodes/${code}`);
+      await set(userCodesRef, {
+        code: code,
+        createdAt: Date.now()
+      });
+      addDebugInfo('🔄 Updated user profile');
+
+    } catch (error) {
+      addDebugInfo('❌ Error occurred:');
+      if (error instanceof Error) {
+        addDebugInfo(`🔴 ${error.message}`);
+      } else {
+        addDebugInfo('🔴 Unknown error occurred');
+      }
+      setMessage('Error generating code. Please try again.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -197,19 +205,35 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       });
       
       // Increment invited friends count
-      const userRef = ref(db, `users/${codeData.userId}/invitedFriends`);
-      const userSnapshot = await get(userRef);
-      const currentInvites = userSnapshot.exists() ? userSnapshot.val() : 0;
-      await set(userRef, currentInvites + 1);
+      const referrerRef = ref(db, `users/${codeData.userId}/invitedFriends`);
+      const referrerSnapshot = await get(referrerRef);
+      const currentCount = referrerSnapshot.exists() ? referrerSnapshot.val() : 0;
+      await set(referrerRef, currentCount + 1);
+      
+      // Give bonus tickets to both users
+      const updateUserTickets = async (userId: string, amount: number) => {
+        const userVisitsRef = ref(db, `users/${userId}/visits`);
+        const visitsSnapshot = await get(userVisitsRef);
+        if (visitsSnapshot.exists()) {
+          const visits = visitsSnapshot.val();
+          await set(userVisitsRef, {
+            ...visits,
+            maxPlaysToday: (visits.maxPlaysToday || 5) + amount,
+            playsRemaining: (visits.playsRemaining || 0) + amount
+          });
+        }
+      };
+
+      await updateUserTickets(telegramUser.id.toString(), 2); // New friend gets 2 tickets
+      await updateUserTickets(codeData.userId, 1); // Code owner gets 1 ticket
       
       // Remove used code
       await set(codeRef, null);
       
-      setMessage('Friend added successfully!');
+      setMessage('Friend added successfully! +2 tickets');
       setInputCode('');
       setFriendCount(prev => prev + 1);
       
-      // Clear success message after 3 seconds
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error redeeming code:', error);
@@ -249,10 +273,21 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         ) : (
           <button 
             onClick={handleGenerateCode}
-            className="w-full p-4 mb-4 border-2 border-purple-400 text-purple-400 rounded-xl hover:bg-purple-400/10"
+            disabled={isGenerating}
+            className="w-full p-4 mb-4 border-2 border-purple-400 text-purple-400 rounded-xl hover:bg-purple-400/10 disabled:opacity-50"
           >
-            Generate Code
+            {isGenerating ? 'Generating...' : 'Generate Code'}
           </button>
+        )}
+
+        {debugInfo.length > 0 && (
+          <div className="mt-4 p-3 bg-black/30 rounded-xl text-sm">
+            {debugInfo.map((info, index) => (
+              <div key={index} className="text-cyan-400 mb-1">
+                {info}
+              </div>
+            ))}
+          </div>
         )}
         
         <div className="flex flex-col gap-4">
