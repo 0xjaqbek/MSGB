@@ -53,25 +53,88 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   }, [telegramUser]);
 
   const handleGenerateCode = async () => {
-    if (!telegramUser) return;
+    console.log('Generate Code button clicked');
+    if (!telegramUser) {
+        console.log('Error: No telegram user found');
+        setMessage('Error: Not authorized');
+        return;
+    }
     
     try {
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const db = getDatabase();
-      
-      await set(ref(db, `friendCodes/${code}`), {
-        userId: telegramUser.id,
-        createdAt: Date.now()
-      });
-      
-      setFriendCode(code);
-      setMessage('New code generated successfully!');
-      setTimeout(() => setMessage(''), 3000);
+        console.log('Generating code for user:', telegramUser.id);
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        console.log('Generated code:', code);
+        
+        const db = getDatabase();
+        console.log('Got database reference');
+
+        // First check if user already has a code
+        console.log('Checking existing codes for user');
+        const allCodesRef = ref(db, 'friendCodes');
+        const allCodesSnapshot = await get(allCodesRef);
+        
+        if (allCodesSnapshot.exists()) {
+            console.log('Found existing codes, checking for user codes');
+            const allCodes = allCodesSnapshot.val();
+            for (const [existingCode, data] of Object.entries(allCodes)) {
+                if (typeof data === 'object' && data !== null && 'userId' in data) {
+                    if (data.userId === telegramUser.id) {
+                        console.log('User already has code:', existingCode);
+                        setFriendCode(existingCode as string);
+                        setMessage('Your existing code was found');
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // No existing code found, create new one
+        console.log('No existing code found, creating new one');
+        const codeRef = ref(db, `friendCodes/${code}`);
+        
+        // Check if this specific code already exists
+        const codeSnapshot = await get(codeRef);
+        if (codeSnapshot.exists()) {
+            console.log('Code collision detected, retrying');
+            setMessage('Please try again (code collision)');
+            return;
+        }
+
+        // Create the code entry
+        const codeData = {
+            userId: telegramUser.id,
+            userName: telegramUser.first_name,
+            createdAt: Date.now(),
+            status: 'active'
+        };
+        
+        console.log('Attempting to save code:', code, 'with data:', codeData);
+        await set(codeRef, codeData);
+        
+        console.log('Code saved successfully');
+        setFriendCode(code);
+        setMessage('New code generated successfully!');
+        
+        // Update user's reference to their code
+        const userCodesRef = ref(db, `users/${telegramUser.id}/activeCodes/${code}`);
+        await set(userCodesRef, {
+            code: code,
+            createdAt: Date.now()
+        });
+        console.log('Updated user code reference');
+
     } catch (error) {
-      console.error('Error generating code:', error);
-      setMessage('Error generating code. Please try again.');
+        console.error('Error in handleGenerateCode:', error);
+        if (error instanceof Error) {
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+        }
+        setMessage('Error generating code. Please try again.');
     }
-  };
+};
 
   const handleInvite = () => {
     if (!telegramUser) {
