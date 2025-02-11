@@ -2,6 +2,12 @@
 import { getDatabase, ref, get, set, update } from 'firebase/database';
 import { VisitStats } from './userTracking';
 
+interface InviteData {
+    invitedBy?: string;
+    invitedFriends: string[];
+    timestamp: number;
+}
+
 export const getCurrentPlayCount = async (userId: string): Promise<number> => {
   const db = getDatabase();
   const userRef = ref(db, `users/${userId}/visits`);
@@ -14,17 +20,14 @@ export const getCurrentPlayCount = async (userId: string): Promise<number> => {
   const userData = snapshot.val() as VisitStats;
   return userData.playsToday || 0;
 };
-
-
-
-interface InviteData {
+  
+interface ReferralData {
     invitedBy?: string;
-    invitedFriends: string[];
-    timestamp: number;
+    invitedUsers: string[];
+    ticketsFromInvites: number;
   }
   
   export const processInviteLink = async (userId: string, startParam: string) => {
-    console.log('Processing invite link:', { userId, startParam });
     const db = getDatabase();
     
     if (startParam?.startsWith('ref_')) {
@@ -32,66 +35,57 @@ interface InviteData {
       
       // Don't allow self-referral
       if (referrerId === userId) {
-        console.log('Self-referral detected, ignoring');
         return;
       }
       
-      const referrerRef = ref(db, `users/${referrerId}`);
-      const userRef = ref(db, `users/${userId}`);
+      const referrerRef = ref(db, `users/${referrerId}/referrals`);
+      const userRef = ref(db, `users/${userId}/referrals`);
       
       try {
+        // Get current referral data for both users
         const [referrerSnapshot, userSnapshot] = await Promise.all([
           get(referrerRef),
           get(userRef)
         ]);
   
-        console.log('Current data:', {
-          referrerData: referrerSnapshot.val(),
-          userData: userSnapshot.val()
-        });
+        const referrerData: ReferralData = referrerSnapshot.exists() ? 
+          referrerSnapshot.val() : 
+          { invitedUsers: [], ticketsFromInvites: 0 };
   
-        const referrerData = referrerSnapshot.val() || {};
-        const userData = userSnapshot.val() || {};
+        const userData: ReferralData = userSnapshot.exists() ? 
+          userSnapshot.val() : 
+          { invitedUsers: [], ticketsFromInvites: 0 };
   
-        // Check if user has already been invited
-        if (userData.invitedBy) {
-          console.log('User already invited by:', userData.invitedBy);
-          return;
+        // If user hasn't been invited before
+        if (!userData.invitedBy) {
+          // Update referrer's data - they get a ticket for inviting
+          if (!referrerData.invitedUsers.includes(userId)) {
+            referrerData.invitedUsers.push(userId);
+            referrerData.ticketsFromInvites = (referrerData.ticketsFromInvites || 0) + 1;
+  
+            await set(referrerRef, referrerData);
+          }
+  
+          // Update new user's data - they get a ticket for being invited
+          userData.invitedBy = referrerId;
+          userData.ticketsFromInvites = 1;
+  
+          await set(userRef, userData);
+  
+          // Also update visits data to reflect new ticket count
+          const visitsRef = ref(db, `users/${userId}/visits`);
+          const visitsSnapshot = await get(visitsRef);
+          
+          if (visitsSnapshot.exists()) {
+            const visitsData = visitsSnapshot.val();
+            const maxPlays = visitsData.maxPlaysToday + 1; // Add one for the invite bonus
+            
+            await update(visitsRef, {
+              maxPlaysToday: maxPlays,
+              playsRemaining: maxPlays - (visitsData.playsToday || 0)
+            });
+          }
         }
-  
-        // Update referrer data
-        const updatedReferrerData = {
-          ...referrerData,
-          permanentBonusTickets: (referrerData.permanentBonusTickets || 0) + 1,
-          invites: {
-            invitedFriends: [...(referrerData.invites?.invitedFriends || []), userId],
-            timestamp: Date.now()
-          }
-        };
-  
-        // Update new user data
-        const updatedUserData = {
-          ...userData,
-          invitedBy: referrerId,
-          permanentBonusTickets: 1,
-          invites: {
-            invitedFriends: [],
-            timestamp: Date.now()
-          }
-        };
-  
-        console.log('Updating data:', {
-          referrer: updatedReferrerData,
-          user: updatedUserData
-        });
-  
-        // Update both users
-        await Promise.all([
-          set(referrerRef, updatedReferrerData),
-          set(userRef, updatedUserData)
-        ]);
-  
-        console.log('Invite processing complete');
       } catch (error) {
         console.error('Error processing invite:', error);
       }
@@ -104,38 +98,24 @@ export const calculateAvailableTickets = async (userId: string): Promise<number>
     
     try {
       const snapshot = await get(userRef);
-      console.log('User data for ticket calculation:', {
-        userId,
-        data: snapshot.val()
-      });
-  
       if (!snapshot.exists()) {
-        console.log('No user data found, returning base tickets (5)');
-        return 5;
+        return 5; // Base tickets
       }
   
       const userData = snapshot.val();
+      const referralData = userData.referrals || { ticketsFromInvites: 0 };
       
-      // Calculate components
+      // Base tickets (5) + streak bonus + referral bonus
       const baseTickets = 5;
       const streakBonus = Math.max(0, (userData.visits?.currentStreak || 1) - 1);
-      const permanentBonus = userData.permanentBonusTickets || 0;
+      const referralBonus = referralData.ticketsFromInvites || 0;
       
-      const totalTickets = baseTickets + streakBonus + permanentBonus;
-      
-      console.log('Ticket calculation:', {
-        baseTickets,
-        streakBonus,
-        permanentBonus,
-        totalTickets
-      });
-      
-      return totalTickets;
+      return baseTickets + streakBonus + referralBonus;
     } catch (error) {
       console.error('Error calculating tickets:', error);
       return 5;
     }
-  };
+};
   
   export const updatePlayCount = async (userId: string): Promise<number> => {
     const db = getDatabase();
