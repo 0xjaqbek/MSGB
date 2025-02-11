@@ -158,7 +158,8 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
                 userId: telegramUser.id.toString(),
                 userName: telegramUser.first_name,
                 createdAt: Date.now(),
-                status: 'active'
+                status: 'active',
+                code: code
             };
             
             addDebugInfo('💾 Saving new code...');
