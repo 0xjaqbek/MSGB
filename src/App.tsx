@@ -94,19 +94,26 @@ function App() {
   //    </div>
   //  );
 
-  useEffect(() => {
-    const initializeFirebase = async () => {
-      try {
-        const auth = getAuth();
-        await signInAnonymously(auth);
-        console.log('Anonymous authentication successful');
-      } catch (error) {
-        console.error('Anonymous authentication error', error);
+  const initializeFirebase = async () => {
+    try {
+      const auth = getAuth();
+      const userCredential = await signInAnonymously(auth);
+      console.log('Anonymous authentication successful', userCredential.user);
+    } catch (error) {
+      console.error('Anonymous authentication error', error);
+      
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        
+        // Specific Firebase error handling
+        if ('code' in error) {
+          console.error('Firebase Error Code:', (error as any).code);
+        }
       }
-    };
-  
-    initializeFirebase();
-  }, []); 
+    }
+  };
 
   useEffect(() => {
     const initializeApp = async () => {
