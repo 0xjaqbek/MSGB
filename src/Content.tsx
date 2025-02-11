@@ -599,7 +599,7 @@ const PointsDisplay = styled.div`
 
 const PointsText = styled.span`
   color: white;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: bold;
 `;
 
