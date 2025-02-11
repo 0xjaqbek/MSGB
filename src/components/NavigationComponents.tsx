@@ -97,7 +97,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       
       {/* Invite Section */}
       <div className="card">
-        <h2 className="text-glow text-lg mb-2">Invite Friends</h2>
+        <h2 className="text-glow text-lg p-5 mb-2">Invite Friends</h2>
         <p className="text-info mb-4">
           Invite friends to play and earn permanent extra tickets!
           Each invited friend gives you +1 ticket permanently.
@@ -106,17 +106,6 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
           botUsername="moonstonesgamebot" 
           userId={telegramUser?.id.toString()}
         />
-      </div>
-
-      {/* Existing Leaderboard Section */}
-      <div className="card">
-        <h2 className="text-glow text-lg mb-2">Leaderboard</h2>
-        <p className="text-info">Coming soon...</p>
-      </div>
-      
-      <div className="card">
-        <h2 className="text-glow text-lg mb-2">Friend Requests</h2>
-        <p className="text-info">No pending requests</p>
       </div>
     </div>
   );

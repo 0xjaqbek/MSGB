@@ -1,5 +1,5 @@
 // ticketManagement.ts
-import { getDatabase, ref, get, set } from 'firebase/database';
+import { getDatabase, ref, get, set, update } from 'firebase/database';
 import { VisitStats } from './userTracking';
 
 export const getCurrentPlayCount = async (userId: string): Promise<number> => {
@@ -60,40 +60,61 @@ interface InviteData {
   export const processInviteLink = async (userId: string, startParam: string) => {
     const db = getDatabase();
     
-    // If this is a referral
+    // Check if this is a referral link
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
       
       // Don't allow self-referral
       if (referrerId === userId) return;
       
-      const referrerRef = ref(db, `users/${referrerId}/invites`);
-      const userRef = ref(db, `users/${userId}/invites`);
+      const referrerRef = ref(db, `users/${referrerId}`);
+      const userRef = ref(db, `users/${userId}`);
       
-      // Get current invite data
-      const [referrerData, userData] = await Promise.all([
-        get(referrerRef),
-        get(userRef)
-      ]);
-      
-      // If user hasn't been invited before
-      if (!userData.exists() || !userData.val().invitedBy) {
-        // Update referrer's invited friends list
-        const referrerInvites: InviteData = referrerData.exists() 
-          ? referrerData.val() 
-          : { invitedFriends: [], timestamp: Date.now() };
-        
-        if (!referrerInvites.invitedFriends.includes(userId)) {
-          referrerInvites.invitedFriends.push(userId);
-          await set(referrerRef, referrerInvites);
+      try {
+        // Get current data for both users
+        const [referrerSnapshot, userSnapshot] = await Promise.all([
+          get(referrerRef),
+          get(userRef)
+        ]);
+  
+        const referrerData = referrerSnapshot.val() || {};
+        const userData = userSnapshot.val() || {};
+  
+        // Check if user has already been invited
+        if (userData.invitedBy) {
+          return;
         }
-        
-        // Mark user as invited
-        await set(userRef, {
-          invitedBy: referrerId,
-          invitedFriends: [],
-          timestamp: Date.now()
-        });
+  
+        // Initialize invite data if it doesn't exist
+        if (!referrerData.invites) {
+          referrerData.invites = {
+            invitedFriends: [],
+            timestamp: Date.now()
+          };
+        }
+  
+        // Add user to referrer's invited friends list
+        if (!referrerData.invites.invitedFriends.includes(userId)) {
+          referrerData.invites.invitedFriends.push(userId);
+          
+          // Update referrer data
+          await update(referrerRef, {
+            invites: referrerData.invites,
+            permanentBonusTickets: (referrerData.permanentBonusTickets || 0) + 1
+          });
+  
+          // Mark new user as invited and give them a bonus ticket
+          await update(userRef, {
+            invitedBy: referrerId,
+            permanentBonusTickets: 1,
+            invites: {
+              invitedFriends: [],
+              timestamp: Date.now()
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error processing invite:', error);
       }
     }
   };
@@ -102,32 +123,24 @@ interface InviteData {
   export const calculateAvailableTickets = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const userRef = ref(db, `users/${userId}`);
-    const visitsRef = ref(db, `users/${userId}/visits`);
-    const invitesRef = ref(db, `users/${userId}/invites`);
     
-    const [userSnapshot, visitsSnapshot, invitesSnapshot] = await Promise.all([
-      get(userRef),
-      get(visitsRef),
-      get(invitesRef)
-    ]);
-    
-    if (!visitsSnapshot.exists()) {
-      return 5; // Base tickets
+    try {
+      const snapshot = await get(userRef);
+      if (!snapshot.exists()) {
+        return 5; // Base tickets for new users
+      }
+  
+      const userData = snapshot.val();
+      
+      // Calculate total tickets:
+      // 5 (base) + streak bonus + permanent bonus from invites
+      const baseTickets = 5;
+      const streakBonus = (userData.visits?.currentStreak || 1) - 1;
+      const permanentBonus = userData.permanentBonusTickets || 0;
+      
+      return baseTickets + streakBonus + permanentBonus;
+    } catch (error) {
+      console.error('Error calculating tickets:', error);
+      return 5; // Return base tickets on error
     }
-    
-    const visitsData = visitsSnapshot.val() as VisitStats;
-    const invitesData = invitesSnapshot.exists() ? invitesSnapshot.val() as InviteData : null;
-    
-    // Base tickets from streak
-    let baseTickets = 5;
-    
-    // Add streak bonus
-    baseTickets += (visitsData.currentStreak - 1);
-    
-    // Add permanent bonus from invited friends
-    if (invitesData?.invitedFriends) {
-      baseTickets += invitesData.invitedFriends.length;
-    }
-    
-    return Math.ceil(baseTickets);
   };

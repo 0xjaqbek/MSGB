@@ -63,8 +63,12 @@ export interface UserVisit {
   totalVisits: number;
   dailyVisits: { [key: string]: number };
   firstVisitComplete: boolean;
-  playsToday: number;
-  maxPlaysToday: number;
+  invitedBy?: string;
+  permanentBonusTickets: number;
+  invites: {
+    invitedFriends: string[];
+    timestamp: number;
+  };
 }
 
 export interface VisitStats {
