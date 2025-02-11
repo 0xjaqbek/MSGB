@@ -106,7 +106,7 @@ function App() {
     };
   
     initializeFirebase();
-  }, []);
+  }, []); 
 
   useEffect(() => {
     const initializeApp = async () => {

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase } from 'firebase/database';
-import { getAuth } from 'firebase/auth';
+import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
+import { getAuth, connectAuthEmulator, indexedDBLocalPersistence, initializeAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -14,8 +14,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
+
+// Initialize Database with optional emulator support
 export const database = getDatabase(app);
-export const auth = getAuth(app);
+
+// Initialize Auth with persistence
+export const auth = initializeAuth(app, {
+  persistence: indexedDBLocalPersistence
+});
 
 export const formatDate = (timestamp: string | number | Date) => {
   const date = new Date(timestamp);

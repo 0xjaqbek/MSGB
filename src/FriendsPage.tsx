@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, get, set } from 'firebase/database';
+import { getDatabase, ref, get, set, Database } from 'firebase/database';
 import { TelegramUser } from './types';;
 import { getAuth, signInAnonymously } from 'firebase/auth';
 
@@ -78,9 +78,16 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       setMessage('Error sharing invite link');
     }
   };
-
+  
+  const checkCodeUniqueness = async (code: string, db: Database) => {
+    const codeRef = ref(db, `friendCodes/${code}`);
+    const snapshot = await get(codeRef);
+    return !snapshot.exists();
+  };
+  
   const handleGenerateCode = async () => {
     setIsGenerating(true);
+    setDebugInfo([]); // Clear previous debug info
     
     if (!telegramUser) {
       addDebugInfo('❌ Error: No telegram user found');
@@ -90,19 +97,46 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     }
     
     try {
-      // Ensure anonymous authentication
       const auth = getAuth();
-      await signInAnonymously(auth);
+      const authResult = await signInAnonymously(auth);
+      
+      // Additional error checking
+      if (!authResult.user) {
+        throw new Error('Authentication failed');
+      }
+  
       addDebugInfo('🔒 Anonymous authentication successful');
       
       const db = getDatabase();
       addDebugInfo('📚 Connected to database');
       
-      // Generate a unique code
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      addDebugInfo(`🎲 Generated code: ${code}`);
+      // Generate a unique code with multiple attempts
+      let code: string | undefined;
+      let isUnique = false;
+      const maxAttempts = 10;
+      let attempts = 0;
+  
+      while (!isUnique && attempts < maxAttempts) {
+        const potentialCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        isUnique = await checkCodeUniqueness(potentialCode, db);
+        
+        if (isUnique) {
+          code = potentialCode;
+          break;
+        }
+        
+        attempts++;
+      }
+  
+      if (!code) {
+        setMessage('Unable to generate a unique code. Try again.');
+        setIsGenerating(false);
+        return;
+      }
+  
+      addDebugInfo(`🎲 Generated unique code: ${code}`);
       
-      // Check for existing codes
+      // Check for existing codes for this user
       const allCodesRef = ref(db, 'friendCodes');
       const allCodesSnapshot = await get(allCodesRef);
       
@@ -130,7 +164,8 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         userId: telegramUser.id.toString(),
         userName: telegramUser.first_name,
         createdAt: Date.now(),
-        status: 'active'
+        status: 'active',
+        code: code
       };
       
       addDebugInfo('💾 Saving new code...');
@@ -140,19 +175,22 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       setFriendCode(code);
       setMessage('New code generated successfully!');
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Full error:', error);
       addDebugInfo(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setMessage('Error generating code. Please try again.');
     } finally {
       setIsGenerating(false);
     }
   };
-
+  
   const handleRedeemCode = async () => {
     if (!telegramUser || !inputCode || isRedeeming) return;
     
     setIsRedeeming(true);
     try {
+      // Log the attempt
+      console.log(`Attempting to redeem code: ${inputCode} for user: ${telegramUser?.id}`);
+  
       const db = getDatabase();
       const codeRef = ref(db, `friendCodes/${inputCode}`);
       const snapshot = await get(codeRef);
@@ -205,12 +243,15 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
           });
         }
       };
-
+  
       await updateUserTickets(telegramUser.id.toString(), 2); // New friend gets 2 tickets
       await updateUserTickets(codeData.userId, 1); // Code owner gets 1 ticket
       
       // Remove used code
       await set(codeRef, null);
+      
+      // Log successful redemption
+      console.log(`Code ${inputCode} successfully redeemed for user ${telegramUser?.id}`);
       
       setMessage('Friend added successfully! +2 tickets');
       setInputCode('');
@@ -218,13 +259,13 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      console.error('Error redeeming code:', error);
+      // Log the full error for debugging
+      console.error('Detailed redemption error:', error);
       setMessage('Error redeeming code. Please try again.');
     } finally {
       setIsRedeeming(false);
     }
   };
-
   return (
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
