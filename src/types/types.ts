@@ -22,7 +22,7 @@ export type TelegramUser = {
   photo_url?: string;
 };
 
-// Single global declaration for Telegram
+// Updated WebApp type definition
 declare global {
   interface Window {
     Telegram?: {
@@ -36,6 +36,10 @@ declare global {
         isOrientationLocked: boolean;
         initDataUnsafe?: {
           user?: TelegramUser;
+          start_param?: string;  // Added this line
+          auth_date?: number;
+          hash?: string;
+          query_id?: string;
         };
         MainButton: {
           color: string;
