@@ -9,6 +9,7 @@ import { NavigationBar, AccountPage, TasksPage } from './components/NavigationCo
 import FriendsPage from './FriendsPage';
 import { TelegramUser, NavigationPage } from './types';
 import { get, getDatabase, ref, set } from 'firebase/database';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 // Define WelcomeBonus component outside of the main App component
 const WelcomeBonus: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -92,6 +93,20 @@ function App() {
   //      </div>
   //    </div>
   //  );
+
+  useEffect(() => {
+    const initializeFirebase = async () => {
+      try {
+        const auth = getAuth();
+        await signInAnonymously(auth);
+        console.log('Anonymous authentication successful');
+      } catch (error) {
+        console.error('Anonymous authentication error', error);
+      }
+    };
+  
+    initializeFirebase();
+  }, []);
 
   useEffect(() => {
     const initializeApp = async () => {

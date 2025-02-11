@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, get, set } from 'firebase/database';
-import { TelegramUser } from './types';
+import { TelegramUser } from './types';;
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 interface FriendsPageProps {
   telegramUser: TelegramUser | null;
@@ -79,126 +80,73 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   };
 
   const handleGenerateCode = async () => {
-    setDebugInfo([]); // Clear previous debug info
     setIsGenerating(true);
     
     if (!telegramUser) {
-        addDebugInfo('❌ Error: No telegram user found');
-        setMessage('Error: Not authorized');
-        setIsGenerating(false);
-        return;
+      addDebugInfo('❌ Error: No telegram user found');
+      setMessage('Error: Not authorized');
+      setIsGenerating(false);
+      return;
     }
     
     try {
-        // First check database access
-        const db = getDatabase();
-        addDebugInfo('🔒 Testing database access...');
+      // Ensure anonymous authentication
+      const auth = getAuth();
+      await signInAnonymously(auth);
+      addDebugInfo('🔒 Anonymous authentication successful');
+      
+      const db = getDatabase();
+      addDebugInfo('📚 Connected to database');
+      
+      // Generate a unique code
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      addDebugInfo(`🎲 Generated code: ${code}`);
+      
+      // Check for existing codes
+      const allCodesRef = ref(db, 'friendCodes');
+      const allCodesSnapshot = await get(allCodesRef);
+      
+      if (allCodesSnapshot.exists()) {
+        addDebugInfo('📝 Found existing codes list');
+        const allCodes = allCodesSnapshot.val();
         
-        // Test write permission in user's own path first
-        try {
-            const testRef = ref(db, `users/${telegramUser.id.toString()}/test`);
-            await set(testRef, {
-                timestamp: Date.now()
-            });
-            await set(testRef, null); // Clean up test data
-            addDebugInfo('✅ Database access confirmed');
-        } catch (error) {
-            addDebugInfo('❌ Database access denied');
-            addDebugInfo('🔑 Please make sure you are authorized');
-            setMessage('Database access denied. Please try again later.');
-            setIsGenerating(false);
-            return;
-        }
-
-        addDebugInfo('👤 Checking user: ' + telegramUser.id.toString());
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-        addDebugInfo('🎲 Generated code: ' + code);
-        
-        addDebugInfo('📚 Connected to database');
-
-        // Check for existing codes
-        addDebugInfo('🔍 Checking existing codes...');
-        try {
-            const allCodesRef = ref(db, 'friendCodes');
-            const allCodesSnapshot = await get(allCodesRef);
-            
-            if (allCodesSnapshot.exists()) {
-                addDebugInfo('📝 Found existing codes list');
-                const allCodes = allCodesSnapshot.val();
-                for (const [existingCode, data] of Object.entries(allCodes)) {
-                    if (typeof data === 'object' && data !== null && 'userId' in data) {
-                        if (data.userId === telegramUser.id.toString()) {
-                            addDebugInfo('✨ Found your existing code: ' + existingCode);
-                            setFriendCode(existingCode as string);
-                            setMessage('Your existing code was found');
-                            setIsGenerating(false);
-                            return;
-                        }
-                    }
-                }
+        // Check if user already has a code
+        for (const [existingCode, data] of Object.entries(allCodes)) {
+          if (typeof data === 'object' && data !== null && 'userId' in data) {
+            if (data.userId === telegramUser.id.toString()) {
+              addDebugInfo(`✨ Found your existing code: ${existingCode}`);
+              setFriendCode(existingCode as string);
+              setMessage('Your existing code was found');
+              setIsGenerating(false);
+              return;
             }
-        } catch (error) {
-            addDebugInfo('❌ Error checking existing codes');
-            addDebugInfo('⚠️ Proceeding with new code generation');
+          }
         }
-        
-        addDebugInfo('🆕 Creating new code...');
-        
-        try {
-            // Try to write directly to user's path first
-            const userCodeRef = ref(db, `users/${telegramUser.id.toString()}/friendCode`);
-            await set(userCodeRef, {
-                code: code,
-                createdAt: Date.now()
-            });
-            
-            // Then try to write to friendCodes
-            const codeRef = ref(db, `friendCodes/${code}`);
-            const codeData = {
-                userId: telegramUser.id.toString(),
-                userName: telegramUser.first_name,
-                createdAt: Date.now(),
-                status: 'active',
-                code: code
-            };
-            
-            addDebugInfo('💾 Saving new code...');
-            await set(codeRef, codeData);
-            
-            addDebugInfo('✅ Code saved successfully!');
-            setFriendCode(code);
-            setMessage('New code generated successfully!');
-            
-        } catch (error) {
-            if (error instanceof Error) {
-                if (error.message.includes('permission_denied')) {
-                    addDebugInfo('❌ Permission denied saving code');
-                    addDebugInfo('🔑 Please contact support');
-                } else {
-                    addDebugInfo(`❌ Error: ${error.message}`);
-                }
-            }
-            setMessage('Error saving code. Please try again later.');
-            return;
-        }
-
+      }
+      
+      // Create new code
+      const codeRef = ref(db, `friendCodes/${code}`);
+      const codeData = {
+        userId: telegramUser.id.toString(),
+        userName: telegramUser.first_name,
+        createdAt: Date.now(),
+        status: 'active'
+      };
+      
+      addDebugInfo('💾 Saving new code...');
+      await set(codeRef, codeData);
+      
+      addDebugInfo('✅ Code saved successfully!');
+      setFriendCode(code);
+      setMessage('New code generated successfully!');
     } catch (error) {
-        addDebugInfo('❌ Error occurred:');
-        if (error instanceof Error) {
-            if (error.message.includes('permission_denied')) {
-                addDebugInfo('🔒 Database access denied');
-                addDebugInfo('🔑 Please make sure you are authorized');
-            } else {
-                addDebugInfo(`🔴 ${error.message}`);
-            }
-        } else {
-            addDebugInfo('🔴 Unknown error occurred');
-        }
-        setMessage('Error generating code. Please try again.');
+      console.error('Error:', error);
+      addDebugInfo(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setMessage('Error generating code. Please try again.');
     } finally {
-        setIsGenerating(false);
+      setIsGenerating(false);
     }
-};
+  };
 
   const handleRedeemCode = async () => {
     if (!telegramUser || !inputCode || isRedeeming) return;
