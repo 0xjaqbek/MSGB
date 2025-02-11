@@ -7,6 +7,7 @@ import LandingPage from "./LandingPage";
 import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
 import { NavigationBar, FriendsPage, AccountPage, TasksPage } from './components/NavigationComponents';
 import { TelegramUser, NavigationPage } from './types';
+import { processInviteLink } from './ticketManagement'; 
 
 function App() {
   const { network } = useTonConnect();
@@ -54,38 +55,55 @@ function App() {
 //    </div>
 //  );
 //
-  useEffect(() => {
-    const initializeApp = async () => {
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.ready();
-        tg.expand();
-        
-        if (!tg.isOrientationLocked) {
-          tg.lockOrientation();  // Call without parameters
-        }
-        
-        // Detect mobile environment
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        setIsMobileTelegram(isMobile);
-  
-        (tg as any).requestFullscreen?.();
-        const user = tg.initDataUnsafe?.user;
-        
-        if (user) {
-          setTelegramUser(user as TelegramUser);
-          try {
-            const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
-            setUserStats(visitStats);
-          } catch (error) {
-            console.error('Error tracking user visit:', error);
+useEffect(() => {
+  const initializeApp = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      
+      if (!tg.isOrientationLocked) {
+        tg.lockOrientation();
+      }
+      
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobileTelegram(isMobile);
+
+      (tg as any).requestFullscreen?.();
+      const user = tg.initDataUnsafe?.user;
+      const startParam = tg.initDataUnsafe?.start_param; // Add this line
+      
+      if (user) {
+        setTelegramUser(user as TelegramUser);
+        try {
+          // Process invite link if it exists
+          if (startParam) {
+            await processInviteLink(user.id.toString(), startParam);
           }
+          
+          const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
+          setUserStats(visitStats);
+        } catch (error) {
+          console.error('Error tracking user visit:', error);
         }
       }
-    };
-  
-    initializeApp();
-  }, []);
+    }
+  };
+
+  initializeApp();
+}, []);
+
+const handleNavigateToFriends = () => {
+  setCurrentPage('friends');
+};
+
+// Add handleGameOver function
+const handleGameOver = (score: number) => {
+  // If no plays remaining, navigate to friends page
+  if (userStats?.playsRemaining === 0) {
+    handleNavigateToFriends();
+  }
+};
 
 // In App.tsx
 const handleStart = async () => {
@@ -143,25 +161,20 @@ const handleStart = async () => {
 //    return <MobileAppFallback />;
 //  }
 //
-  return (
-    <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
-      {/* Background container */}
-      <div className={`background-container ${isPlaying ? 'game-bg' : 'main-bg'}`} />
-
-      {renderCurrentPage()}
-
-      {/* Show navigation bar only when not playing and not on landing */}
-      {!showLanding && !isPlaying && (
-        <NavigationBar 
-          currentPage={currentPage}
-          onNavigate={setCurrentPage}
-        />
-      )}
-    </div>
-  );
+return (
+  <div style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}>
+    <div className={`background-container ${isPlaying ? 'game-bg' : 'main-bg'}`} />
+    {renderCurrentPage()}
+    {!showLanding && !isPlaying && (
+      <NavigationBar 
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+      />
+    )}
+  </div>
+);
 
   function renderCurrentPage() {
-    console.log("renderCurrentPage called, showLanding:", showLanding);
     if (showLanding) {
       return (
         <LandingPage 
@@ -173,12 +186,13 @@ const handleStart = async () => {
       );
     }
   
-    console.log("currentPage:", currentPage);
     switch (currentPage) {
       case 'main':
         return <Content 
           onGameStateChange={handleGameStateChange}
-          userStats={userStats}  // Add this
+          userStats={userStats}
+          onGameOver={handleGameOver} // Add this prop
+          onNavigateToFriends={handleNavigateToFriends} // Add this prop
         />;
       case 'friends':
         return <FriendsPage telegramUser={telegramUser} />;
@@ -189,10 +203,14 @@ const handleStart = async () => {
       default:
         return <Content 
           onGameStateChange={handleGameStateChange}
-          userStats={userStats}  // Add this here too
+          userStats={userStats}
+          onGameOver={handleGameOver} // Add this prop
+          onNavigateToFriends={handleNavigateToFriends} // Add this prop
         />;
     }
   }
+
+
 }
 
 export default App;

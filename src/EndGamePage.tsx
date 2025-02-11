@@ -12,6 +12,7 @@ interface EndGamePageProps {
   onClose?: () => void;
   onPlayAgain?: () => void;
   ticketsLeft: number;
+  onNavigateToFriends?: () => void;
 }
 
 const Container = styled.div`
@@ -119,9 +120,11 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
   reason, 
   score,
   ticketsLeft,
-  onPlayAgain
+  onPlayAgain,
+  onNavigateToFriends
 }) => {
   return (
+    
     <Container>
       <HeroImage src={hero} alt="Hero" />
       <BoxContainer>
@@ -152,13 +155,14 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
         </PlayAgainButton>
       ) : (
         <>
-          <InviteButton>
+          <InviteButton onClick={onNavigateToFriends}>
             <span>INVITE A FREN</span>
           </InviteButton>
           <LoginText>OR LOGIN TOMORROW</LoginText>
         </>
       )}
     </Container>
+    
   );
 };
 

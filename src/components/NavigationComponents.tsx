@@ -13,6 +13,7 @@ import tasksActive from '../assets/taskasA.svg';
 import tasksDefault from '../assets/tasksD.svg';
 import { get, getDatabase, ref } from 'firebase/database';
 import hudBackground from '../assets/HUDbottom.svg';
+import InviteComponent from '../InviteComponent';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -93,9 +94,23 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   return (
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
+      
+      {/* Invite Section */}
       <div className="card">
-        <h2 className="text-glow text-lg mb-2">Welcome, {telegramUser?.first_name}</h2>
-        <h3 className="text-glow text-lg mb-2">Leaderboard</h3>
+        <h2 className="text-glow text-lg mb-2">Invite Friends</h2>
+        <p className="text-info mb-4">
+          Invite friends to play and earn permanent extra tickets!
+          Each invited friend gives you +1 ticket permanently.
+        </p>
+        <InviteComponent 
+          botUsername="moonstonesgamebot" 
+          userId={telegramUser?.id.toString()}
+        />
+      </div>
+
+      {/* Existing Leaderboard Section */}
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Leaderboard</h2>
         <p className="text-info">Coming soon...</p>
       </div>
       

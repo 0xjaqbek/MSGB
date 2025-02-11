@@ -80,8 +80,9 @@ interface ContentProps {
     isFirstVisit: boolean;
     playsRemaining: number;
   } | null;
+  onGameOver?: (score: number) => void;  // Move this out of userStats
+  onNavigateToFriends?: () => void;      // Move this out of userStats
 }
-
 
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
   const db = getDatabase();
@@ -101,7 +102,12 @@ export const getUserVisitStats = async (userId: string): Promise<UserVisit | nul
 
 const GAME_DURATION = 60; // 60 seconds for the game
 
-const Content: React.FC<ContentProps> = ({ onGameStateChange, userStats }) => {
+const Content: React.FC<ContentProps> = ({ 
+  onGameStateChange, 
+  userStats, 
+  onGameOver,
+  onNavigateToFriends 
+}) => {
   const [showBlink, setShowBlink] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState(0);
@@ -592,18 +598,41 @@ const handlePlayAgain = () => {
   window.dispatchEvent(event);
 };
 
+useEffect(() => {
+  if (gameOver) {
+    setIsPlaying(false);
+    setEndGameReason('game-over');
+    setShowEndGame(true);
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.MainButton.text = "Play Again";
+      tg.MainButton.hide();
+      updateScore();
+      tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+    }
+    // Add this line to call onGameOver when game ends
+    onGameOver?.(score);
+    
+    // If no plays remaining, navigate to friends page
+    if (userStats?.playsRemaining === 0) {
+      onNavigateToFriends?.();
+    }
+  }
+}, [gameOver, score, onGameOver, onNavigateToFriends, userStats?.playsRemaining]);
+
 return (
   <StyledContent>
-    {showEndGame ? (
-      <EndGamePage
-        reason={endGameReason}
-        score={endGameReason === 'game-over' ? score : undefined}
-        ticketsLeft={userStats?.playsRemaining || 0}
-        onPlayAgain={handlePlayAgain}
-        onShare={handleShare}
-        onClose={handleClose}
-      />
-    ) : (
+        {showEndGame ? (
+          <EndGamePage
+            reason={endGameReason}
+            score={endGameReason === 'game-over' ? score : undefined}
+            ticketsLeft={userStats?.playsRemaining || 0}
+            onPlayAgain={handlePlayAgain}
+            onShare={handleShare}
+            onClose={handleClose}
+            onNavigateToFriends={onNavigateToFriends} // Add this line
+          />
+        ) : (
       <>
         {isPlaying && <NebulaEffect />}  {/* Add this line */}
         
