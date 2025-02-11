@@ -7,9 +7,8 @@ export interface UserVisit {
   totalVisits: number;
   dailyVisits: { [key: string]: number };
   firstVisitComplete: boolean;
-  playsToday: number;
-  maxPlaysToday: number;
-  playsRemaining: number;
+  playsToday: number;  // Added for plays tracking
+  maxPlaysToday: number;  // Added for plays tracking
 }
 
 export interface VisitHistoryEntry {
@@ -122,37 +121,34 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     }
   };
 
-  export const updatePlayCount = async (userId: string): Promise<number> => {
-    const db = getDatabase();
-    const userVisitsRef = ref(db, `users/${userId}/visits`);
-    
-    try {
-      const snapshot = await get(userVisitsRef);
-      if (!snapshot.exists()) {
-        throw new Error('User not found');
-      }
-      
-      const userData = snapshot.val() as UserVisit;
-      const maxPlays = calculateMaxPlays(userData.currentStreak);
-      const newPlaysCount = (userData.playsToday || 0) + 1;
-      
-      if (newPlaysCount > maxPlays) {
-        return -1; // No plays remaining
-      }
-      
-      await set(userVisitsRef, {
-        ...userData,
-        playsToday: newPlaysCount,
-        maxPlaysToday: maxPlays,
-        playsRemaining: maxPlays - newPlaysCount
-      });
-      
-      return maxPlays - newPlaysCount; // Return remaining plays
-    } catch (error) {
-      console.error('Error updating play count:', error);
-      throw error;
+export const updatePlayCount = async (userId: string): Promise<number> => {
+  const db = getDatabase();
+  const userVisitsRef = ref(db, `users/${userId}/visits`);
+  
+  try {
+    const snapshot = await get(userVisitsRef);
+    if (!snapshot.exists()) {
+      throw new Error('User not found');
     }
-  };
+    
+    const userData = snapshot.val() as UserVisit;
+    const newPlaysCount = userData.playsToday + 1;
+    
+    if (newPlaysCount > userData.maxPlaysToday) {
+      return -1; // No plays remaining
+    }
+    
+    await set(userVisitsRef, {
+      ...userData,
+      playsToday: newPlaysCount
+    });
+    
+    return userData.maxPlaysToday - newPlaysCount; // Return remaining plays
+  } catch (error) {
+    console.error('Error updating play count:', error);
+    throw error;
+  }
+};
 
 export const getUserVisitStats = async (userId: string): Promise<VisitStats | null> => {
   const db = getDatabase();
@@ -175,56 +171,6 @@ export const getUserVisitStats = async (userId: string): Promise<VisitStats | nu
     };
   } catch (error) {
     console.error('Error getting user visit stats:', error);
-    throw error;
-  }
-};
-
-export const handleReferral = async (newUserId: string, referrerId: string) => {
-  const db = getDatabase();
-  
-  try {
-    // Add referral record
-    await set(ref(db, `users/${newUserId}/referredBy`), {
-      userId: referrerId,
-      timestamp: Date.now()
-    });
-
-    // Add to referrer's invited list
-    await set(ref(db, `users/${referrerId}/invited/${newUserId}`), {
-      timestamp: Date.now()
-    });
-
-    // Increment referrer's invitedFriends count
-    const referrerRef = ref(db, `users/${referrerId}/invitedFriends`);
-    const snapshot = await get(referrerRef);
-    const currentCount = snapshot.exists() ? snapshot.val() : 0;
-    await set(referrerRef, currentCount + 1);
-
-    // Give bonus tickets to both users
-    await addBonusTickets(newUserId, 2); // 2 bonus tickets for new user
-    await addBonusTickets(referrerId, 1); // 1 bonus ticket for referrer
-  } catch (error) {
-    console.error('Error handling referral:', error);
-    throw error;
-  }
-};
-
-export const addBonusTickets = async (userId: string, amount: number) => {
-  const db = getDatabase();
-  const userVisitsRef = ref(db, `users/${userId}/visits`);
-  
-  try {
-    const snapshot = await get(userVisitsRef);
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      await set(userVisitsRef, {
-        ...userData,
-        maxPlaysToday: (userData.maxPlaysToday || 5) + amount,
-        playsRemaining: (userData.playsRemaining || 0) + amount
-      });
-    }
-  } catch (error) {
-    console.error('Error adding bonus tickets:', error);
     throw error;
   }
 };

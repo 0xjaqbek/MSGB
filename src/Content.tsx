@@ -56,8 +56,6 @@ type TelegramUser = {
 };
 
 interface UserVisit {
-  maxPlaysToday: any;
-  playsToday: any;
   lastVisit: string;
   currentStreak: number;
   highestStreak: number;
@@ -239,44 +237,10 @@ const getTotalPoints = async (playerId: string) => {
   }, [isPlaying, onGameStateChange]);
 
   const handleStartClick = async () => {
-    if (!telegramUser?.id) return;
-    
-    try {
-      // Get latest stats
-      const visitStats = await getUserVisitStats(telegramUser.id.toString());
-      if (!visitStats || visitStats.maxPlaysToday - visitStats.playsToday <= 0) {
-        setEndGameReason('no-plays');
-        setShowEndGame(true);
-        return;
-      }
-      
-      // Update play count and get remaining plays
-      const remainingPlays = await updatePlayCount(telegramUser.id.toString());
-      if (remainingPlays < 0) {
-        setEndGameReason('no-plays');
-        setShowEndGame(true);
-        return;
-      }
-      
-      setPlaysRemaining(remainingPlays);
-      setIsStartAnimating(false);
-      setIsPlaying(true);
-      setScore(0);
-      setGameOver(false);
-      setDifficulty(1);
-      setCurrentStones([]);
-      setStoneIdCounter(0);
-      setRemainingTime(GAME_DURATION);
+    const tg = window.Telegram?.WebApp;
+    if (!tg?.initDataUnsafe?.user?.id) return;
   
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.MainButton.hide();
-        tg.sendData(JSON.stringify({ action: 'gameStarted' }));
-      }
-    } catch (error) {
-      console.error('Error starting game:', error);
-      alert("There was an error starting the game. Please try again.");
-    }
+    setIsStartAnimating(true); // Start animation
   };
   
   const handleAnimationComplete = async () => {
@@ -599,7 +563,7 @@ const PointsDisplay = styled.div`
 
 const PointsText = styled.span`
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
 `;
 
