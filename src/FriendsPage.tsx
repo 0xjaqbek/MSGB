@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, get, set } from 'firebase/database';
-import { TelegramUser } from '../src/types';
+import { TelegramUser } from './types';
 
 interface FriendsPageProps {
   telegramUser: TelegramUser | null;
@@ -11,83 +11,84 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [inputCode, setInputCode] = useState('');
   const [message, setMessage] = useState('');
   const [friendCount, setFriendCount] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
 
+  // Fetch existing friend code and friend count
   useEffect(() => {
     if (!telegramUser) return;
-    
-    const fetchFriendCount = async () => {
+
+    const fetchInitialData = async () => {
       const db = getDatabase();
-      const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
       
+      // Fetch friend code
       try {
-        const snapshot = await get(friendsRef);
-        if (snapshot.exists()) {
-          setFriendCount(Object.keys(snapshot.val()).length);
+        const codesRef = ref(db, 'friendCodes');
+        const codesSnapshot = await get(codesRef);
+        
+        if (codesSnapshot.exists()) {
+          const codes = codesSnapshot.val();
+          for (const [code, data] of Object.entries(codes)) {
+            if (typeof data === 'object' && data !== null && 'userId' in data) {
+              if (data.userId === telegramUser.id) {
+                setFriendCode(code as string);
+                break;
+              }
+            }
+          }
+        }
+
+        // Fetch friend count
+        const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+        const friendsSnapshot = await get(friendsRef);
+        
+        if (friendsSnapshot.exists()) {
+          setFriendCount(Object.keys(friendsSnapshot.val()).length);
         }
       } catch (error) {
-        console.error('Error fetching friend count:', error);
+        console.error('Error fetching initial data:', error);
       }
     };
 
-    fetchFriendCount();
+    fetchInitialData();
   }, [telegramUser]);
 
   const handleGenerateCode = async () => {
-    console.log('Generate Code button clicked');
-    if (!telegramUser || isGenerating) return;
+    if (!telegramUser) return;
     
-    setIsGenerating(true);
     try {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       const db = getDatabase();
-
-      // Log database write attempt
-      console.log('Attempting to write code to database:', code);
       
       await set(ref(db, `friendCodes/${code}`), {
         userId: telegramUser.id,
         createdAt: Date.now()
       });
       
-      console.log('Successfully wrote code to database');
       setFriendCode(code);
-      setMessage('Code generated successfully!');
+      setMessage('New code generated successfully!');
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error generating code:', error);
       setMessage('Error generating code. Please try again.');
-    } finally {
-      setIsGenerating(false);
     }
   };
 
   const handleInvite = () => {
-    console.log('Share Game Link button clicked');
     if (!telegramUser) {
-      console.log('No telegram user found');
+      setMessage('Error: User not found');
       return;
     }
 
     try {
       const inviteLink = `https://t.me/moonstonesgamebot?start=invite_${telegramUser.id}`;
-      console.log('Generated invite link:', inviteLink);
-
-      // Get Telegram WebApp instance
-      const tg = window.Telegram?.WebApp;
-      console.log('Telegram WebApp object:', tg);
-
-      if (tg) {
-        // Send the share request
-        tg.sendData(JSON.stringify({ 
-          action: 'share_invite',
-          link: inviteLink
-        }));
-        console.log('Share request sent to Telegram');
-      } else {
-        console.error('Telegram WebApp not available');
-        setMessage('Error: Telegram WebApp not available');
-      }
+      navigator.clipboard.writeText(inviteLink)
+        .then(() => {
+          setMessage('Invite link copied to clipboard!');
+          setTimeout(() => setMessage(''), 3000);
+        })
+        .catch(() => {
+          setMessage('Failed to copy link');
+        });
     } catch (error) {
       console.error('Error in handleInvite:', error);
       setMessage('Error sharing invite link');
@@ -95,7 +96,6 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   };
 
   const handleRedeemCode = async () => {
-    console.log('Redeem Code button clicked');
     if (!telegramUser || !inputCode || isRedeeming) return;
     
     setIsRedeeming(true);
@@ -112,6 +112,15 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       const codeData = snapshot.val();
       if (codeData.userId === telegramUser.id) {
         setMessage('Cannot use your own code');
+        return;
+      }
+      
+      // Check if already friends
+      const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${codeData.userId}`);
+      const existingFriendSnapshot = await get(existingFriendRef);
+      
+      if (existingFriendSnapshot.exists()) {
+        setMessage('Already friends with this user');
         return;
       }
       
@@ -136,6 +145,9 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       setMessage('Friend added successfully!');
       setInputCode('');
       setFriendCount(prev => prev + 1);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error redeeming code:', error);
       setMessage('Error redeeming code. Please try again.');
@@ -163,27 +175,21 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         >
           Share Game Link
         </button>
-        {message && (
-          <div className="text-center text-sm text-cyan-400">
-            {message}
-          </div>
-        )}
       </div>
       
       <div className="card">
         <h2 className="text-glow text-lg mb-2">Friend Code</h2>
-        <button 
-          onClick={handleGenerateCode}
-          disabled={isGenerating}
-          className="w-full p-4 mb-4 border-2 border-purple-400 text-purple-400 rounded-xl hover:bg-purple-400/10 disabled:opacity-50"
-        >
-          {isGenerating ? 'Generating...' : 'Generate Code'}
-        </button>
-        
-        {friendCode && (
+        {friendCode ? (
           <div className="text-center p-4 bg-purple-400/10 rounded-xl mb-4">
             <span className="text-purple-400 text-xl font-bold">{friendCode}</span>
           </div>
+        ) : (
+          <button 
+            onClick={handleGenerateCode}
+            className="w-full p-4 mb-4 border-2 border-purple-400 text-purple-400 rounded-xl hover:bg-purple-400/10"
+          >
+            Generate Code
+          </button>
         )}
         
         <div className="flex flex-col gap-4">
@@ -203,18 +209,18 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
           >
             {isRedeeming ? 'Redeeming...' : 'Redeem Code'}
           </button>
-          
-          {message && (
-            <div className={`text-center ${
-              message.includes('Error') || message.includes('Invalid') 
-                ? 'text-red-400' 
-                : 'text-green-400'
-            }`}>
-              {message}
-            </div>
-          )}
         </div>
       </div>
+      
+      {message && (
+        <div className={`text-center mt-4 ${
+          message.includes('Error') || message.includes('Invalid') 
+            ? 'text-red-400' 
+            : 'text-green-400'
+        }`}>
+          {message}
+        </div>
+      )}
     </div>
   );
 };
