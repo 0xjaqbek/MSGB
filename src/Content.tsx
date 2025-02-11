@@ -305,20 +305,7 @@ useEffect(() => {
 }, [isPlaying, gameOver]);
 
 
-useEffect(() => {
-  if (gameOver) {
-    setIsPlaying(false);
-    setEndGameReason('game-over');
-    setShowEndGame(true);
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.MainButton.text = "Play Again";
-      tg.MainButton.hide();
-      updateScore();
-      tg.sendData(JSON.stringify({ action: 'gameOver', score }));
-    }
-  }
-}, [gameOver, score]);
+
 
   const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
@@ -454,6 +441,38 @@ const updateScore = useCallback(async () => {
     console.error('Error updating score:', error);
   }
 }, [score, remainingTime, telegramUser, database]);
+
+// Single consolidated gameOver effect
+useEffect(() => {
+  if (gameOver) {
+    const handleGameOver = async () => {
+      setIsPlaying(false);
+      setEndGameReason('game-over');
+      setShowEndGame(true);
+      
+      // Update score once
+      await updateScore();
+      
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.MainButton.text = "Play Again";
+        tg.MainButton.hide();
+        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+      }
+
+      // Call onGameOver callback
+      onGameOver?.(score);
+      
+      // Navigate to friends if no plays remaining
+      if (userStats?.playsRemaining === 0) {
+        onNavigateToFriends?.();
+      }
+    };
+
+    handleGameOver();
+  }
+}, [gameOver, score, updateScore, onGameOver, onNavigateToFriends, userStats?.playsRemaining]);
+
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
@@ -597,28 +616,6 @@ const handlePlayAgain = () => {
   const event = new CustomEvent('start-game');
   window.dispatchEvent(event);
 };
-
-useEffect(() => {
-  if (gameOver) {
-    setIsPlaying(false);
-    setEndGameReason('game-over');
-    setShowEndGame(true);
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.MainButton.text = "Play Again";
-      tg.MainButton.hide();
-      updateScore();
-      tg.sendData(JSON.stringify({ action: 'gameOver', score }));
-    }
-    // Add this line to call onGameOver when game ends
-    onGameOver?.(score);
-    
-    // If no plays remaining, navigate to friends page
-    if (userStats?.playsRemaining === 0) {
-      onNavigateToFriends?.();
-    }
-  }
-}, [gameOver, score, onGameOver, onNavigateToFriends, userStats?.playsRemaining]);
 
 return (
   <StyledContent>
