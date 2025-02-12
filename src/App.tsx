@@ -58,54 +58,55 @@ function App() {
 
 // In App.tsx, modify just the initializeApp function
 useEffect(() => {
-  const initializeApp = async () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      // Add these lines for URL parameter checking
-      const urlParams = new URLSearchParams(window.location.search);
-      const refParam = urlParams.get('ref');
-      
-      console.log('Init Data:', {
-        startParam: tg.initDataUnsafe?.start_param,
-        urlParams: Object.fromEntries(urlParams.entries()),
-        refParam: refParam,
-        fullUrl: window.location.href
-      });
+// In App.tsx, update the initializeApp function
+const initializeApp = async () => {
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    // Get parameter from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const startParam = urlParams.get('tgWebAppStartParam'); // Changed from 'ref' to 'tgWebAppStartParam'
+    
+    console.log('App initialization:', {
+      startParam,
+      urlParams: Object.fromEntries(urlParams.entries()),
+      fullUrl: window.location.href
+    });
 
-      tg.ready();
-      tg.expand();
-      
-      if (!tg.isOrientationLocked) {
-        tg.lockOrientation();
-      }
-      
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobileTelegram(isMobile);
+    tg.ready();
+    tg.expand();
+    
+    if (!tg.isOrientationLocked) {
+      tg.lockOrientation();
+    }
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobileTelegram(isMobile);
 
-      (tg as any).requestFullscreen?.();
-      const user = tg.initDataUnsafe?.user;
-      
-      if (user) {
-        setTelegramUser(user as TelegramUser);
-        try {
-          // Try both parameters
-          const startParam = tg.initDataUnsafe?.start_param;
-          const inviteParam = refParam || startParam;
-          
-          if (inviteParam?.startsWith('ref_')) {
-            console.log('Processing invite parameter:', inviteParam);
-            await processInviteLink(user.id.toString(), inviteParam);
-          }
-          
-          const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
-          setUserStats(visitStats);
-        } catch (error) {
-          console.error('Error in initialization:', error);
+    (tg as any).requestFullscreen?.();
+    const user = tg.initDataUnsafe?.user;
+    
+    if (user) {
+      setTelegramUser(user as TelegramUser);
+      try {
+        // Check for referral parameter
+        if (startParam?.startsWith('ref_')) {
+          console.log('Processing referral:', {
+            userId: user.id,
+            startParam,
+            userName: user.first_name
+          });
+          await processInviteLink(user.id.toString(), startParam);
+          console.log('Referral processed successfully');
         }
+        
+        const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
+        setUserStats(visitStats);
+      } catch (error) {
+        console.error('Error in initialization:', error);
       }
     }
-  };
-
+  }
+};
   initializeApp();
 }, []);
 
