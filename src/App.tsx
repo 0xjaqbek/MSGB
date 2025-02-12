@@ -56,75 +56,50 @@ function App() {
 //    </div>
 //  );
 
-useEffect(() => {
-  const initializeApp = async () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      // Add more detailed logging
-      console.log('Raw Telegram WebApp data:', tg);
-      console.log('InitDataUnsafe:', tg.initDataUnsafe);
-      console.log('Start Parameter:', tg.initDataUnsafe?.start_param);
-      console.log('Parsed start_param:', {
-        raw: tg.initDataUnsafe?.start_param,
-        isString: typeof tg.initDataUnsafe?.start_param === 'string',
-        value: tg.initDataUnsafe?.start_param
-      });
-      
-      tg.ready();
-      tg.expand();
-      
-      if (!tg.isOrientationLocked) {
-        tg.lockOrientation();
-      }
-      
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobileTelegram(isMobile);
+// In App.tsx, update initializeApp
+const initializeApp = async () => {
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    // Get ref parameter from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get('ref');
+    
+    console.log('Initialization data:', {
+      webAppData: tg.initDataUnsafe,
+      urlParams: Object.fromEntries(urlParams.entries()),
+      refParam: refParam,
+      fullUrl: window.location.href
+    });
 
-      (tg as any).requestFullscreen?.();
-      const user = tg.initDataUnsafe?.user;
-      const startParam = tg.initDataUnsafe?.start_param;
-      
-      if (user) {
-        setTelegramUser(user as TelegramUser);
-        try {
-          // Added additional logging for invite processing
-          if (startParam) {
-            console.log('Processing invite:', {
-              startParam,
-              userId: user.id,
-              isRef: startParam.startsWith('ref_'),
-              referrerId: startParam.replace('ref_', '')
-            });
-            await processInviteLink(user.id.toString(), startParam);
-            
-            // Verify the referral data was saved
-            const db = getDatabase();
-            const userRef = ref(db, `users/${user.id}`);
-            const snapshot = await get(userRef);
-            console.log('User data after invite processing:', snapshot.val());
-          }
-          
-          const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
-          setUserStats(visitStats);
-          
-          // Check final state
-          const db = getDatabase();
-          const finalDataRef = ref(db, `users/${user.id}`);
-          const finalData = await get(finalDataRef);
-          console.log('Final user data:', finalData.val());
-        } catch (error) {
-          console.error('Error in initialization:', error);
-        }
-      } else {
-        console.log('No user data found');
-      }
-    } else {
-      console.log('Telegram WebApp not found');
+    tg.ready();
+    tg.expand();
+    
+    if (!tg.isOrientationLocked) {
+      tg.lockOrientation();
     }
-  };
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobileTelegram(isMobile);
 
-  initializeApp();
-}, []);
+    (tg as any).requestFullscreen?.();
+    const user = tg.initDataUnsafe?.user;
+    
+    if (user) {
+      setTelegramUser(user as TelegramUser);
+      try {
+        if (refParam?.startsWith('ref_')) {
+          console.log('Processing referral:', refParam);
+          await processInviteLink(user.id.toString(), refParam);
+        }
+        
+        const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
+        setUserStats(visitStats);
+      } catch (error) {
+        console.error('Error in initialization:', error);
+      }
+    }
+  }
+};
 
 const handleNavigateToFriends = () => {
   setCurrentPage('friends');
