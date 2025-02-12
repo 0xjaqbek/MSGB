@@ -56,58 +56,42 @@ function App() {
 //    </div>
 //  );
 
-// In App.tsx, modify just the initializeApp function
 useEffect(() => {
-// In App.tsx, update the initializeApp function
-const initializeApp = async () => {
-  const tg = window.Telegram?.WebApp;
-  if (tg) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const inviteParam = urlParams.get('tgWebAppStartParam');
-    
-    console.log('App initialization:', {
-      urlParams: Object.fromEntries(urlParams.entries()),
-      inviteParam,
-      user: tg.initDataUnsafe?.user
-    });
+  const initializeApp = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      
+      if (!tg.isOrientationLocked) {
+        tg.lockOrientation();
+      }
+      
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobileTelegram(isMobile);
 
-    tg.ready();
-    tg.expand();
-    
-    if (!tg.isOrientationLocked) {
-      tg.lockOrientation();
-    }
-    
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    setIsMobileTelegram(isMobile);
-
-    (tg as any).requestFullscreen?.();
-    const user = tg.initDataUnsafe?.user;
-    
-    if (user) {
-      setTelegramUser(user as TelegramUser);
-      try {
-        // Check for invite parameter
-        if (inviteParam && inviteParam.startsWith('ref_')) {
-          console.log('Found invite parameter:', inviteParam);
-          try {
+      (tg as any).requestFullscreen?.();
+      const user = tg.initDataUnsafe?.user;
+      const urlParams = new URLSearchParams(window.location.search);
+      const inviteParam = urlParams.get('tgWebAppStartParam');
+      
+      if (user) {
+        setTelegramUser(user as TelegramUser);
+        try {
+          // Process invite if present
+          if (inviteParam?.startsWith('ref_')) {
+            console.log('Processing invite:', inviteParam);
             await processInviteLink(user.id.toString(), inviteParam);
-            console.log('Successfully processed invite link');
-          } catch (inviteError) {
-            console.error('Error processing invite:', inviteError);
           }
-        } else {
-          console.log('No invite parameter found');
+          
+          const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
+          setUserStats(visitStats);
+        } catch (error) {
+          console.error('Error in initialization:', error);
         }
-        
-        const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
-        setUserStats(visitStats);
-      } catch (error) {
-        console.error('Error in initialization:', error);
       }
     }
-  }
-};
+  };
 
   initializeApp();
 }, []);
