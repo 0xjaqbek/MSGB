@@ -15,75 +15,78 @@ const bot = new TelegramBot(token, {
 const app = express();
 app.use(express.json());
 
+// Keep track of processed messages to prevent duplicates
+const processedMessages = new Set();
+
 // Handle /start command
 bot.onText(/\/start(.+)?/, async (msg, match) => {
+  // Check if message was already processed
+  const messageId = `${msg.chat.id}_${msg.message_id}`;
+  if (processedMessages.has(messageId)) {
+    return;
+  }
+  processedMessages.add(messageId);
+
   const chatId = msg.chat.id;
   const startParam = match[1]?.trim();
   
   console.log('Start command received:', { chatId, startParam });
 
-  if (startParam?.startsWith('ref_')) {
-    const refParam = encodeURIComponent(startParam);
-    const webAppUrl = `${WEBAPP_URL}?ref=${refParam}`;
-    
-    console.log('Sending referral URL:', webAppUrl);
-    
-    await bot.sendMessage(chatId, '🎮 Welcome! Click button to play and claim your bonus:', {
-      reply_markup: {
-        inline_keyboard: [
-          [{
-            text: '🎮 Play with Bonus',
+  try {
+    if (startParam?.startsWith('ref_')) {
+      const webAppUrl = `${WEBAPP_URL}?tgWebAppStartParam=${startParam}`;
+      console.log('Sending referral webapp URL:', webAppUrl);
+      
+      await bot.sendMessage(chatId, '🎮 Welcome! Open the game to claim your bonus ticket:', {
+        reply_markup: {
+          inline_keyboard: [[{
+            text: '🎮 Play MoonStones',
             web_app: { url: webAppUrl }
-          }]
-        ]
-      }
-    });
-  } else {
-    await bot.sendMessage(chatId, '🎮 Welcome to MoonStones! Click to play:', {
-      reply_markup: {
-        inline_keyboard: [
-          [{
+          }]]
+        }
+      });
+    } else {
+      console.log('Sending regular webapp URL:', WEBAPP_URL);
+      await bot.sendMessage(chatId, '🎮 Welcome to MoonStones! Click below to start playing:', {
+        reply_markup: {
+          inline_keyboard: [[{
             text: '🎮 Play MoonStones',
             web_app: { url: WEBAPP_URL }
-          }]
-        ]
-      }
-    });
+          }]]
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error handling start command:', error);
   }
 });
 
 // Handle /invite command
 bot.onText(/\/invite/, async (msg) => {
+  const messageId = `${msg.chat.id}_${msg.message_id}`;
+  if (processedMessages.has(messageId)) {
+    return;
+  }
+  processedMessages.add(messageId);
+
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   const inviteLink = `https://t.me/moonstonesgamebot?start=ref_${userId}`;
   
-  console.log('Generating invite link:', inviteLink);
-  
-  await bot.sendMessage(chatId, 
-    `🎮 Share this link with friends to get bonus tickets!\n\n${inviteLink}`, 
-    { 
-      disable_web_page_preview: true,
-      reply_markup: {
-        inline_keyboard: [
-          [{
-            text: '📋 Copy Invite Link',
-            callback_data: 'copy_invite'
-          }]
-        ]
-      }
-    }
-  );
-});
-
-// Handle callback queries
-bot.on('callback_query', async (query) => {
-  if (query.data === 'copy_invite') {
-    const userId = query.from.id;
-    const inviteLink = `https://t.me/moonstonesgamebot?start=ref_${userId}`;
-    await bot.answerCallbackQuery(query.id, { text: 'Invite link copied!' });
+  try {
+    await bot.sendMessage(chatId, 
+      `🎮 Share this link with friends to get bonus tickets!\n\n${inviteLink}`, 
+      { disable_web_page_preview: true }
+    );
+  } catch (error) {
+    console.error('Error generating invite link:', error);
   }
 });
+
+// Clean up old processed messages periodically
+setInterval(() => {
+  processedMessages.clear();
+}, 30 * 60 * 1000); // Clear every 30 minutes
 
 app.listen(port, () => {
   console.log(`Bot server is running on port ${port}`);
