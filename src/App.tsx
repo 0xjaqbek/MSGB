@@ -62,14 +62,13 @@ useEffect(() => {
 const initializeApp = async () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
-    // Get parameter from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const startParam = urlParams.get('tgWebAppStartParam'); // Changed from 'ref' to 'tgWebAppStartParam'
+    const inviteParam = urlParams.get('tgWebAppStartParam');
     
     console.log('App initialization:', {
-      startParam,
       urlParams: Object.fromEntries(urlParams.entries()),
-      fullUrl: window.location.href
+      inviteParam,
+      user: tg.initDataUnsafe?.user
     });
 
     tg.ready();
@@ -88,15 +87,17 @@ const initializeApp = async () => {
     if (user) {
       setTelegramUser(user as TelegramUser);
       try {
-        // Check for referral parameter
-        if (startParam?.startsWith('ref_')) {
-          console.log('Processing referral:', {
-            userId: user.id,
-            startParam,
-            userName: user.first_name
-          });
-          await processInviteLink(user.id.toString(), startParam);
-          console.log('Referral processed successfully');
+        // Check for invite parameter
+        if (inviteParam && inviteParam.startsWith('ref_')) {
+          console.log('Found invite parameter:', inviteParam);
+          try {
+            await processInviteLink(user.id.toString(), inviteParam);
+            console.log('Successfully processed invite link');
+          } catch (inviteError) {
+            console.error('Error processing invite:', inviteError);
+          }
+        } else {
+          console.log('No invite parameter found');
         }
         
         const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
@@ -107,6 +108,7 @@ const initializeApp = async () => {
     }
   }
 };
+
   initializeApp();
 }, []);
 

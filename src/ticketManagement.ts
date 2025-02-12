@@ -27,61 +27,66 @@ interface ReferralData {
     ticketsFromInvites: number;
   }
   
-
-  export const processInviteLink = async (userId: string, startParam: string) => {
+// In ticketManagement.ts
+export const processInviteLink = async (userId: string, startParam: string) => {
     const db = getDatabase();
-    console.log('Starting invite processing:', { userId, startParam });
+    console.log('Processing invite:', { userId, startParam });
     
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
-      console.log('Processing referral:', { referrerId, userId });
+      console.log('Found referrer ID:', referrerId);
       
+      // Don't allow self-referral
       if (referrerId === userId) {
-        console.log('Self-referral detected, skipping');
+        console.log('Self-referral detected, ignoring');
         return;
       }
       
       try {
-        // First update the new user's data directly
-        console.log('Setting invited user data...');
-        await set(ref(db, `users/${userId}/referralInfo`), {
-          invitedBy: referrerId,
-          inviteTimestamp: Date.now()
+        // Get current data
+        const referrerRef = ref(db, `users/${referrerId}`);
+        const userRef = ref(db, `users/${userId}`);
+        
+        const [referrerSnapshot, userSnapshot] = await Promise.all([
+          get(referrerRef),
+          get(userRef)
+        ]);
+  
+        console.log('Current data:', {
+          referrerData: referrerSnapshot.val(),
+          userData: userSnapshot.val()
         });
   
-        // Then update the referrer's data
-        console.log('Updating referrer data...');
-        const referrerRef = ref(db, `users/${referrerId}/referralInfo`);
-        const referrerSnapshot = await get(referrerRef);
-        const referrerData = referrerSnapshot.val() || { invitedUsers: [], totalInvites: 0 };
+        // Update referrer data
+        const referrerUpdates = {
+          [`users/${referrerId}/referrals/invitedUsers`]: [
+            ...(referrerSnapshot.val()?.referrals?.invitedUsers || []),
+            userId
+          ],
+          [`users/${referrerId}/referrals/totalInvites`]: 
+            (referrerSnapshot.val()?.referrals?.totalInvites || 0) + 1
+        };
   
-        if (!referrerData.invitedUsers.includes(userId)) {
-          await set(referrerRef, {
-            ...referrerData,
-            invitedUsers: [...referrerData.invitedUsers, userId],
-            totalInvites: referrerData.totalInvites + 1
-          });
-        }
+        // Update new user data
+        const userUpdates = {
+          [`users/${userId}/referrals/invitedBy`]: referrerId,
+          [`users/${userId}/referrals/inviteTimestamp`]: Date.now()
+        };
   
-        // Set initial tickets
-        console.log('Setting initial tickets...');
-        await set(ref(db, `users/${userId}/visits`), {
-          maxPlaysToday: 6,  // Base 5 + 1 from invite
-          playsRemaining: 6,
-          playsToday: 0
+        // Apply all updates
+        await update(ref(db), {
+          ...referrerUpdates,
+          ...userUpdates
         });
   
-        // Verify the data was written
-        const finalCheck = await get(ref(db, `users/${userId}`));
-        console.log('Final data check:', finalCheck.val());
-  
+        console.log('Successfully updated referral data');
       } catch (error) {
-        console.error('Error in processInviteLink:', error);
+        console.error('Error processing invite:', error);
         throw error;
       }
     }
   };
-  
+
 export const calculateAvailableTickets = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const userRef = ref(db, `users/${userId}`);
