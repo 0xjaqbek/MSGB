@@ -45,13 +45,7 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     const now = new Date();
     const today = now.toISOString().split('T')[0];
     
-    // Get existing data to preserve referral info
-    const existingData = snapshot.exists() ? snapshot.val() : {};
-    const referralInfo = existingData.referralInfo;
-    
-    // Calculate maxPlays based on referral status
-    const baseMaxPlays = referralInfo?.invitedBy ? 6 : 5; // 6 if invited, 5 if not
-    
+    // If user doesn't exist, create initial user data
     if (!snapshot.exists()) {
       const initialVisit: VisitStats = {
         lastVisit: today,
@@ -63,66 +57,65 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
         isNewDay: true,
         isFirstVisit: true,
         todayVisits: 1,
-        playsRemaining: baseMaxPlays,
+        playsRemaining: 5,  // Default initial plays
         playsToday: 0,
-        maxPlaysToday: baseMaxPlays
+        maxPlaysToday: 5
       };
       
-      // Preserve referral info when setting initial data
-      await set(userRef, {
-        ...existingData,
-        visits: initialVisit
+      // Set initial data
+      await set(userRef, { 
+        visits: initialVisit,
+        userId: userId,
+        userName: userName
       });
       
       return initialVisit;
     }
     
+    // Existing user logic
     const userData = snapshot.val();
-    const lastVisitDate = new Date(userData.visits.lastVisit);
-    const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
-    const isNewDay = today !== lastVisitDay;
+    const existingVisits = userData.visits || {};
     
-    const daysSinceLastVisit = Math.floor(
-      (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    
-    let newStreak = userData.visits.currentStreak;
-    if (isNewDay) {
-      if (daysSinceLastVisit === 1) {
-        newStreak = userData.visits.currentStreak + 1;
-      } else if (daysSinceLastVisit > 1) {
-        newStreak = 1;
-      }
-    }
-    
-    const dailyVisits = { ...(userData.visits.dailyVisits || {}) };
-    dailyVisits[today] = (dailyVisits[today] || 0) + 1;
-    
-    const updatedVisit: VisitStats = {
-      lastVisit: today,
-      currentStreak: newStreak,
-      highestStreak: Math.max(newStreak, userData.visits.highestStreak || 1),
-      totalVisits: (userData.visits.totalVisits || 0) + 1,
-      dailyVisits,
-      firstVisitComplete: true,
-      isNewDay,
-      isFirstVisit: !userData.visits.firstVisitComplete,
-      todayVisits: dailyVisits[today],
-      playsRemaining: baseMaxPlays,
-      playsToday: 0,
-      maxPlaysToday: baseMaxPlays
+    // Provide default values if any property is missing
+    const processedVisits: VisitStats = {
+      lastVisit: existingVisits.lastVisit || today,
+      currentStreak: existingVisits.currentStreak || 1,
+      highestStreak: existingVisits.highestStreak || 1,
+      totalVisits: (existingVisits.totalVisits || 0) + 1,
+      dailyVisits: existingVisits.dailyVisits || { [today]: 1 },
+      firstVisitComplete: existingVisits.firstVisitComplete || false,
+      isNewDay: today !== existingVisits.lastVisit,
+      isFirstVisit: !existingVisits.firstVisitComplete,
+      todayVisits: (existingVisits.dailyVisits?.[today] || 0) + 1,
+      playsRemaining: existingVisits.playsRemaining || 5,
+      playsToday: (existingVisits.playsToday || 0) + 1,
+      maxPlaysToday: existingVisits.maxPlaysToday || 5
     };
     
-    // Preserve referral info when updating
-    await update(userRef, {
-      visits: updatedVisit,
-      referralInfo: referralInfo || {} // Keep existing referral info
+    // Update user data
+    await update(userRef, { 
+      visits: processedVisits 
     });
     
-    return updatedVisit;
+    return processedVisits;
   } catch (error) {
-    console.error('Error tracking user visit:', error);
-    throw error;
+    console.error('Error in trackUserVisit:', error);
+    
+    // Fallback to a default state if everything fails
+    return {
+      lastVisit: new Date().toISOString().split('T')[0],
+      currentStreak: 1,
+      highestStreak: 1,
+      totalVisits: 1,
+      dailyVisits: {},
+      firstVisitComplete: false,
+      isNewDay: true,
+      isFirstVisit: true,
+      todayVisits: 1,
+      playsRemaining: 5,
+      playsToday: 0,
+      maxPlaysToday: 5
+    };
   }
 };
 
