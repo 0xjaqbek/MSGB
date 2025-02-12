@@ -1,4 +1,4 @@
-import { getDatabase, ref, get, set } from 'firebase/database';
+import { getDatabase, ref, get, set, update } from 'firebase/database';
 
 export interface UserVisit {
   lastVisit: string;
@@ -37,89 +37,94 @@ const calculateMaxPlays = (streak: number): number => {
 };
 
 export const trackUserVisit = async (userId: string, userName: string): Promise<VisitStats> => {
-    const db = getDatabase();
-    const userVisitsRef = ref(db, `users/${userId}/visits`);
+  const db = getDatabase();
+  const userRef = ref(db, `users/${userId}`);
+  
+  try {
+    const snapshot = await get(userRef);
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
     
-    try {
-      const snapshot = await get(userVisitsRef);
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      
-      if (!snapshot.exists()) {
-        const maxPlays = calculateMaxPlays(1);
-        const initialVisit: VisitStats = {
-          lastVisit: today,
-          currentStreak: 1,
-          highestStreak: 1,
-          totalVisits: 1,
-          dailyVisits: { [today]: 1 },
-          firstVisitComplete: false,
-          isNewDay: true,
-          isFirstVisit: true,
-          todayVisits: 1,
-          playsRemaining: maxPlays,
-          playsToday: 0,
-          maxPlaysToday: maxPlays
-        };
-        
-        await set(userVisitsRef, initialVisit);
-        return initialVisit;
-      }
-      
-      const userData = snapshot.val() as VisitStats;
-      const lastVisitDate = new Date(userData.lastVisit);
-      const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
-      const isNewDay = today !== lastVisitDay;
-      
-      const daysSinceLastVisit = Math.floor(
-        (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      
-      let newStreak = userData.currentStreak;
-      
-      if (isNewDay) {
-        if (daysSinceLastVisit === 1) {
-          newStreak = userData.currentStreak + 1;
-        } else if (daysSinceLastVisit > 1) {
-          newStreak = 1;
-        }
-      }
-      
-      const maxPlays = calculateMaxPlays(newStreak);
-      const playsToday = isNewDay ? 0 : (userData.playsToday || 0);
-      const dailyVisits = { ...userData.dailyVisits };
-      dailyVisits[today] = (dailyVisits[today] || 0) + 1;
-      
-      const updatedVisit: VisitStats = {
+    // Get existing data to preserve referral info
+    const existingData = snapshot.exists() ? snapshot.val() : {};
+    const referralInfo = existingData.referralInfo;
+    
+    // Calculate maxPlays based on referral status
+    const baseMaxPlays = referralInfo?.invitedBy ? 6 : 5; // 6 if invited, 5 if not
+    
+    if (!snapshot.exists()) {
+      const initialVisit: VisitStats = {
         lastVisit: today,
-        currentStreak: newStreak,
-        highestStreak: Math.max(newStreak, userData.highestStreak),
-        totalVisits: userData.totalVisits + 1,
-        dailyVisits,
-        firstVisitComplete: true,
-        isNewDay,
-        isFirstVisit: !userData.firstVisitComplete,
-        todayVisits: dailyVisits[today],
-        playsRemaining: maxPlays - playsToday,
-        playsToday,
-        maxPlaysToday: maxPlays
+        currentStreak: 1,
+        highestStreak: 1,
+        totalVisits: 1,
+        dailyVisits: { [today]: 1 },
+        firstVisitComplete: false,
+        isNewDay: true,
+        isFirstVisit: true,
+        todayVisits: 1,
+        playsRemaining: baseMaxPlays,
+        playsToday: 0,
+        maxPlaysToday: baseMaxPlays
       };
       
-      const visitHistoryRef = ref(db, `users/${userId}/visitHistory/${now.getTime()}`);
-      await set(visitHistoryRef, {
-        timestamp: now.toISOString(),
-        userName: userName,
-        streak: newStreak
+      // Preserve referral info when setting initial data
+      await set(userRef, {
+        ...existingData,
+        visits: initialVisit
       });
       
-      await set(userVisitsRef, updatedVisit);
-      return updatedVisit;
-      
-    } catch (error) {
-      console.error('Error tracking user visit:', error);
-      throw error;
+      return initialVisit;
     }
-  };
+    
+    const userData = snapshot.val();
+    const lastVisitDate = new Date(userData.visits.lastVisit);
+    const lastVisitDay = lastVisitDate.toISOString().split('T')[0];
+    const isNewDay = today !== lastVisitDay;
+    
+    const daysSinceLastVisit = Math.floor(
+      (now.getTime() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    
+    let newStreak = userData.visits.currentStreak;
+    if (isNewDay) {
+      if (daysSinceLastVisit === 1) {
+        newStreak = userData.visits.currentStreak + 1;
+      } else if (daysSinceLastVisit > 1) {
+        newStreak = 1;
+      }
+    }
+    
+    const dailyVisits = { ...(userData.visits.dailyVisits || {}) };
+    dailyVisits[today] = (dailyVisits[today] || 0) + 1;
+    
+    const updatedVisit: VisitStats = {
+      lastVisit: today,
+      currentStreak: newStreak,
+      highestStreak: Math.max(newStreak, userData.visits.highestStreak || 1),
+      totalVisits: (userData.visits.totalVisits || 0) + 1,
+      dailyVisits,
+      firstVisitComplete: true,
+      isNewDay,
+      isFirstVisit: !userData.visits.firstVisitComplete,
+      todayVisits: dailyVisits[today],
+      playsRemaining: baseMaxPlays,
+      playsToday: 0,
+      maxPlaysToday: baseMaxPlays
+    };
+    
+    // Preserve referral info when updating
+    await update(userRef, {
+      visits: updatedVisit,
+      referralInfo: referralInfo || {} // Keep existing referral info
+    });
+    
+    return updatedVisit;
+  } catch (error) {
+    console.error('Error tracking user visit:', error);
+    throw error;
+  }
+};
 
 export const updatePlayCount = async (userId: string): Promise<number> => {
   const db = getDatabase();
