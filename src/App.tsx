@@ -56,48 +56,58 @@ function App() {
 //    </div>
 //  );
 
+// In App.tsx, modify just the initializeApp function
 useEffect(() => {
-  const initializeApp = async () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      // Prepare for multiple ways of getting start parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlStartParam = urlParams.get('tgWebAppStartParam');
-      const initDataStartParam = tg.initDataUnsafe?.start_param;
-      const startParam = urlStartParam || initDataStartParam;
+// In App.tsx, update the initializeApp function
+const initializeApp = async () => {
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const inviteParam = urlParams.get('tgWebAppStartParam');
+    
+    console.log('App initialization:', {
+      urlParams: Object.fromEntries(urlParams.entries()),
+      inviteParam,
+      user: tg.initDataUnsafe?.user
+    });
 
+    tg.ready();
+    tg.expand();
+    
+    if (!tg.isOrientationLocked) {
+      tg.lockOrientation();
+    }
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobileTelegram(isMobile);
+
+    (tg as any).requestFullscreen?.();
+    const user = tg.initDataUnsafe?.user;
+    
+    if (user) {
+      setTelegramUser(user as TelegramUser);
       try {
-        tg.ready();
-        tg.expand();
-        
-        if (!tg.isOrientationLocked) {
-          tg.lockOrientation();
-        }
-        
-        const user = tg.initDataUnsafe?.user;
-        
-        if (user) {
-          setTelegramUser(user as TelegramUser);
-          
-          // Process invite link if exists
-          if (startParam && startParam.startsWith('ref_')) {
-            try {
-              await processInviteLink(user.id.toString(), startParam);
-            } catch (inviteError) {
-              console.error('Invite processing error:', inviteError);
-              // Continue with app initialization even if invite fails
-            }
+        // Check for invite parameter
+        if (inviteParam && inviteParam.startsWith('ref_')) {
+          console.log('Found invite parameter:', inviteParam);
+          try {
+            await processInviteLink(user.id.toString(), inviteParam);
+            console.log('Successfully processed invite link');
+          } catch (inviteError) {
+            console.error('Error processing invite:', inviteError);
           }
-          
-          // Always track user visit
-          const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
-          setUserStats(visitStats);
+        } else {
+          console.log('No invite parameter found');
         }
+        
+        const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
+        setUserStats(visitStats);
       } catch (error) {
-        console.error('Initialization error:', error);
+        console.error('Error in initialization:', error);
       }
     }
-  };
+  }
+};
 
   initializeApp();
 }, []);
