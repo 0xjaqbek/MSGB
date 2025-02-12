@@ -59,18 +59,22 @@ export const processInviteLink = async (userId: string, startParam: string) => {
   
         // Update referrer data
         const referrerUpdates = {
-          [`users/${referrerId}/referrals/invitedUsers`]: [
+            [`users/${referrerId}/referrals/invitedUsers`]: [
             ...(referrerSnapshot.val()?.referrals?.invitedUsers || []),
             userId
-          ],
-          [`users/${referrerId}/referrals/totalInvites`]: 
-            (referrerSnapshot.val()?.referrals?.totalInvites || 0) + 1
+            ],
+            [`users/${referrerId}/referrals/totalInvites`]: 
+            (referrerSnapshot.val()?.referrals?.totalInvites || 0) + 1,
+            [`users/${referrerId}/referrals/ticketsFromInvites`]: 
+            (referrerSnapshot.val()?.referrals?.ticketsFromInvites || 0) + 1
         };
-  
+        
         // Update new user data
         const userUpdates = {
-          [`users/${userId}/referrals/invitedBy`]: referrerId,
-          [`users/${userId}/referrals/inviteTimestamp`]: Date.now()
+            [`users/${userId}/referrals/invitedBy`]: referrerId,
+            [`users/${userId}/referrals/inviteTimestamp`]: Date.now(),
+            [`users/${userId}/referrals/ticketsFromInvites`]: 
+            (userSnapshot.val()?.referrals?.ticketsFromInvites || 0) + 1
         };
   
         // Apply all updates
