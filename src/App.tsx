@@ -55,19 +55,21 @@ function App() {
       </div>
 //    </div>
 //  );
-//
-// In your App.tsx
+
 useEffect(() => {
   const initializeApp = async () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
-      // Detailed logging of initial data
-      console.log('Initializing app with data:', {
-        fullInitData: tg.initDataUnsafe,
-        startParam: tg.initDataUnsafe?.start_param,
-        user: tg.initDataUnsafe?.user
+      // Add more detailed logging
+      console.log('Raw Telegram WebApp data:', tg);
+      console.log('InitDataUnsafe:', tg.initDataUnsafe);
+      console.log('Start Parameter:', tg.initDataUnsafe?.start_param);
+      console.log('Parsed start_param:', {
+        raw: tg.initDataUnsafe?.start_param,
+        isString: typeof tg.initDataUnsafe?.start_param === 'string',
+        value: tg.initDataUnsafe?.start_param
       });
-
+      
       tg.ready();
       tg.expand();
       
@@ -85,30 +87,39 @@ useEffect(() => {
       if (user) {
         setTelegramUser(user as TelegramUser);
         try {
-          // Process invite link before visit tracking
+          // Added additional logging for invite processing
           if (startParam) {
-            console.log('Processing invite link:', {
+            console.log('Processing invite:', {
               startParam,
               userId: user.id,
-              userName: user.first_name
+              isRef: startParam.startsWith('ref_'),
+              referrerId: startParam.replace('ref_', '')
             });
-            
-            // Wait for invite processing to complete
             await processInviteLink(user.id.toString(), startParam);
             
-            // Verify referral data was saved
+            // Verify the referral data was saved
             const db = getDatabase();
-            const userRef = ref(db, `users/${user.id}/referralInfo`);
+            const userRef = ref(db, `users/${user.id}`);
             const snapshot = await get(userRef);
-            console.log('Referral data after processing:', snapshot.val());
+            console.log('User data after invite processing:', snapshot.val());
           }
           
           const visitStats = await trackUserVisit(user.id.toString(), user.first_name);
           setUserStats(visitStats);
+          
+          // Check final state
+          const db = getDatabase();
+          const finalDataRef = ref(db, `users/${user.id}`);
+          const finalData = await get(finalDataRef);
+          console.log('Final user data:', finalData.val());
         } catch (error) {
           console.error('Error in initialization:', error);
         }
+      } else {
+        console.log('No user data found');
       }
+    } else {
+      console.log('Telegram WebApp not found');
     }
   };
 
