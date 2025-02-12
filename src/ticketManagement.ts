@@ -28,67 +28,60 @@ interface ReferralData {
   }
   
 
-export const processInviteLink = async (userId: string, startParam: string) => {
+  export const processInviteLink = async (userId: string, startParam: string) => {
     const db = getDatabase();
+    console.log('Starting invite processing:', { userId, startParam });
     
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
-      console.log('Processing referral from:', referrerId, 'for user:', userId);
+      console.log('Processing referral:', { referrerId, userId });
       
       if (referrerId === userId) {
-        console.log('Self-referral detected, ignoring');
+        console.log('Self-referral detected, skipping');
         return;
       }
       
       try {
-        // Get current data for both users
-        const referrerSnapshot = await get(ref(db, `users/${referrerId}`));
-        const userSnapshot = await get(ref(db, `users/${userId}`));
+        // First update the new user's data directly
+        console.log('Setting invited user data...');
+        await set(ref(db, `users/${userId}/referralInfo`), {
+          invitedBy: referrerId,
+          inviteTimestamp: Date.now()
+        });
   
-        // First, let's update the new user's data with referral info
-        const updates: any = {
-          [`users/${userId}/referralInfo`]: {
-            invitedBy: referrerId,
-            inviteTimestamp: Date.now()
-          }
-        };
+        // Then update the referrer's data
+        console.log('Updating referrer data...');
+        const referrerRef = ref(db, `users/${referrerId}/referralInfo`);
+        const referrerSnapshot = await get(referrerRef);
+        const referrerData = referrerSnapshot.val() || { invitedUsers: [], totalInvites: 0 };
   
-        // Then update the referrer's data - add this user to their invited list
-        const referrerData = referrerSnapshot.val() || {};
-        if (!referrerData.referralInfo) {
-          referrerData.referralInfo = {
-            invitedUsers: [],
-            totalInvites: 0
-          };
+        if (!referrerData.invitedUsers.includes(userId)) {
+          await set(referrerRef, {
+            ...referrerData,
+            invitedUsers: [...referrerData.invitedUsers, userId],
+            totalInvites: referrerData.totalInvites + 1
+          });
         }
   
-        // Add the new user to referrer's invited list if not already there
-        if (!referrerData.referralInfo.invitedUsers.includes(userId)) {
-          updates[`users/${referrerId}/referralInfo`] = {
-            ...referrerData.referralInfo,
-            invitedUsers: [...(referrerData.referralInfo.invitedUsers || []), userId],
-            totalInvites: (referrerData.referralInfo.totalInvites || 0) + 1
-          };
-        }
+        // Set initial tickets
+        console.log('Setting initial tickets...');
+        await set(ref(db, `users/${userId}/visits`), {
+          maxPlaysToday: 6,  // Base 5 + 1 from invite
+          playsRemaining: 6,
+          playsToday: 0
+        });
   
-        // Set the initial maxPlaysToday to include invite bonus
-        if (!userSnapshot.exists()) {
-          updates[`users/${userId}/visits/maxPlaysToday`] = 6; // Base 5 + 1 from invite
-          updates[`users/${userId}/visits/playsRemaining`] = 6;
-        }
-  
-        console.log('Applying updates:', updates);
-        await update(ref(db), updates);
-        console.log('Successfully processed invite link');
+        // Verify the data was written
+        const finalCheck = await get(ref(db, `users/${userId}`));
+        console.log('Final data check:', finalCheck.val());
   
       } catch (error) {
-        console.error('Error processing invite:', error);
+        console.error('Error in processInviteLink:', error);
         throw error;
       }
-    } else {
-      console.log('Not a referral link');
     }
   };
+  
 export const calculateAvailableTickets = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const userRef = ref(db, `users/${userId}`);
