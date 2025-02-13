@@ -15,6 +15,7 @@ import { get, getDatabase, ref } from 'firebase/database';
 import hudBackground from '../assets/HUDbottom.svg';
 import InviteComponent from '../InviteComponent';
 import ramka from '../assets/ramka.svg';
+import { calculateLeaderboardPosition } from '@/utils/leaderboardUtils';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -127,11 +128,13 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
 
 const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) => {
   const [totalPoints, setTotalPoints] = useState<number>(0);
+  const [leaderboardPosition, setLeaderboardPosition] = useState<number>(0);
 
   useEffect(() => {
-    const fetchTotalPoints = async () => {
+    const fetchData = async () => {
       if (telegramUser) {
         try {
+          // Fetch total points
           const db = getDatabase();
           const playerScoresRef = ref(db, `/${telegramUser.id}/scores`);
           const snapshot = await get(playerScoresRef);
@@ -143,13 +146,17 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
             }, 0);
             setTotalPoints(total);
           }
+
+          // Calculate leaderboard position
+          const position = await calculateLeaderboardPosition(telegramUser.id.toString());
+          setLeaderboardPosition(position);
         } catch (error) {
-          console.error('Error fetching total points:', error);
+          console.error('Error fetching data:', error);
         }
       }
     };
 
-    fetchTotalPoints();
+    fetchData();
   }, [telegramUser]);
 
   if (!telegramUser) {
@@ -170,6 +177,10 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
           <div className="stat-row">
             <span className="text-info">User ID:</span>
             <span className="text-value">{telegramUser.id}</span>
+          </div>
+          <div className="stat-row">
+            <span className="text-info">Leaderboard Position:</span>
+            <span className="text-value">#{leaderboardPosition}</span>
           </div>
           {userStats && (
             <>
