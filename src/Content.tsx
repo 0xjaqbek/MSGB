@@ -18,6 +18,7 @@ import NebulaEffect from './components/NebulaEffect';
 import hudTop from './assets/HUDtop.svg';
 import ProgressBar from './ProgressBar';
 import pointsBg from './assets/points.svg';
+import { calculateAvailableTickets } from './ticketManagement';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -182,10 +183,11 @@ const getTotalPoints = async (playerId: string) => {
         if (user) {
           setTelegramUser(user);
           try {
+            const maxTickets = await calculateAvailableTickets(user.id.toString());
             const stats = await trackUserVisit(user.id.toString(), user.first_name);
             setVisitStats(stats);
-            setPlaysRemaining(stats.playsRemaining);
-            setMaxPlaysToday(stats.maxPlaysToday);
+            setMaxPlaysToday(maxTickets);
+            setPlaysRemaining(maxTickets - (stats.playsToday || 0));
             setUserStreak(stats.currentStreak);
             const points = await getTotalPoints(user.id.toString());
             setTotalPoints(points);
@@ -255,6 +257,7 @@ const getTotalPoints = async (playerId: string) => {
   
     try {
       const userId = tg.initDataUnsafe.user.id.toString();
+      const maxTickets = await calculateAvailableTickets(userId);
       const remainingPlays = await updatePlayCount(userId);
       
       if (remainingPlays < 0) {
@@ -263,6 +266,7 @@ const getTotalPoints = async (playerId: string) => {
         return;
       }
   
+      setMaxPlaysToday(maxTickets);
       setPlaysRemaining(remainingPlays);
       setIsPlaying(true);
       setScore(0);
