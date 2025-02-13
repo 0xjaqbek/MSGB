@@ -425,10 +425,11 @@ const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
-    
-    // Update score in a separate scores collection
     const playerScoresRef = ref(database, `/${playerId}/scores`);
+    const userVisitsRef = ref(database, `users/${playerId}/visits`);
     const timestamp = Date.now();
+
+    // First update the score
     await update(playerScoresRef, {
       [timestamp]: {
         userName,
@@ -438,24 +439,17 @@ const updateScore = useCallback(async () => {
       }
     });
 
-    // Update tickets separately
-    const userRef = ref(database, `users/${playerId}`);
-    const userSnapshot = await get(userRef);
-    if (!userSnapshot.exists()) return;
-
-    const userData = userSnapshot.val();
+    // Then update plays info
     const maxTickets = await calculateAvailableTickets(playerId);
-    const currentPlays = userData.plays?.today || 0;
+    const visitsSnapshot = await get(userVisitsRef);
+    const visits = visitsSnapshot.val() || {};
+    const currentPlays = visits.playsToday || 0;
     const newPlaysCount = currentPlays + 1;
 
-    // Update plays in a separate 'plays' node
-    await update(userRef, {
-      'plays': {
-        today: newPlaysCount,
-        max: maxTickets,
-        remaining: Math.max(0, maxTickets - newPlaysCount),
-        lastPlayed: Date.now()
-      }
+    await update(userVisitsRef, {
+      playsToday: newPlaysCount,
+      maxPlaysToday: maxTickets,
+      playsRemaining: Math.max(0, maxTickets - newPlaysCount)
     });
 
     // Update local state
@@ -465,11 +459,10 @@ const updateScore = useCallback(async () => {
     const newTotal = await getTotalPoints(playerId);
     setTotalPoints(newTotal);
 
-    console.log('Score and plays updated:', {
-      score,
-      newPlaysCount,
-      maxTickets,
-      remaining: maxTickets - newPlaysCount
+    console.log('Score and plays updated successfully:', { 
+      newPlaysCount, 
+      maxTickets, 
+      remaining: maxTickets - newPlaysCount 
     });
   } catch (error) {
     console.error('Error updating score:', error);
@@ -679,49 +672,49 @@ return (
         <BlinkScreen isVisible={showBlink} />
 
         {!isPlaying && telegramUser && visitStats && (
+
+
           <PlaysInfoContainer>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {/* Tickets Section */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 <div style={{ 
                   color: 'white', 
-                  fontSize: '0.9rem'
+                  fontSize: '0.9rem'  // Smaller white text
                 }}>
                   Tickets left
                 </div>
                 <div style={{ 
-                  color: '#0FF',
-                  fontSize: '1.6rem'
+                  color: '#0FF',      // Original cyan color
+                  fontSize: '1.6rem'  // Slightly bigger than label
                 }}>
                   {playsRemaining}/{maxPlaysToday}
                 </div>
               </div>
-              {/* Coin Balance Section - Only show if greater than 0 */}
-              {totalPoints > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                  <div style={{ 
-                    color: 'white', 
-                    fontSize: '0.9rem'
-                  }}>
-                    Coin Balance
-                  </div>
-                  <div style={{ 
-                    color: '#FFD700',
-                    fontSize: '2rem'
-                  }}>
-                    {totalPoints}
-                  </div>
-                </div>
-              )}
 
-              {/* Only show streak bonus if greater than 1 */}
+              {/* Coin Balance Section */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <div style={{ 
+                  color: 'white', 
+                  fontSize: '0.9rem'  // Smaller white text
+                }}>
+                  Coin Balance
+                </div>
+                <div style={{ 
+                  color: '#FFD700',   // Gold color
+                  fontSize: '2rem'  // Bigger than tickets value
+                }}>
+                  {totalPoints}
+                </div>
+              </div>
+
+              {/* Streak Bonus if applicable */}
               {userStreak > 1 && (
                 <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
                   +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
                 </div>
               )}
-              
-              {/* Only show invites bonus if greater than 0 */}
+              {/* Invite Bonus if applicable */}
               {visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0 && (
                 <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
                   +{visitStats.ticketsFromInvites} permanent {visitStats.ticketsFromInvites === 1 ? 'ticket' : 'tickets'} from invites!
