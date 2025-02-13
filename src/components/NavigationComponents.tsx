@@ -96,7 +96,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       <h1 className="text-glow text-xl mb-4">Friends</h1>
       
       {/* Invite Section */}
-      <div className="card">
+      <div className="card px-2">
         <h2 className="text-glow text-lg p-5 mb-2">Invite Friends</h2>
         <p className="text-info mb-4 mx-10">
           Invite friends to play and earn permanent extra tickets!
