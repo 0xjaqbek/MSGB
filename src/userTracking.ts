@@ -18,19 +18,20 @@ export interface VisitHistoryEntry {
 }
 
 export interface VisitStats {
-    lastVisit: string;
-    currentStreak: number;
-    highestStreak: number;
-    totalVisits: number;
-    dailyVisits: { [key: string]: number };
-    firstVisitComplete: boolean;
-    isNewDay: boolean;
-    isFirstVisit: boolean;
-    todayVisits: number;
-    playsRemaining: number;
-    playsToday: number;
-    maxPlaysToday: number;
-  }
+  lastVisit: string;
+  currentStreak: number;
+  highestStreak: number;
+  totalVisits: number;
+  dailyVisits: { [key: string]: number };
+  firstVisitComplete: boolean;
+  isNewDay: boolean;
+  isFirstVisit: boolean;
+  todayVisits: number;
+  playsRemaining: number;
+  playsToday: number;
+  maxPlaysToday: number;
+  ticketsFromInvites?: number;
+}
 
 const calculateMaxPlays = (streak: number): number => {
   return 5 + (streak - 1); // Base 5 plays + bonus from streak
@@ -59,14 +60,19 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
         todayVisits: 1,
         playsRemaining: 5,  // Default initial plays
         playsToday: 0,
-        maxPlaysToday: 5
+        maxPlaysToday: 5,
+        ticketsFromInvites: 0
       };
       
       // Set initial data
       await set(userRef, { 
         visits: initialVisit,
         userId: userId,
-        userName: userName
+        userName: userName,
+        referrals: {
+          ticketsFromInvites: 0,
+          invitedUsers: []
+        }
       });
       
       return initialVisit;
@@ -75,6 +81,7 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     // Existing user logic
     const userData = snapshot.val();
     const existingVisits = userData.visits || {};
+    const ticketsFromInvites = userData.referrals?.ticketsFromInvites || 0;
     
     // Provide default values if any property is missing
     const processedVisits: VisitStats = {
@@ -89,7 +96,8 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       todayVisits: (existingVisits.dailyVisits?.[today] || 0) + 1,
       playsRemaining: existingVisits.playsRemaining || 5,
       playsToday: (existingVisits.playsToday || 0) + 1,
-      maxPlaysToday: existingVisits.maxPlaysToday || 5
+      maxPlaysToday: existingVisits.maxPlaysToday || 5,
+      ticketsFromInvites
     };
     
     // Update user data
@@ -114,7 +122,8 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       todayVisits: 1,
       playsRemaining: 5,
       playsToday: 0,
-      maxPlaysToday: 5
+      maxPlaysToday: 5,
+      ticketsFromInvites: 0
     };
   }
 };

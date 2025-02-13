@@ -85,6 +85,7 @@ export interface VisitStats {
   playsRemaining: number;
   playsToday: number;
   maxPlaysToday: number;
+  ticketsFromInvites?: number;
 }
 
 export type NavigationPage = 'main' | 'friends' | 'account' | 'tasks';
