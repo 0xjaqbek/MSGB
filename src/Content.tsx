@@ -439,25 +439,31 @@ const updateScore = useCallback(async () => {
       }
     });
 
-    // Then increment playsToday
+    // Then update plays info
+    const maxTickets = await calculateAvailableTickets(playerId);
     const visitsSnapshot = await get(userVisitsRef);
     const visits = visitsSnapshot.val() || {};
     const currentPlays = visits.playsToday || 0;
-    const maxTickets = visits.maxPlaysToday || 5;
+    const newPlaysCount = currentPlays + 1;
 
     await update(userVisitsRef, {
-      playsToday: currentPlays + 1,
-      playsRemaining: Math.max(0, maxTickets - (currentPlays + 1))
+      playsToday: newPlaysCount,
+      maxPlaysToday: maxTickets,
+      playsRemaining: Math.max(0, maxTickets - newPlaysCount)
     });
 
-    // Update the local state
-    setPlaysRemaining(prev => Math.max(0, (prev || 0) - 1));
+    // Update local state
+    setPlaysRemaining(Math.max(0, maxTickets - newPlaysCount));
 
     // Update total points
     const newTotal = await getTotalPoints(playerId);
     setTotalPoints(newTotal);
 
-    console.log('Score and plays updated successfully!');
+    console.log('Score and plays updated successfully:', { 
+      newPlaysCount, 
+      maxTickets, 
+      remaining: maxTickets - newPlaysCount 
+    });
   } catch (error) {
     console.error('Error updating score:', error);
   }
