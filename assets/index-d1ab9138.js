@@ -3042,7 +3042,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   text-align: center;
   width: 100%;
   position: absolute;
-  top: 0;
+  top: 3%;
   left: 0;
   right: 0;
 `,we=mt.div`
