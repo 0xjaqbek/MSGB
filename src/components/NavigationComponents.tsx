@@ -310,9 +310,11 @@ const removeFriend = async (friendId: string) => {
     background: transparent;
     border: 1px solid ${props => props.$variant === 'danger' ? '#FF4444' : '#0FF'};
     color: ${props => props.$variant === 'danger' ? '#FF4444' : '#0FF'};
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 8px;
     font-family: 'REM', sans-serif;
+    font-size: 0.9rem;
+    margin: 4px;
     transition: all 0.3s ease;
 
     &:hover {
@@ -327,8 +329,10 @@ const removeFriend = async (friendId: string) => {
     border-radius: 8px;
     padding: 8px 12px;
     color: #0FF;
-    width: 100%;
+    width: calc(100% - 24px); // Adjusted width with padding
+    margin: 0 12px;
     font-family: 'REM', sans-serif;
+    font-size: 0.9rem;
 
     &::placeholder {
       color: rgba(0, 255, 255, 0.5);
@@ -341,83 +345,125 @@ const removeFriend = async (friendId: string) => {
     }
   `;
 
-  return (
+  const SectionContainer = styled.div`
+  background-image: url(${ramka});
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: 15px;
+  margin-bottom: 15px;
+  width: 90%; // Match invite section width
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #0FF;
+`;
+
+
+ return (
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
 
       {/* Add Friend Section */}
-      {renderBox("Add Friend", (
-        <div className="w-full space-y-4">
-          <div className="flex gap-2">
-            <StyledInput
-              type="text"
-              placeholder="Enter User ID"
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-            />
-            <ActionButton onClick={sendFriendRequest}>
-              Add
-            </ActionButton>
-          </div>
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+      <SectionContainer>
+        <div style={{ width: '100%', marginBottom: '10px' }}>
+          <StyledInput
+            type="text"
+            placeholder="Enter User ID"
+            value={friendId}
+            onChange={(e) => setFriendId(e.target.value)}
+          />
         </div>
-      ))}
+        <div style={{ textAlign: 'center' }}>
+          <ActionButton onClick={sendFriendRequest}>
+            Add Friend
+          </ActionButton>
+          {error && (
+            <div style={{ 
+              color: error.includes('sent') ? '#0FF' : '#FF4444',
+              fontSize: '0.8rem',
+              marginTop: '4px'
+            }}>
+              {error}
+            </div>
+          )}
+        </div>
+      </SectionContainer>
 
       {/* Pending Requests Section */}
-      {pendingRequests.length > 0 && renderBox("Pending Requests", (
-        <div className="w-full space-y-3">
-          {pendingRequests.map((request) => (
-            <div key={request.fromUserId} className="flex justify-between items-center">
-              <span className="text-white">{request.fromUserName}</span>
-              <div className="flex gap-2">
-                <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
-                  Accept
-                </ActionButton>
-                <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
-                  Reject
-                </ActionButton>
+      {pendingRequests.length > 0 && (
+        <SectionContainer>
+          <h2 className="text-glow text-lg mb-2">Pending Requests</h2>
+          <div style={{ width: '100%' }}>
+            {pendingRequests.map((request) => (
+              <div key={request.fromUserId} 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  marginBottom: '8px',
+                  padding: '4px'
+                }}
+              >
+                <span style={{ color: 'white' }}>{request.fromUserName}</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
+                    Accept
+                  </ActionButton>
+                  <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
+                    Reject
+                  </ActionButton>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ))}
+            ))}
+          </div>
+        </SectionContainer>
+      )}
 
       {/* Friends List Section */}
-      {friends.length > 0 && renderBox("My Friends", (
-        <div className="w-full space-y-3">
-          {friends.map((friend) => (
-            <div key={friend.userId} className="flex flex-col gap-1 border-b border-cyan-400/20 pb-2">
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-white text-lg">{friend.userName}</span>
-                  <div className="text-sm text-cyan-400/70">
-                    Last active: {formatLastActive(friend.lastActive)}
-                  </div>
-                  {friend.lastScore && (
-                    <div className="text-sm text-yellow-400">
-                      Last score: {friend.lastScore}
+      {friends.length > 0 && (
+        <SectionContainer>
+          <h2 className="text-glow text-lg mb-2">My Friends</h2>
+          <div style={{ width: '100%' }}>
+            {friends.map((friend) => (
+              <div key={friend.userId} 
+                style={{ 
+                  borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
+                  padding: '8px 4px',
+                  marginBottom: '8px'
+                }}
+              >
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <div style={{ color: 'white' }}>{friend.userName}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
+                      {formatLastActive(friend.lastActive)}
                     </div>
+                  </div>
+                  {showConfirmRemove === friend.userId ? (
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
+                        Confirm
+                      </ActionButton>
+                      <ActionButton onClick={() => setShowConfirmRemove(null)}>
+                        Cancel
+                      </ActionButton>
+                    </div>
+                  ) : (
+                    <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
+                      Remove
+                    </ActionButton>
                   )}
                 </div>
-                {showConfirmRemove === friend.userId ? (
-                  <div className="flex gap-2">
-                    <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
-                      Confirm
-                    </ActionButton>
-                    <ActionButton onClick={() => setShowConfirmRemove(null)}>
-                      Cancel
-                    </ActionButton>
-                  </div>
-                ) : (
-                  <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
-                    Remove
-                  </ActionButton>
-                )}
               </div>
-            </div>
-          ))}
-        </div>
-      ))}
+            ))}
+          </div>
+        </SectionContainer>
+      )}
 
       {/* Invite Section */}
       <div 
@@ -427,6 +473,8 @@ const removeFriend = async (friendId: string) => {
           backgroundRepeat: 'no-repeat',
           padding: '20px',
           marginTop: '20px',
+          width: '90%',
+          maxWidth: '400px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
