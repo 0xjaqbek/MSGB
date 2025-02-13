@@ -204,17 +204,19 @@ const getTotalPoints = async (playerId: string) => {
       if (!telegramUser?.id) return;
   
       try {
-        const remainingPlays = await updatePlayCount(telegramUser.id.toString());
-        
-        if (remainingPlays < 0) {
+        const maxTickets = await calculateAvailableTickets(telegramUser.id.toString());
+        const visitsSnapshot = await get(ref(database, `users/${telegramUser.id}/visits`));
+        const currentPlays = visitsSnapshot.val()?.playsToday || 0;
+
+        if (currentPlays >= maxTickets) {
           setEndGameReason('no-plays');
           setShowEndGame(true);
           return;
         }
-  
-        setPlaysRemaining(remainingPlays);
-        setIsStartAnimating(false); // Make sure animation is off
-        setIsPlaying(true);  // Start the game immediately
+
+        setPlaysRemaining(maxTickets - currentPlays);
+        setIsStartAnimating(false);
+        setIsPlaying(true);
         setScore(0);
         setGameOver(false);
         setDifficulty(1);
@@ -232,7 +234,6 @@ const getTotalPoints = async (playerId: string) => {
         alert("There was an error starting the game. Please try again.");
       }
     };
-
     window.addEventListener('start-game', startGameHandler);
 
     return () => {
@@ -258,16 +259,17 @@ const getTotalPoints = async (playerId: string) => {
     try {
       const userId = tg.initDataUnsafe.user.id.toString();
       const maxTickets = await calculateAvailableTickets(userId);
-      const remainingPlays = await updatePlayCount(userId);
-      
-      if (remainingPlays < 0) {
+      const visitsSnapshot = await get(ref(database, `users/${userId}/visits`));
+      const currentPlays = visitsSnapshot.val()?.playsToday || 0;
+
+      if (currentPlays >= maxTickets) {
         setEndGameReason('no-plays');
         setShowEndGame(true);
         return;
       }
-  
+
       setMaxPlaysToday(maxTickets);
-      setPlaysRemaining(remainingPlays);
+      setPlaysRemaining(maxTickets - currentPlays);
       setIsPlaying(true);
       setScore(0);
       setGameOver(false);
@@ -424,23 +426,38 @@ const updateScore = useCallback(async () => {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
     const playerScoresRef = ref(database, `/${playerId}/scores`);
+    const userVisitsRef = ref(database, `users/${playerId}/visits`);
     const timestamp = Date.now();
-    const formattedTimestamp = formatDate(timestamp);
 
+    // First update the score
     await update(playerScoresRef, {
       [timestamp]: {
         userName,
         score,
         remainingTime,
-        timestamp: formattedTimestamp,
+        timestamp: formatDate(timestamp),
       }
     });
 
-    // Update total points after adding new score
+    // Then increment playsToday
+    const visitsSnapshot = await get(userVisitsRef);
+    const visits = visitsSnapshot.val() || {};
+    const currentPlays = visits.playsToday || 0;
+    const maxTickets = visits.maxPlaysToday || 5;
+
+    await update(userVisitsRef, {
+      playsToday: currentPlays + 1,
+      playsRemaining: Math.max(0, maxTickets - (currentPlays + 1))
+    });
+
+    // Update the local state
+    setPlaysRemaining(prev => Math.max(0, (prev || 0) - 1));
+
+    // Update total points
     const newTotal = await getTotalPoints(playerId);
     setTotalPoints(newTotal);
 
-    console.log('Score updated successfully!');
+    console.log('Score and plays updated successfully!');
   } catch (error) {
     console.error('Error updating score:', error);
   }
