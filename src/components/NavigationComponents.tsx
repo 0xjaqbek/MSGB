@@ -109,10 +109,9 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
           textAlign: 'center'
         }}
       >
-        <h2 className="text-glow text-lg mb-4">Invite Friends</h2>
-        <p className="text-info mb-4 px-4">
+        <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
           Invite friends to play and earn permanent extra tickets! 
-          Each invited friend gives you and him +1 ticket permanently.
+          <span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
         </p>
       </div>
       
