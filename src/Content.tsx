@@ -679,21 +679,19 @@ return (
         <BlinkScreen isVisible={showBlink} />
 
         {!isPlaying && telegramUser && visitStats && (
-
-
           <PlaysInfoContainer>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {/* Tickets Section */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 <div style={{ 
                   color: 'white', 
-                  fontSize: '0.9rem'  // Smaller white text
+                  fontSize: '0.9rem'
                 }}>
                   Tickets left
                 </div>
                 <div style={{ 
-                  color: '#0FF',      // Original cyan color
-                  fontSize: '1.6rem'  // Slightly bigger than label
+                  color: '#0FF',
+                  fontSize: '1.6rem'
                 }}>
                   {playsRemaining}/{maxPlaysToday}
                 </div>
@@ -703,25 +701,26 @@ return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 <div style={{ 
                   color: 'white', 
-                  fontSize: '0.9rem'  // Smaller white text
+                  fontSize: '0.9rem'
                 }}>
                   Coin Balance
                 </div>
                 <div style={{ 
-                  color: '#FFD700',   // Gold color
-                  fontSize: '2rem'  // Bigger than tickets value
+                  color: '#FFD700',
+                  fontSize: '2rem'
                 }}>
                   {totalPoints}
                 </div>
               </div>
 
-              {/* Streak Bonus if applicable */}
+              {/* Only show streak bonus if greater than 1 */}
               {userStreak > 1 && (
                 <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
                   +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
                 </div>
               )}
-              {/* Invite Bonus if applicable */}
+              
+              {/* Only show invites bonus if greater than 0 */}
               {visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0 && (
                 <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
                   +{visitStats.ticketsFromInvites} permanent {visitStats.ticketsFromInvites === 1 ? 'ticket' : 'tickets'} from invites!

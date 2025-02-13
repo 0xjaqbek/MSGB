@@ -9,6 +9,9 @@ const url = process.env.APP_URL;
 const port = process.env.PORT || 3000;
 const WEBAPP_URL = 'https://0xjaqbek.github.io/MSGB';
 
+const app = express();
+app.use(express.json());
+
 let bot;
 if (isDevelopment) {
   // Use polling for local development
@@ -16,14 +19,10 @@ if (isDevelopment) {
   console.log('Bot started in development mode (polling)');
 } else {
   // Use webhooks for production
-  bot = new TelegramBot(token, { webHook: { port } });
-  // Set the webhook
+  bot = new TelegramBot(token, { webHook: { port: null } }); // Don't let bot create server
   bot.setWebHook(`${url}/bot${token}`);
   console.log('Webhook set:', `${url}/bot${token}`);
 }
-
-const app = express();
-app.use(express.json());
 
 // Keep track of processed messages to prevent duplicates
 const processedMessages = new Set();
@@ -33,7 +32,7 @@ app.get('/', (req, res) => {
   res.send('Bot is running!');
 });
 
-// Webhook endpoint
+// Webhook endpoint for production
 if (!isDevelopment) {
   app.post(`/bot${token}`, (req, res) => {
     bot.processUpdate(req.body);
@@ -43,11 +42,8 @@ if (!isDevelopment) {
 
 // Handle /start command
 bot.onText(/\/start(.+)?/, async (msg, match) => {
-  // Check if message was already processed
   const messageId = `${msg.chat.id}_${msg.message_id}`;
-  if (processedMessages.has(messageId)) {
-    return;
-  }
+  if (processedMessages.has(messageId)) return;
   processedMessages.add(messageId);
 
   const chatId = msg.chat.id;
@@ -87,9 +83,7 @@ bot.onText(/\/start(.+)?/, async (msg, match) => {
 // Handle /invite command
 bot.onText(/\/invite/, async (msg) => {
   const messageId = `${msg.chat.id}_${msg.message_id}`;
-  if (processedMessages.has(messageId)) {
-    return;
-  }
+  if (processedMessages.has(messageId)) return;
   processedMessages.add(messageId);
 
   const chatId = msg.chat.id;
@@ -120,9 +114,9 @@ bot.on('webhook_error', (error) => {
   console.error('Webhook error:', error);
 });
 
-// Start server
+// Use a single server for both bot and express
 app.listen(port, () => {
-  console.log(`Bot server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
   console.log('Environment:', process.env.NODE_ENV);
   console.log('Webapp URL:', WEBAPP_URL);
   if (!isDevelopment) {
