@@ -425,11 +425,10 @@ const updateScore = useCallback(async () => {
   try {
     const playerId = telegramUser?.id.toString() || 'anonymous'; 
     const userName = telegramUser?.first_name.toString() || 'anonymous'; 
+    
+    // Update score in a separate scores collection
     const playerScoresRef = ref(database, `/${playerId}/scores`);
-    const userVisitsRef = ref(database, `users/${playerId}/visits`);
     const timestamp = Date.now();
-
-    // First update the score
     await update(playerScoresRef, {
       [timestamp]: {
         userName,
@@ -439,17 +438,24 @@ const updateScore = useCallback(async () => {
       }
     });
 
-    // Then update plays info
+    // Update tickets separately
+    const userRef = ref(database, `users/${playerId}`);
+    const userSnapshot = await get(userRef);
+    if (!userSnapshot.exists()) return;
+
+    const userData = userSnapshot.val();
     const maxTickets = await calculateAvailableTickets(playerId);
-    const visitsSnapshot = await get(userVisitsRef);
-    const visits = visitsSnapshot.val() || {};
-    const currentPlays = visits.playsToday || 0;
+    const currentPlays = userData.plays?.today || 0;
     const newPlaysCount = currentPlays + 1;
 
-    await update(userVisitsRef, {
-      playsToday: newPlaysCount,
-      maxPlaysToday: maxTickets,
-      playsRemaining: Math.max(0, maxTickets - newPlaysCount)
+    // Update plays in a separate 'plays' node
+    await update(userRef, {
+      'plays': {
+        today: newPlaysCount,
+        max: maxTickets,
+        remaining: Math.max(0, maxTickets - newPlaysCount),
+        lastPlayed: Date.now()
+      }
     });
 
     // Update local state
@@ -459,10 +465,11 @@ const updateScore = useCallback(async () => {
     const newTotal = await getTotalPoints(playerId);
     setTotalPoints(newTotal);
 
-    console.log('Score and plays updated successfully:', { 
-      newPlaysCount, 
-      maxTickets, 
-      remaining: maxTickets - newPlaysCount 
+    console.log('Score and plays updated:', {
+      score,
+      newPlaysCount,
+      maxTickets,
+      remaining: maxTickets - newPlaysCount
     });
   } catch (error) {
     console.error('Error updating score:', error);
