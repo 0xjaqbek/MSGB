@@ -14,6 +14,7 @@ interface LandingPageProps {
     todayVisits: number;
     isFirstVisit: boolean;
     playsRemaining: number;
+    ticketsFromInvites?: number;
   } | null;
 }
 
@@ -157,6 +158,16 @@ const StreakMessage = styled.div`
   z-index: 2; // Higher z-index to ensure it stays on top
 `;
 
+const BonusInfo = styled.div`
+  color: #FFD700;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 5px;
+  animation: ${fadeIn} 1s ease-out;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  z-index: 2;
+`;
+
 const getOrdinalSuffix = (number: number): string => {
   const j = number % 10;
   const k = number % 100;
@@ -207,9 +218,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
         </StreakMessage>
       ) : (
         userStats && userStats.currentStreak > 0 && (
-          <StreakMessage>
-            It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
-          </StreakMessage>
+          <>
+            <StreakMessage>
+              It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
+            </StreakMessage>
+            {userStats.currentStreak > 1 && (
+              <BonusInfo>
+                +{Math.min(69, userStats.currentStreak - 1)} bonus tickets from streak!
+              </BonusInfo>
+            )}
+            {userStats.ticketsFromInvites && userStats.ticketsFromInvites > 0 && (
+              <BonusInfo style={{ color: '#0FF' }}>
+                +{userStats.ticketsFromInvites} permanent tickets from invites!
+              </BonusInfo>
+            )}
+          </>
         )
       )}
       
