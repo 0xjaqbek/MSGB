@@ -5,18 +5,41 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const token = process.env.BOT_TOKEN;
 const isDevelopment = process.env.NODE_ENV === 'development';
+const url = process.env.APP_URL;
 const port = process.env.PORT || 3000;
 const WEBAPP_URL = 'https://0xjaqbek.github.io/MSGB';
 
-const bot = new TelegramBot(token, { 
-  polling: isDevelopment 
-});
+let bot;
+if (isDevelopment) {
+  // Use polling for local development
+  bot = new TelegramBot(token, { polling: true });
+  console.log('Bot started in development mode (polling)');
+} else {
+  // Use webhooks for production
+  bot = new TelegramBot(token, { webHook: { port } });
+  // Set the webhook
+  bot.setWebHook(`${url}/bot${token}`);
+  console.log('Webhook set:', `${url}/bot${token}`);
+}
 
 const app = express();
 app.use(express.json());
 
 // Keep track of processed messages to prevent duplicates
 const processedMessages = new Set();
+
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.send('Bot is running!');
+});
+
+// Webhook endpoint
+if (!isDevelopment) {
+  app.post(`/bot${token}`, (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
+  });
+}
 
 // Handle /start command
 bot.onText(/\/start(.+)?/, async (msg, match) => {
@@ -88,7 +111,21 @@ setInterval(() => {
   processedMessages.clear();
 }, 30 * 60 * 1000); // Clear every 30 minutes
 
+// Error handling
+bot.on('error', (error) => {
+  console.error('Bot error:', error);
+});
+
+bot.on('webhook_error', (error) => {
+  console.error('Webhook error:', error);
+});
+
+// Start server
 app.listen(port, () => {
   console.log(`Bot server is running on port ${port}`);
   console.log('Environment:', process.env.NODE_ENV);
+  console.log('Webapp URL:', WEBAPP_URL);
+  if (!isDevelopment) {
+    console.log('Webhook URL:', `${url}/bot${token}`);
+  }
 });

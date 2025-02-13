@@ -98,9 +98,9 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       {/* Invite Section */}
       <div className="card">
         <h2 className="text-glow text-lg p-5 mb-2">Invite Friends</h2>
-        <p className="text-info mb-4">
+        <p className="text-info m-4">
           Invite friends to play and earn permanent extra tickets!
-          Each invited friend gives you +1 ticket permanently.
+          Each invited friend gives you and him +1 ticket permanently.
         </p>
         <InviteComponent 
           botUsername="moonstonesgamebot" 
