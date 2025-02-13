@@ -123,3 +123,59 @@ app.listen(port, () => {
     console.log('Webhook URL:', `${url}/bot${token}`);
   }
 });
+
+// Handle notifications from web app
+bot.on('web_app_data', async (msg) => {
+    const chatId = msg.chat.id;
+    try {
+      const data = JSON.parse(msg.web_app_data.data);
+      
+      switch (data.action) {
+        case 'generateInvite':
+          const userId = data.userId;
+          const inviteLink = `https://t.me/moonstonesgamebot?start=ref_${userId}`;
+          await bot.sendMessage(chatId, 
+            `🎮 Share this link with friends to get bonus tickets!\n\n${inviteLink}`, 
+            { disable_web_page_preview: true }
+          );
+          break;
+  
+        case 'friendRequest':
+          // Send notification to target user
+          await bot.sendMessage(data.targetUserId, 
+            `🤝 ${data.senderName} wants to be your friend!\n\nOpen the game to respond to the request.`,
+            {
+              reply_markup: {
+                inline_keyboard: [[
+                  { text: '🎮 Open Game', web_app: { url: 'https://0xjaqbek.github.io/MSGB' } }
+                ]]
+              }
+            }
+          );
+          break;
+  
+        case 'friendRequestAccepted':
+          // Notify sender that their request was accepted
+          await bot.sendMessage(data.targetUserId,
+            `✨ ${data.accepterName} accepted your friend request!`,
+            {
+              reply_markup: {
+                inline_keyboard: [[
+                  { text: '🎮 Open Game', web_app: { url: 'https://0xjaqbek.github.io/MSGB' } }
+                ]]
+              }
+            }
+          );
+          break;
+  
+        case 'friendRemoved':
+          // Optional: Notify user they've been removed from someone's friend list
+          await bot.sendMessage(data.targetUserId,
+            `👋 ${data.removerName} has removed you from their friends list.`
+          );
+          break;
+      }
+    } catch (error) {
+      console.error('Error handling web_app_data:', error);
+    }
+  });

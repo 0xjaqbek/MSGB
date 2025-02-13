@@ -99,6 +99,9 @@ export interface Friend {
   userId: string;
   userName: string;
   addedAt: number;
+  lastActive?: number;
+  lastScore?: number;
+  status?: 'online' | 'offline';
 }
 
 export type NavigationPage = 'main' | 'friends' | 'account' | 'tasks';
