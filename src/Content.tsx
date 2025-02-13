@@ -696,22 +696,23 @@ return (
                   {playsRemaining}/{maxPlaysToday}
                 </div>
               </div>
-
-              {/* Coin Balance Section */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <div style={{ 
-                  color: 'white', 
-                  fontSize: '0.9rem'
-                }}>
-                  Coin Balance
+              {/* Coin Balance Section - Only show if greater than 0 */}
+              {totalPoints > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  <div style={{ 
+                    color: 'white', 
+                    fontSize: '0.9rem'
+                  }}>
+                    Coin Balance
+                  </div>
+                  <div style={{ 
+                    color: '#FFD700',
+                    fontSize: '2rem'
+                  }}>
+                    {totalPoints}
+                  </div>
                 </div>
-                <div style={{ 
-                  color: '#FFD700',
-                  fontSize: '2rem'
-                }}>
-                  {totalPoints}
-                </div>
-              </div>
+              )}
 
               {/* Only show streak bonus if greater than 1 */}
               {userStreak > 1 && (
