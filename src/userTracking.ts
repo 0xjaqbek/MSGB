@@ -38,7 +38,7 @@ const calculateMaxPlays = (streak: number): number => {
   return 5 + (streak - 1); // Base 5 plays + bonus from streak
 };
 
-export const trackUserVisit = async (userId: string, userName: string): Promise<VisitStats> => {
+export const trackUserVisit = async (userId: string, userFirstName: string, username?: string): Promise<VisitStats> => {
   const db = getDatabase();
   const userRef = ref(db, `users/${userId}`);
   
@@ -46,6 +46,9 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     const snapshot = await get(userRef);
     const now = new Date();
     const today = now.toISOString().split('T')[0];
+    
+    // Use username if available, otherwise use first name
+    const displayName = username || userFirstName;
     
     // Get max tickets available
     const maxTickets = await calculateAvailableTickets(userId);
@@ -71,7 +74,10 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       await set(userRef, { 
         visits: initialVisit,
         userId: userId,
-        userName: userName,
+        userName: displayName,
+        userFirstName: userFirstName,
+        username: username || null,
+        displayName: `${displayName} (${userId})`,
         referrals: {
           ticketsFromInvites: 0,
           invitedUsers: []
@@ -92,13 +98,22 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       };
     }
     
-    // Existing user logic
+    // For existing users, update their name info if changed
     const userData = snapshot.val();
+    if (userData.userName !== displayName || 
+        userData.userFirstName !== userFirstName || 
+        userData.username !== username) {
+      await update(userRef, {
+        userName: displayName,
+        userFirstName: userFirstName,
+        username: username || null,
+        displayName: `${displayName} (${userId})`
+      });
+    }
     const existingVisits = userData.visits || {};
     const ticketsFromInvites = userData.referrals?.ticketsFromInvites || 0;
     const plays = userData.plays || { today: 0, max: maxTickets, remaining: maxTickets };
     
-    // Process visit data without plays
     const processedVisits: VisitStats = {
       lastVisit: existingVisits.lastVisit || today,
       currentStreak: existingVisits.currentStreak || 1,
@@ -115,14 +130,12 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       maxPlaysToday: plays.max
     };
     
-    // If it's a new day, reset play counts
     if (processedVisits.isNewDay) {
       plays.today = 0;
       plays.max = maxTickets;
       plays.remaining = maxTickets;
     }
     
-    // Update both visits and plays data
     await update(userRef, { 
       visits: processedVisits,
       plays

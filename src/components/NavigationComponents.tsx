@@ -162,11 +162,14 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">My Account</h1>
       <div className="card">
-        
         <div className="space-y-2">
           <div className="stat-row">
             <span className="text-info">Name:</span>
             <span className="text-value">{telegramUser.first_name}</span>
+          </div>
+          <div className="stat-row">
+            <span className="text-info">User ID:</span>
+            <span className="text-value">{telegramUser.id}</span>
           </div>
           {userStats && (
             <>
@@ -179,25 +182,12 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
                 <span className="text-value">{userStats.highestStreak} days</span>
               </div>
               <div className="stat-row">
-                <span className="text-info">Total Visits:</span>
-                <span className="text-value">{userStats.totalVisits}</span>
-              </div>
-              <div className="stat-row">
-                <span className="text-info">Today's Plays:</span>
-                <span className="text-value">{userStats.playsToday} / {userStats.maxPlaysToday}</span>
-              </div>
-              <div className="stat-row">
                 <span className="text-info">Total Points:</span>
                 <span className="text-value">{totalPoints}</span>
               </div>
             </>
           )}
         </div>
-      </div>
-      
-      <div className="card">
-        <h2 className="text-glow text-lg mb-2">Statistics</h2>
-        <p className="text-info">More stats coming soon...</p>
       </div>
     </div>
   );
