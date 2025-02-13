@@ -110,7 +110,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         }}
       >
         <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
-          Invite friends. <br></br>Each invited friend gives you and him 
+          Invite friends.<br></br>Each invited friend<br></br>gives you and him 
           <span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
         </p>
       </div>
