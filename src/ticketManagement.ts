@@ -34,7 +34,7 @@ export const processInviteLink = async (userId: string, startParam: string) => {
     
     if (startParam?.startsWith('ref_')) {
       const referrerId = startParam.replace('ref_', '');
-      console.log('Found referrer ID:', referrerId);
+      console.log('Processing referral from:', referrerId, 'for user:', userId);
       
       // Don't allow self-referral
       if (referrerId === userId) {
@@ -52,38 +52,41 @@ export const processInviteLink = async (userId: string, startParam: string) => {
           get(userRef)
         ]);
   
-        console.log('Current data:', {
-          referrerData: referrerSnapshot.val(),
-          userData: userSnapshot.val()
-        });
+        const userData = userSnapshot.val() || {};
+        const referrerData = referrerSnapshot.val() || {};
   
-        // Update referrer data
+        // Check if user has already been invited and received bonus
+        if (userData.referrals?.hasReceivedInviteBonus) {
+          console.log('User already received invite bonus');
+          return;
+        }
+  
+        // Prepare referrer updates
         const referrerUpdates = {
-            [`users/${referrerId}/referrals/invitedUsers`]: [
-            ...(referrerSnapshot.val()?.referrals?.invitedUsers || []),
+          [`users/${referrerId}/referrals/invitedUsers`]: [
+            ...(referrerData.referrals?.invitedUsers || []),
             userId
-            ],
-            [`users/${referrerId}/referrals/totalInvites`]: 
-            (referrerSnapshot.val()?.referrals?.totalInvites || 0) + 1,
-            [`users/${referrerId}/referrals/ticketsFromInvites`]: 
-            (referrerSnapshot.val()?.referrals?.ticketsFromInvites || 0) + 1
-        };
-        
-        // Update new user data
-        const userUpdates = {
-            [`users/${userId}/referrals/invitedBy`]: referrerId,
-            [`users/${userId}/referrals/inviteTimestamp`]: Date.now(),
-            [`users/${userId}/referrals/ticketsFromInvites`]: 
-            (userSnapshot.val()?.referrals?.ticketsFromInvites || 0) + 1
+          ],
+          [`users/${referrerId}/referrals/ticketsFromInvites`]: 
+            (referrerData.referrals?.ticketsFromInvites || 0) + 1
         };
   
-        // Apply all updates
+        // Prepare new user updates
+        const userUpdates = {
+          [`users/${userId}/referrals/invitedBy`]: referrerId,
+          [`users/${userId}/referrals/ticketsFromInvites`]: 1,
+          [`users/${userId}/referrals/hasReceivedInviteBonus`]: true,
+          [`users/${userId}/referrals/invitedUsers`]: [],
+          [`users/${userId}/referrals/inviteTimestamp`]: Date.now()
+        };
+  
+        // Apply all updates in one transaction
         await update(ref(db), {
           ...referrerUpdates,
           ...userUpdates
         });
   
-        console.log('Successfully updated referral data');
+        console.log('Successfully updated referral data for both users');
       } catch (error) {
         console.error('Error processing invite:', error);
         throw error;
