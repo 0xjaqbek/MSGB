@@ -29,16 +29,12 @@ const InviteButton = styled.button`
   }
 `;
 
-interface NotificationTextProps {
-  visible: boolean;
-}
-
-const NotificationText = styled.p<NotificationTextProps>`
+const NotificationText = styled.p<{ $visible: boolean }>`
   color: white;
   text-align: center;
   font-size: 0.9rem;
   margin-top: 10px;
-  opacity: ${props => props.visible ? '1' : '0'};
+  opacity: ${props => props.$visible ? '1' : '0'};
   transition: opacity 0.3s ease;
 `;
 
@@ -66,7 +62,7 @@ const InviteComponent: React.FC<InviteComponentProps> = ({ botUsername, userId }
       <InviteButton onClick={handleInvite}>
         <span>INVITE A FREN</span>
       </InviteButton>
-      <NotificationText visible={showNotification}>
+      <NotificationText $visible={showNotification}>
         Invite link copied to clipboard!
       </NotificationText>
     </div>
