@@ -38,6 +38,14 @@ const NotificationText = styled.p<{ $visible: boolean }>`
   transition: opacity 0.3s ease;
 `;
 
+const ClickToCopyText = styled.p`
+  color: white;
+  text-align: center;
+  font-size: 0.8rem;
+  margin-top: 10px;
+  opacity: 0.7;
+`;
+
 interface InviteComponentProps {
   botUsername: string;
   userId?: string;
@@ -62,6 +70,7 @@ const InviteComponent: React.FC<InviteComponentProps> = ({ botUsername, userId }
       <InviteButton onClick={handleInvite}>
         <span>INVITE A FREN</span>
       </InviteButton>
+      <ClickToCopyText>Click to copy invite link</ClickToCopyText>
       <NotificationText $visible={showNotification}>
         Invite link copied to clipboard!
       </NotificationText>
