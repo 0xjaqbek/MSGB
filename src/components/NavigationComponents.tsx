@@ -1,7 +1,7 @@
 // components/NavigationComponents.tsx
 import React, { useEffect, useState } from 'react';
 import { Home, Users, User, CheckSquare } from 'lucide-react';
-import { TelegramUser, NavigationPage } from '../types';
+import { TelegramUser, NavigationPage, Friend, FriendRequest } from '../types';
 import { VisitStats } from '../userTracking';
 import mainActive from '../assets/mainA.svg';
 import mainDefault from '../assets/mainD.svg';
@@ -11,7 +11,7 @@ import accountActive from '../assets/accountA.svg';
 import accountDefault from '../assets/accountD.svg';
 import tasksActive from '../assets/taskasA.svg';
 import tasksDefault from '../assets/tasksD.svg';
-import { get, getDatabase, ref } from 'firebase/database';
+import { get, getDatabase, off, onValue, ref, set, update } from 'firebase/database';
 import hudBackground from '../assets/HUDbottom.svg';
 import InviteComponent from '../InviteComponent';
 import ramka from '../assets/ramka.svg';
@@ -92,16 +92,197 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 export default NavigationBar;
 
 const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
+  const [friendId, setFriendId] = useState('');
+  const [error, setError] = useState('');
+  const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]);
+
+  useEffect(() => {
+    if (!telegramUser) return;
+
+    const db = getDatabase();
+    const requestsRef = ref(db, `users/${telegramUser.id}/friendRequests`);
+    const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+
+    // Listen for friend requests
+    onValue(requestsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const requests = Object.values(snapshot.val()).filter(
+          (req: any) => req.status === 'pending'
+        ) as FriendRequest[];
+        setPendingRequests(requests);
+      }
+    });
+
+    // Listen for friends list
+    onValue(friendsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const friendsList = Object.values(snapshot.val()) as Friend[];
+        setFriends(friendsList);
+      }
+    });
+
+    return () => {
+      off(requestsRef);
+      off(friendsRef);
+    };
+  }, [telegramUser]);
+
+  const sendFriendRequest = async () => {
+    if (!telegramUser || !friendId.trim()) {
+      setError('Please enter a User ID');
+      return;
+    }
+
+    try {
+      const db = getDatabase();
+      const targetUserRef = ref(db, `users/${friendId}`);
+      const snapshot = await get(targetUserRef);
+
+      if (!snapshot.exists()) {
+        setError('User not found');
+        return;
+      }
+
+      // Check if already friends
+      const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
+      const friendSnapshot = await get(existingFriendRef);
+      if (friendSnapshot.exists()) {
+        setError('Already friends with this user');
+        return;
+      }
+
+      // Send friend request
+      const request: FriendRequest = {
+        fromUserId: telegramUser.id.toString(),
+        fromUserName: telegramUser.first_name,
+        status: 'pending',
+        timestamp: Date.now()
+      };
+
+      await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
+      setFriendId('');
+      setError('Friend request sent!');
+    } catch (err) {
+      setError('Error sending friend request');
+      console.error(err);
+    }
+  };
+
+  const handleRequest = async (requesterId: string, action: 'accept' | 'reject') => {
+    if (!telegramUser) return;
+
+    const db = getDatabase();
+    const request = pendingRequests.find(req => req.fromUserId === requesterId);
+    
+    if (!request) return;
+
+    try {
+      // Update request status
+      await update(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`), {
+        status: action
+      });
+
+      if (action === 'accept') {
+        // Add to both users' friends lists
+        const newFriend: Friend = {
+          userId: request.fromUserId,
+          userName: request.fromUserName,
+          addedAt: Date.now()
+        };
+        
+        const currentUserFriend: Friend = {
+          userId: telegramUser.id.toString(),
+          userName: telegramUser.first_name,
+          addedAt: Date.now()
+        };
+
+        await Promise.all([
+          set(ref(db, `users/${telegramUser.id}/friends/${request.fromUserId}`), newFriend),
+          set(ref(db, `users/${request.fromUserId}/friends/${telegramUser.id}`), currentUserFriend)
+        ]);
+      }
+    } catch (err) {
+      console.error('Error handling friend request:', err);
+    }
+  };
+
   return (
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
       
+      {/* Friend Request Section */}
+      <div className="card">
+        <h2 className="text-glow text-lg mb-2">Add Friend</h2>
+        <div className="space-y-2">
+          <div className="stat-row">
+            <input
+              type="text"
+              placeholder="Enter User ID"
+              value={friendId}
+              onChange={(e) => setFriendId(e.target.value)}
+              className="bg-black/30 border border-cyan-400/30 rounded-lg p-2 text-cyan-400 w-full"
+            />
+          </div>
+          <div className="stat-row">
+            <button
+              onClick={sendFriendRequest}
+              className="bg-transparent border border-cyan-400 text-cyan-400 px-4 py-2 rounded-lg hover:bg-cyan-400/10"
+            >
+              Send Request
+            </button>
+          </div>
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+        </div>
+      </div>
+
+      {/* Pending Requests Section */}
+      {pendingRequests.length > 0 && (
+        <div className="card mt-4">
+          <h2 className="text-glow text-lg mb-2">Pending Requests</h2>
+          {pendingRequests.map((request) => (
+            <div key={request.fromUserId} className="stat-row">
+              <span className="text-value">{request.fromUserName}</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleRequest(request.fromUserId, 'accept')}
+                  className="bg-transparent border border-cyan-400 text-cyan-400 px-3 py-1 rounded-lg hover:bg-cyan-400/10"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleRequest(request.fromUserId, 'reject')}
+                  className="bg-transparent border border-red-400 text-red-400 px-3 py-1 rounded-lg hover:bg-red-400/10"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Friends List Section */}
+      {friends.length > 0 && (
+        <div className="card mt-4">
+          <h2 className="text-glow text-lg mb-2">My Friends</h2>
+          {friends.map((friend) => (
+            <div key={friend.userId} className="stat-row">
+              <span className="text-value">{friend.userName}</span>
+              <span className="text-info">{friend.userId}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Invite Section - your existing code */}
       <div 
         style={{
           backgroundImage: `url(${ramka})`,
           backgroundSize: '100% 100%',
           backgroundRepeat: 'no-repeat',
           padding: '20px',
+          marginTop: '20px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -124,7 +305,6 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     </div>
   );
 };
-
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
   const db = getDatabase();

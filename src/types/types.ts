@@ -88,4 +88,17 @@ export interface VisitStats {
   ticketsFromInvites?: number;
 }
 
+export interface FriendRequest {
+  fromUserId: string;
+  fromUserName: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  timestamp: number;
+}
+
+export interface Friend {
+  userId: string;
+  userName: string;
+  addedAt: number;
+}
+
 export type NavigationPage = 'main' | 'friends' | 'account' | 'tasks';
