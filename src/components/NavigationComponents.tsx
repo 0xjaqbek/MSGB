@@ -14,6 +14,7 @@ import tasksDefault from '../assets/tasksD.svg';
 import { get, getDatabase, ref } from 'firebase/database';
 import hudBackground from '../assets/HUDbottom.svg';
 import InviteComponent from '../InviteComponent';
+import ramka from '../assets/ramka.svg';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -95,13 +96,27 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     <div className="page-container" style={{ marginTop: '30px' }}>
       <h1 className="text-glow text-xl mb-4">Friends</h1>
       
-      {/* Invite Section */}
-      <div className="card px-2">
-        <h2 className="text-glow text-lg p-5 mb-2">Invite Friends</h2>
-        <p className="text-info mb-4 mx-10">
-          Invite friends to play and earn permanent extra tickets!
+      <div 
+        style={{
+          backgroundImage: `url(${ramka})`,
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          color: '#0FF',
+          textAlign: 'center'
+        }}
+      >
+        <h2 className="text-glow text-lg mb-4">Invite Friends</h2>
+        <p className="text-info mb-4 px-4">
+          Invite friends to play and earn permanent extra tickets! 
           Each invited friend gives you and him +1 ticket permanently.
         </p>
+      </div>
+      
+      <div className="mt-4 flex justify-center">
         <InviteComponent 
           botUsername="moonstonesgamebot" 
           userId={telegramUser?.id.toString()}
