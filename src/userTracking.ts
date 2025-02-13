@@ -1,4 +1,5 @@
 import { getDatabase, ref, get, set, update } from 'firebase/database';
+import { calculateAvailableTickets } from './ticketManagement';
 
 export interface UserVisit {
   lastVisit: string;
@@ -46,6 +47,9 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
     const now = new Date();
     const today = now.toISOString().split('T')[0];
     
+    // Get max tickets available
+    const maxTickets = await calculateAvailableTickets(userId);
+    
     // If user doesn't exist, create initial user data
     if (!snapshot.exists()) {
       const initialVisit: VisitStats = {
@@ -58,13 +62,12 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
         isNewDay: true,
         isFirstVisit: true,
         todayVisits: 1,
-        playsRemaining: 5,  // Default initial plays
+        playsRemaining: maxTickets, 
         playsToday: 0,
-        maxPlaysToday: 5,
+        maxPlaysToday: maxTickets,
         ticketsFromInvites: 0
       };
       
-      // Set initial data
       await set(userRef, { 
         visits: initialVisit,
         userId: userId,
@@ -72,18 +75,30 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
         referrals: {
           ticketsFromInvites: 0,
           invitedUsers: []
+        },
+        plays: {
+          today: 0,
+          max: maxTickets,
+          remaining: maxTickets,
+          lastPlayed: null
         }
       });
       
-      return initialVisit;
+      return {
+        ...initialVisit,
+        playsRemaining: maxTickets,
+        playsToday: 0,
+        maxPlaysToday: maxTickets
+      };
     }
     
     // Existing user logic
     const userData = snapshot.val();
     const existingVisits = userData.visits || {};
     const ticketsFromInvites = userData.referrals?.ticketsFromInvites || 0;
+    const plays = userData.plays || { today: 0, max: maxTickets, remaining: maxTickets };
     
-    // Provide default values if any property is missing
+    // Process visit data without plays
     const processedVisits: VisitStats = {
       lastVisit: existingVisits.lastVisit || today,
       currentStreak: existingVisits.currentStreak || 1,
@@ -94,22 +109,28 @@ export const trackUserVisit = async (userId: string, userName: string): Promise<
       isNewDay: today !== existingVisits.lastVisit,
       isFirstVisit: !existingVisits.firstVisitComplete,
       todayVisits: (existingVisits.dailyVisits?.[today] || 0) + 1,
-      playsRemaining: existingVisits.playsRemaining || 5,
-      playsToday: (existingVisits.playsToday || 0) + 1,
-      maxPlaysToday: existingVisits.maxPlaysToday || 5,
-      ticketsFromInvites
+      ticketsFromInvites,
+      playsRemaining: plays.remaining,
+      playsToday: plays.today,
+      maxPlaysToday: plays.max
     };
     
-    // Update user data
+    // If it's a new day, reset play counts
+    if (processedVisits.isNewDay) {
+      plays.today = 0;
+      plays.max = maxTickets;
+      plays.remaining = maxTickets;
+    }
+    
+    // Update both visits and plays data
     await update(userRef, { 
-      visits: processedVisits 
+      visits: processedVisits,
+      plays
     });
     
     return processedVisits;
   } catch (error) {
     console.error('Error in trackUserVisit:', error);
-    
-    // Fallback to a default state if everything fails
     return {
       lastVisit: new Date().toISOString().split('T')[0],
       currentStreak: 1,
