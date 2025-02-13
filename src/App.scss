@@ -10,17 +10,37 @@
   @return unquote($value);
 }
 
+/* Add iOS-specific media query for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .app-container {
+    padding-top: env(safe-area-inset-top);
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  
+  .HUDTop {
+    height: calc((172 / 412) * 100vw + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
 /* Generate shadows for the stars */
 $shadows-small: multiple-box-shadow(700);
 $shadows-medium: multiple-box-shadow(200);
 $shadows-big: multiple-box-shadow(100);
 
-html, body {
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
   height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  overscroll-behavior: none; // Prevent pull-to-refresh
+  overscroll-behavior: none;
+  position: fixed;
+  width: 100%;
 }
 
 #root {
@@ -31,6 +51,11 @@ html, body {
   top: 0;
   left: 0;
   font-family: 'REM', sans-serif !important;
+  /* Add support for iOS safe areas */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 @media all and (display-mode: fullscreen) {
@@ -126,7 +151,7 @@ html, body {
 // Navigation styles
 .navigation-container {
   position: fixed;
-  bottom: 0;
+  bottom: env(safe-area-inset-bottom, 0);
   left: 0;
   right: 0;
   height: 64px;
@@ -134,6 +159,7 @@ html, body {
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .scoreboard {
@@ -143,7 +169,7 @@ html, body {
 /* Title styling */
 #title {
   position: absolute;
-  top: 2%;
+  top: calc(2% + env(safe-area-inset-top, 0px));
   left: 0;
   right: 0;
   color: -webkit-linear-gradient(white, #38495a);
@@ -156,6 +182,7 @@ html, body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: rgba(255, 255, 255, 0);
 }
+
 
 .button {
   color: black;
