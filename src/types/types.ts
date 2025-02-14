@@ -86,6 +86,7 @@ export interface VisitStats {
   playsToday: number;
   maxPlaysToday: number;
   ticketsFromInvites?: number;
+  ticketsFromFriends?: number;  
 }
 
 export interface FriendRequest {

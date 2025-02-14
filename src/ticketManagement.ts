@@ -94,7 +94,7 @@ export const processInviteLink = async (userId: string, startParam: string) => {
     }
   };
 
-export const calculateAvailableTickets = async (userId: string): Promise<number> => {
+  export const calculateAvailableTickets = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const userRef = ref(db, `users/${userId}`);
     
@@ -106,18 +106,19 @@ export const calculateAvailableTickets = async (userId: string): Promise<number>
   
       const userData = snapshot.val();
       const referralData = userData.referrals || { ticketsFromInvites: 0 };
+      const ticketsFromFriends = userData.ticketsFromFriends || 0;
       
-      // Base tickets (5) + streak bonus + referral bonus
+      // Base tickets (5) + streak bonus + referral bonus + friends bonus
       const baseTickets = 5;
       const streakBonus = Math.max(0, (userData.visits?.currentStreak || 1) - 1);
       const referralBonus = referralData.ticketsFromInvites || 0;
       
-      return baseTickets + streakBonus + referralBonus;
+      return baseTickets + streakBonus + referralBonus + ticketsFromFriends;
     } catch (error) {
       console.error('Error calculating tickets:', error);
       return 5;
     }
-};
+  };
   
   export const updatePlayCount = async (userId: string): Promise<number> => {
     const db = getDatabase();

@@ -32,6 +32,7 @@ export interface VisitStats {
   playsToday: number;
   maxPlaysToday: number;
   ticketsFromInvites?: number;
+  ticketsFromFriends?: number
 }
 
 const calculateMaxPlays = (streak: number): number => {
@@ -68,7 +69,8 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
         playsRemaining: maxTickets, 
         playsToday: 0,
         maxPlaysToday: maxTickets,
-        ticketsFromInvites: 0
+        ticketsFromInvites: 0,
+        ticketsFromFriends: 0
       };
       
       await set(userRef, { 
@@ -82,6 +84,7 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
           ticketsFromInvites: 0,
           invitedUsers: []
         },
+        ticketsFromFriends: 0, 
         plays: {
           today: 0,
           max: maxTickets,
@@ -125,6 +128,7 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
       isFirstVisit: !existingVisits.firstVisitComplete,
       todayVisits: (existingVisits.dailyVisits?.[today] || 0) + 1,
       ticketsFromInvites,
+      ticketsFromFriends: userData.ticketsFromFriends || 0, 
       playsRemaining: plays.remaining,
       playsToday: plays.today,
       maxPlaysToday: plays.max
@@ -157,7 +161,8 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
       playsRemaining: 5,
       playsToday: 0,
       maxPlaysToday: 5,
-      ticketsFromInvites: 0
+      ticketsFromInvites: 0,
+      ticketsFromFriends: 0
     };
   }
 };

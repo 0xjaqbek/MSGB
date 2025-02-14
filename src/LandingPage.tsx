@@ -15,6 +15,7 @@ interface LandingPageProps {
     isFirstVisit: boolean;
     playsRemaining: number;
     ticketsFromInvites?: number;
+    ticketsFromFriends?: number; 
   } | null;
 }
 
@@ -230,6 +231,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
             {userStats.ticketsFromInvites && userStats.ticketsFromInvites > 0 && (
               <BonusInfo style={{ color: '#0FF' }}>
                 +{userStats.ticketsFromInvites} permanent tickets from invites!
+              </BonusInfo>
+            )}
+            {userStats.ticketsFromFriends && userStats.ticketsFromFriends > 0 && (
+              <BonusInfo style={{ color: '#FFD700' }}>
+                +{userStats.ticketsFromFriends} bonus tickets from friends!
               </BonusInfo>
             )}
           </>

@@ -246,10 +246,38 @@ const handleRequest = async (requesterId: string, action: 'accept' | 'reject') =
         status: 'online'
       };
 
+      // Get current friends count and calculate bonus tickets
+      const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+      const friendsSnapshot = await get(friendsRef);
+      const currentFriendsCount = friendsSnapshot.exists() ? Object.keys(friendsSnapshot.val()).length : 0;
+      const newFriendsCount = currentFriendsCount + 1;
+      const bonusTickets = Math.floor(newFriendsCount / 2);
+      const previousBonusTickets = Math.floor(currentFriendsCount / 2);
+      
+      // Only update if bonus tickets increased
+      if (bonusTickets > previousBonusTickets) {
+        await update(ref(db, `users/${telegramUser.id}`), {
+          'ticketsFromFriends': bonusTickets
+        });
+      }
+
       await Promise.all([
         set(ref(db, `users/${telegramUser.id}/friends/${request.fromUserId}`), newFriend),
         set(ref(db, `users/${request.fromUserId}/friends/${telegramUser.id}`), currentUserFriend)
       ]);
+
+      // Calculate and update bonus tickets for requester as well
+      const requesterFriendsRef = ref(db, `users/${request.fromUserId}/friends`);
+      const requesterFriendsSnapshot = await get(requesterFriendsRef);
+      const requesterFriendsCount = requesterFriendsSnapshot.exists() ? Object.keys(requesterFriendsSnapshot.val()).length : 0;
+      const requesterBonusTickets = Math.floor(requesterFriendsCount / 2);
+      const previousRequesterBonusTickets = Math.floor((requesterFriendsCount - 1) / 2);
+
+      if (requesterBonusTickets > previousRequesterBonusTickets) {
+        await update(ref(db, `users/${request.fromUserId}`), {
+          'ticketsFromFriends': requesterBonusTickets
+        });
+      }
 
       // Send acceptance notification
       window.Telegram?.WebApp?.sendData(JSON.stringify({
@@ -264,6 +292,7 @@ const handleRequest = async (requesterId: string, action: 'accept' | 'reject') =
     console.error('Error handling friend request:', err);
   }
 };
+
 
 const removeFriend = async (friendId: string) => {
   if (!telegramUser) return;
