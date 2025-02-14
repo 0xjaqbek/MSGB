@@ -337,54 +337,18 @@ const removeFriend = async (friendId: string) => {
 
   const ActionButton = styled.button<{ $variant?: 'danger' | 'success' | 'white' }>`
   background: transparent;
-  border: 1px solid ${props => {
-    switch (props.$variant) {
-      case 'danger':
-        return '#FF4444';
-      case 'white':
-        return '#FFFFFF';
-      default:
-        return '#0FF';
-    }
-  }};
-  color: ${props => {
-    switch (props.$variant) {
-      case 'danger':
-        return '#FF4444';
-      case 'white':
-        return '#FFFFFF';
-      default:
-        return '#0FF';
-    }
-  }};
-  padding: 6px 12px;
-  border-radius: 8px;
+  border: ${props => props.$variant === 'white' ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid ' + (props.$variant === 'danger' ? '#FF4444' : '#0FF')};
+  color: ${props => props.$variant === 'white' ? '#FFF' : props.$variant === 'danger' ? '#FF4444' : '#0FF'};
+  padding: 8px 24px;
+  border-radius: 20px; // More rounded corners
   font-family: 'REM', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   margin: 4px;
   transition: all 0.3s ease;
 
   &:hover {
-    background: ${props => {
-      switch (props.$variant) {
-        case 'danger':
-          return 'rgba(255, 68, 68, 0.1)';
-        case 'white':
-          return 'rgba(255, 255, 255, 0.1)';
-        default:
-          return 'rgba(0, 255, 255, 0.1)';
-      }
-    }};
-    box-shadow: 0 0 10px ${props => {
-      switch (props.$variant) {
-        case 'danger':
-          return 'rgba(255, 68, 68, 0.3)';
-        case 'white':
-          return 'rgba(255, 255, 255, 0.3)';
-        default:
-          return 'rgba(0, 255, 255, 0.3)';
-      }
-    }};
+    background: ${props => props.$variant === 'white' ? 'rgba(255, 255, 255, 0.1)' : props.$variant === 'danger' ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 255, 255, 0.1)'};
+    box-shadow: 0 0 15px ${props => props.$variant === 'white' ? 'rgba(255, 255, 255, 0.2)' : props.$variant === 'danger' ? 'rgba(255, 68, 68, 0.2)' : 'rgba(0, 255, 255, 0.2)'};
   }
 `;
 
@@ -392,8 +356,8 @@ const ramkaStyle = {
   backgroundImage: `url(${ramka})`,
   backgroundSize: '100% 100%',
   backgroundRepeat: 'no-repeat',
-  padding: '20px',
-  marginTop: '20px',
+  padding: '12px 20px',
+  marginTop: '10px',
   width: '90%',
   maxWidth: '400px',
   display: 'flex',
