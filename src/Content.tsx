@@ -591,6 +591,7 @@ const TotalPointsValue = styled.div`
 `;
 
 const MoonstoneTitle = styled.div`
+  justify-content: center;
   display: flex;
   color: white;
   font-size: 1rem;
