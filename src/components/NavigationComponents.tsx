@@ -16,6 +16,7 @@ import hudBackground from '../assets/HUDbottom.svg';
 import InviteComponent from '../InviteComponent';
 import ramka from '../assets/ramka.svg';
 import styled from 'styled-components';
+import FriendsModal from './FriendsModal';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -99,6 +100,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [errorTimeout, setErrorTimeout] = useState<NodeJS.Timeout | null>(null);
   const [showConfirmRemove, setShowConfirmRemove] = useState<string | null>(null);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
 
   useEffect(() => {
     if (!telegramUser) return;
@@ -380,6 +382,17 @@ const removeFriend = async (friendId: string) => {
   }
 `;
 
+const FriendsButton = styled(ActionButton)`
+  width: 80%;
+  margin: 20px auto;
+  padding: 12px;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`;
+
 const ramkaStyle = {
   backgroundImage: `url(${ramka})`,
   backgroundSize: '100% 100%',
@@ -507,49 +520,24 @@ return (
 
     {/* Friends List Section */}
     {friends.length > 0 && (
-      <div style={ramkaStyle}>
-        <div style={innerContainerStyle}>
-          <h2 className="text-glow text-lg mb-2">My Friends</h2>
-          {friends.map((friend) => (
-            <div key={friend.userId} 
-              style={{ 
-                width: '100%',
-                borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
-                padding: '8px 0',
-                marginBottom: '8px'
-              }}
-            >
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center'
-              }}>
-                <div>
-                  <div style={{ color: 'white' }}>{friend.userName}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
-                    {formatLastActive(friend.lastActive)}
-                  </div>
-                </div>
-                {showConfirmRemove === friend.userId ? (
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
-                      Confirm
-                    </ActionButton>
-                    <ActionButton onClick={() => setShowConfirmRemove(null)}>
-                      Cancel
-                    </ActionButton>
-                  </div>
-                ) : (
-                  <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
-                    Remove
-                  </ActionButton>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
+  <>
+    <FriendsButton 
+      onClick={() => setShowFriendsModal(true)}
+    >
+      My Friends ({friends.length})
+    </FriendsButton>
+    
+    <FriendsModal
+      isOpen={showFriendsModal}
+      onClose={() => setShowFriendsModal(false)}
+      friends={friends}
+      formatLastActive={formatLastActive}
+      onRemoveFriend={removeFriend}
+      showConfirmRemove={showConfirmRemove}
+      setShowConfirmRemove={setShowConfirmRemove}
+    />
+  </>
+)}
   </div>
 );
 };
