@@ -97,6 +97,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [error, setError] = useState('');
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [errorTimeout, setErrorTimeout] = useState<NodeJS.Timeout | null>(null);
   const [showConfirmRemove, setShowConfirmRemove] = useState<string | null>(null);
 
   useEffect(() => {
@@ -145,6 +146,25 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     };
   }, [telegramUser]);
 
+  const showError = (message: string) => {
+    // Clear any existing timeout
+    if (errorTimeout) {
+      clearTimeout(errorTimeout);
+    }
+  
+    // Set the new error message
+    setError(message);
+  
+    // Set a new timeout to clear the error after 4 seconds
+    const newTimeout = setTimeout(() => {
+      setError('');
+      setErrorTimeout(null);
+    }, 4000);
+  
+    // Save the timeout reference
+    setErrorTimeout(newTimeout);
+  };
+
   const formatLastActive = (timestamp?: number) => {
     if (!timestamp) return 'Never';
     const diff = Date.now() - timestamp;
@@ -156,65 +176,73 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
-const sendFriendRequest = async () => {
-  if (!telegramUser || !friendId.trim()) {
-    setError('Please enter a User ID');
-    return;
-  }
-
-  try {
-    const db = getDatabase();
-    const targetUserRef = ref(db, `users/${friendId}`);
-    const snapshot = await get(targetUserRef);
-
-    if (!snapshot.exists()) {
-      setError('User not found');
+  const sendFriendRequest = async () => {
+    if (!telegramUser || !friendId.trim()) {
+      showError('Please enter a User ID');
       return;
     }
-
-    if (friendId === telegramUser.id.toString()) {
-      setError('Cannot add yourself as a friend');
-      return;
+  
+    try {
+      const db = getDatabase();
+      const targetUserRef = ref(db, `users/${friendId}`);
+      const snapshot = await get(targetUserRef);
+  
+      if (!snapshot.exists()) {
+        showError('User not found');
+        return;
+      }
+  
+      if (friendId === telegramUser.id.toString()) {
+        showError('Cannot add yourself as a friend');
+        return;
+      }
+  
+      const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
+      const friendSnapshot = await get(existingFriendRef);
+      if (friendSnapshot.exists()) {
+        showError('Already friends with this user');
+        return;
+      }
+  
+      const existingRequestRef = ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`);
+      const requestSnapshot = await get(existingRequestRef);
+      if (requestSnapshot.exists()) {
+        showError('Friend request already sent');
+        return;
+      }
+  
+      // Send friend request
+      const request: FriendRequest = {
+        fromUserId: telegramUser.id.toString(),
+        fromUserName: telegramUser.first_name,
+        status: 'pending',
+        timestamp: Date.now()
+      };
+  
+      await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
+      
+      // Send Telegram notification
+      window.Telegram?.WebApp?.sendData(JSON.stringify({
+        action: 'friendRequest',
+        targetUserId: friendId,
+        senderName: telegramUser.first_name
+      }));
+  
+      setFriendId('');
+      showError('Friend request sent!');
+    } catch (err) {
+      console.error('Error sending friend request:', err);
+      showError('Error sending friend request');
     }
+  };
 
-    const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
-    const friendSnapshot = await get(existingFriendRef);
-    if (friendSnapshot.exists()) {
-      setError('Already friends with this user');
-      return;
-    }
-
-    const existingRequestRef = ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`);
-    const requestSnapshot = await get(existingRequestRef);
-    if (requestSnapshot.exists()) {
-      setError('Friend request already sent');
-      return;
-    }
-
-    // Send friend request
-    const request: FriendRequest = {
-      fromUserId: telegramUser.id.toString(),
-      fromUserName: telegramUser.first_name,
-      status: 'pending',
-      timestamp: Date.now()
+  useEffect(() => {
+    return () => {
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+      }
     };
-
-    await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
-    
-    // Send Telegram notification
-    window.Telegram?.WebApp?.sendData(JSON.stringify({
-      action: 'friendRequest',
-      targetUserId: friendId,
-      senderName: telegramUser.first_name
-    }));
-
-    setFriendId('');
-    setError('Friend request sent!');
-  } catch (err) {
-    console.error('Error sending friend request:', err);
-    setError('Error sending friend request');
-  }
-};
+  }, [errorTimeout]);
 
 const handleRequest = async (requesterId: string, action: 'accept' | 'reject') => {
   if (!telegramUser) return;
@@ -374,178 +402,178 @@ const innerContainerStyle = {
   maxWidth: '100%'
 } as const;
 
-  return (
-    <div className="page-container" style={{ marginTop: '20px' }}>
-      <h1 className="text-glow text-xl mb-1">Friends</h1>
+return (
+  <div className="page-container" style={{ marginTop: '20px' }}>
+    <h1 className="text-glow text-xl mb-1">Friends</h1>
 
-      {/* Add Friend/Pending Requests Section */}
-      <div style={{...ramkaStyle, marginTop: '10px'}}>
-        <div style={innerContainerStyle}>
-          {pendingRequests.length > 0 ? (
-            <>
-              <h2 className="text-glow text-lg mb-1">Pending Requests</h2>
-              {pendingRequests.map((request) => (
-                <div key={request.fromUserId} 
-                  style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    width: '100%',
-                    marginBottom: '8px'
-                  }}
-                >
-                  <span style={{ color: 'white', marginBottom: '8px' }}>{request.fromUserName}</span>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
-                      Accept
-                    </ActionButton>
-                    <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
-                      Reject
-                    </ActionButton>
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              <p className="text-info mb-1" style={{ color: 'white' }}>
-                Get extra ticket<br/>for every 2 friends added
-              </p>
-              <div style={{ 
-                position: 'relative',
-                width: '90%',
-                maxWidth: '300px',
-                marginTop: '16px',
-                marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                paddingLeft: '10px' 
-              }}>
-                {error && (
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '-30px', 
-                    left: '50%', 
-                    transform: 'translateX(-50%)', 
-                    background: 'rgba(0, 0, 0, 0.8)', 
-                    padding: '8px 16px', 
-                    borderRadius: '8px', 
-                    color: error.includes('sent') ? '#0FF' : '#FF4444', 
-                    fontSize: '0.9rem', 
-                    whiteSpace: 'nowrap', 
-                    zIndex: 10, 
-                    pointerEvents: 'none' 
-                  }}>
-                    {error}
-                  </div>
-                )}
-                <input
-                  type="text"
-                  placeholder="Enter User ID"
-                  value={friendId}
-                  onChange={(e) => setFriendId(e.target.value)}
-                  style={{
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    border: '1px solid rgba(0, 255, 255, 0.15)', 
-                    borderRadius: '8px',
-                    padding: '12px 16px',
-                    paddingRight: '110px', // Fixed width for button + padding
-                    color: '#0FF',
-                    width: '100%',
-                    fontFamily: 'REM, sans-serif',
-                    fontSize: '1rem'
-                  }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  right: '4px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  <ActionButton 
-                    onClick={sendFriendRequest} 
-                    $variant="white"
-                    style={{
-                      margin: 0,
-                      padding: '8px 16px',
-                      height: 'calc(100% - 8px)',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Add Friend
-                  </ActionButton>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Invite Section */}
-      <div style={ramkaStyle}>
-        <div style={innerContainerStyle}>
-          <p className="text-info mb-2" style={{ color: 'white' }}>
-            Invite players —each adds<br/>
-            <span style={{ color: '#FFD700' }}> +1 ticket permanently</span><br/>
-            for both of you!
-          </p>
-        </div>
-      </div>
-      
-      <div className="mt-4 flex justify-center">
-        <InviteComponent 
-          botUsername="moonstonesgamebot" 
-          userId={telegramUser?.id.toString()}
-        />
-      </div>
-
-      {/* Friends List Section */}
-      {friends.length > 0 && (
-        <div style={ramkaStyle}>
-          <div style={innerContainerStyle}>
-            <h2 className="text-glow text-lg mb-2">My Friends</h2>
-            {friends.map((friend) => (
-              <div key={friend.userId} 
+    {/* Add Friend/Pending Requests Section */}
+    <div style={{...ramkaStyle, marginTop: '10px'}}>
+      <div style={innerContainerStyle}>
+        {pendingRequests.length > 0 ? (
+          <>
+            <h2 className="text-glow text-lg mb-1">Pending Requests</h2>
+            {pendingRequests.map((request) => (
+              <div key={request.fromUserId} 
                 style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
                   width: '100%',
-                  borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
-                  padding: '8px 0',
                   marginBottom: '8px'
                 }}
               >
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center'
-                }}>
-                  <div>
-                    <div style={{ color: 'white' }}>{friend.userName}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
-                      {formatLastActive(friend.lastActive)}
-                    </div>
-                  </div>
-                  {showConfirmRemove === friend.userId ? (
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
-                        Confirm
-                      </ActionButton>
-                      <ActionButton onClick={() => setShowConfirmRemove(null)}>
-                        Cancel
-                      </ActionButton>
-                    </div>
-                  ) : (
-                    <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
-                      Remove
-                    </ActionButton>
-                  )}
+                <span style={{ color: 'white', marginBottom: '8px' }}>{request.fromUserName}</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
+                    Accept
+                  </ActionButton>
+                  <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
+                    Reject
+                  </ActionButton>
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
+          </>
+        ) : (
+          <>
+            <p className="text-info mb-1" style={{ color: 'white' }}>
+              Get extra ticket<br/>for every 2 friends added
+            </p>
+            <div style={{ 
+              position: 'relative',
+              width: '90%',
+              maxWidth: '300px',
+              marginTop: '16px',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: '10px' 
+            }}>
+              {error && (
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '-30px', 
+                  left: '50%', 
+                  transform: 'translateX(-50%)', 
+                  background: 'rgba(0, 0, 0, 0.8)', 
+                  padding: '8px 16px', 
+                  borderRadius: '8px', 
+                  color: error.includes('sent') ? '#0FF' : '#FF4444', 
+                  fontSize: '0.9rem', 
+                  whiteSpace: 'nowrap', 
+                  zIndex: 10, 
+                  pointerEvents: 'none' 
+                }}>
+                  {error}
+                </div>
+              )}
+              <input
+                type="text"
+                placeholder="Enter User ID"
+                value={friendId}
+                onChange={(e) => setFriendId(e.target.value)}
+                style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(0, 255, 255, 0.15)', 
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  paddingRight: '110px', // Fixed width for button + padding
+                  color: '#0FF',
+                  width: '100%',
+                  fontFamily: 'REM, sans-serif',
+                  fontSize: '1rem'
+                }}
+              />
+              <div style={{
+                position: 'absolute',
+                right: '4px',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <ActionButton 
+                  onClick={sendFriendRequest} 
+                  $variant="white"
+                  style={{
+                    margin: 0,
+                    padding: '8px 16px',
+                    height: 'calc(100% - 8px)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Add Friend
+                </ActionButton>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
-  );
+
+    {/* Invite Section */}
+    <div style={ramkaStyle}>
+      <div style={innerContainerStyle}>
+        <p className="text-info mb-2" style={{ color: 'white' }}>
+          Invite players —each adds<br/>
+          <span style={{ color: '#FFD700' }}> +1 ticket permanently</span><br/>
+          for both of you!
+        </p>
+      </div>
+    </div>
+    
+    <div className="mt-4 flex justify-center">
+      <InviteComponent 
+        botUsername="moonstonesgamebot" 
+        userId={telegramUser?.id.toString()}
+      />
+    </div>
+
+    {/* Friends List Section */}
+    {friends.length > 0 && (
+      <div style={ramkaStyle}>
+        <div style={innerContainerStyle}>
+          <h2 className="text-glow text-lg mb-2">My Friends</h2>
+          {friends.map((friend) => (
+            <div key={friend.userId} 
+              style={{ 
+                width: '100%',
+                borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
+                padding: '8px 0',
+                marginBottom: '8px'
+              }}
+            >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{ color: 'white' }}>{friend.userName}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
+                    {formatLastActive(friend.lastActive)}
+                  </div>
+                </div>
+                {showConfirmRemove === friend.userId ? (
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
+                      Confirm
+                    </ActionButton>
+                    <ActionButton onClick={() => setShowConfirmRemove(null)}>
+                      Cancel
+                    </ActionButton>
+                  </div>
+                ) : (
+                  <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
+                    Remove
+                  </ActionButton>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+);
 };
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
