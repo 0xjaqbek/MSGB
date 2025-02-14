@@ -388,78 +388,109 @@ const removeFriend = async (friendId: string) => {
   }
 `;
 
+const ramkaStyle = {
+  backgroundImage: `url(${ramka})`,
+  backgroundSize: '100% 100%',
+  backgroundRepeat: 'no-repeat',
+  padding: '20px',
+  marginTop: '20px',
+  width: '90%',
+  maxWidth: '400px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  color: '#0FF',
+  textAlign: 'center'
+} as const;
+
+const innerContainerStyle = {
+  width: '90%',
+  maxWidth: '90%'
+} as const;
+
 return (
   <div className="page-container" style={{ marginTop: '30px' }}>
     <h1 className="text-glow text-xl mb-4">Friends</h1>
-     {/* Add Friend Section */}
-     <div style={{
-        backgroundImage: `url(${ramka})`,
-        backgroundSize: '100% 100%',
-        backgroundRepeat: 'no-repeat',
-        padding: '20px',
-        marginTop: '20px',
-        width: '90%',
-        maxWidth: '90%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        color: '#0FF',
-        textAlign: 'center'
-      }}>
-        <div className="mb-2 px-4" style={{ width: '100%' }}>
-          <p className="text-info" style={{ color: 'white' }}>
-            Get extra ticket<br/>for every 2 friends added
-          </p>
-          <input
-            type="text"
-            placeholder="Enter User ID"
-            value={friendId}
-            onChange={(e) => setFriendId(e.target.value)}
-            style={{
-              background: 'rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(0, 255, 255, 0.3)',
-              borderRadius: '8px',
-              padding: '8px 12px',
-              color: '#0FF',
-              width: '60%',
-              fontFamily: 'REM, sans-serif',
-              fontSize: '0.9rem',
-              marginTop: '8px',
-              marginBottom: '8px'
-            }}
-          />
-          <div>
-          <ActionButton onClick={sendFriendRequest} $variant="white">
+
+    {/* Add Friend/Pending Requests Section */}
+    <div style={ramkaStyle}>
+      <div style={innerContainerStyle}>
+        {pendingRequests.length > 0 ? (
+          <>
+            <h2 className="text-glow text-lg mb-2">Pending Requests</h2>
+            {pendingRequests.map((request) => (
+              <div key={request.fromUserId} 
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  width: '100%',
+                  marginBottom: '8px'
+                }}
+              >
+                <span style={{ color: 'white', marginBottom: '8px' }}>{request.fromUserName}</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
+                    Accept
+                  </ActionButton>
+                  <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
+                    Reject
+                  </ActionButton>
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <p className="text-info mb-2" style={{ color: 'white' }}>
+              Get extra ticket<br/>for every 2 friends added
+            </p>
+            <input
+              type="text"
+              placeholder="Enter User ID"
+              value={friendId}
+              onChange={(e) => setFriendId(e.target.value)}
+              style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(0, 255, 255, 0.3)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                color: '#0FF',
+                width: '60%',
+                fontFamily: 'REM, sans-serif',
+                fontSize: '0.9rem',
+                marginTop: '8px',
+                marginBottom: '8px'
+              }}
+            />
+            <div>
+              <ActionButton onClick={sendFriendRequest} $variant="white">
                 Add Friend
               </ActionButton>
-            {error && (
-              <div style={{ color: error.includes('sent') ? '#0FF' : '#FF4444', fontSize: '0.8rem', marginTop: '4px' }}>
-                {error}
-              </div>
-            )}
-          </div>
-        </div>
+              {error && (
+                <div style={{ 
+                  color: error.includes('sent') ? '#0FF' : '#FF4444',
+                  fontSize: '0.8rem',
+                  marginTop: '4px'
+                }}>
+                  {error}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
+    </div>
 
-        {/* Invite Section */}
-        <div style={{
-      backgroundImage: `url(${ramka})`,
-      backgroundSize: '100% 100%',
-      backgroundRepeat: 'no-repeat',
-      padding: '20px',
-      marginTop: '20px',
-      width: '90%',
-      maxWidth: '400px',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      color: '#0FF',
-      textAlign: 'center'
-    }}>
-      <p className="text-info mb-2 px-4" style={{ color: 'white' }}>
-      Invite players —each adds<br/><span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
-      <br/>for both of you!  
-      </p>
+    {/* Invite Section */}
+    <div style={ramkaStyle}>
+      <div style={innerContainerStyle}>
+        <p className="text-info mb-2" style={{ color: 'white' }}>
+          Invite players —each adds<br/>
+          <span style={{ color: '#FFD700' }}> +1 ticket permanently</span><br/>
+          for both of you!
+        </p>
+      </div>
     </div>
     
     <div className="mt-4 flex justify-center">
@@ -469,101 +500,49 @@ return (
       />
     </div>
 
-    {/* Pending Requests Section */}
-    {pendingRequests.length > 0 && (
-      <div style={{
-        backgroundImage: `url(${ramka})`,
-        backgroundSize: '100% 100%',
-        backgroundRepeat: 'no-repeat',
-        padding: '20px',
-        marginTop: '20px',
-        width: '90%',
-        maxWidth: '400px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        color: '#0FF',
-        textAlign: 'center'
-      }}>
-        <h2 className="text-glow text-lg mb-2">Pending Requests</h2>
-        {pendingRequests.map((request) => (
-          <div key={request.fromUserId} 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              width: '100%',
-              marginBottom: '8px'
-            }}
-          >
-            <span style={{ color: 'white' }}>{request.fromUserName}</span>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
-                Accept
-              </ActionButton>
-              <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
-                Reject
-              </ActionButton>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-
     {/* Friends List Section */}
     {friends.length > 0 && (
-      <div style={{
-        backgroundImage: `url(${ramka})`,
-        backgroundSize: '100% 100%',
-        backgroundRepeat: 'no-repeat',
-        padding: '20px',
-        marginTop: '20px',
-        width: '90%',
-        maxWidth: '400px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        color: '#0FF',
-        textAlign: 'center'
-      }}>
-        <h2 className="text-glow text-lg mb-2">My Friends</h2>
-        {friends.map((friend) => (
-          <div key={friend.userId} 
-            style={{ 
-              width: '100%',
-              borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
-              padding: '8px 0',
-              marginBottom: '8px'
-            }}
-          >
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center'
-            }}>
-              <div>
-                <div style={{ color: 'white' }}>{friend.userName}</div>
-                <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
-                  {formatLastActive(friend.lastActive)}
+      <div style={ramkaStyle}>
+        <div style={innerContainerStyle}>
+          <h2 className="text-glow text-lg mb-2">My Friends</h2>
+          {friends.map((friend) => (
+            <div key={friend.userId} 
+              style={{ 
+                width: '100%',
+                borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
+                padding: '8px 0',
+                marginBottom: '8px'
+              }}
+            >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{ color: 'white' }}>{friend.userName}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
+                    {formatLastActive(friend.lastActive)}
+                  </div>
                 </div>
+                {showConfirmRemove === friend.userId ? (
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
+                      Confirm
+                    </ActionButton>
+                    <ActionButton onClick={() => setShowConfirmRemove(null)}>
+                      Cancel
+                    </ActionButton>
+                  </div>
+                ) : (
+                  <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
+                    Remove
+                  </ActionButton>
+                )}
               </div>
-              {showConfirmRemove === friend.userId ? (
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
-                    Confirm
-                  </ActionButton>
-                  <ActionButton onClick={() => setShowConfirmRemove(null)}>
-                    Cancel
-                  </ActionButton>
-                </div>
-              ) : (
-                <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
-                  Remove
-                </ActionButton>
-              )}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     )}
   </div>
