@@ -3035,6 +3035,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   font-size: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `,pe=rt.div`
+  justify-content: center;
   display: flex;
   color: white;
   font-size: 1rem;
