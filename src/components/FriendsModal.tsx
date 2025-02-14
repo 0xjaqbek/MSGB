@@ -22,6 +22,7 @@ const ModalContent = styled.div`
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 30px;
+  padding-top: 60px;
   position: relative;
   overflow-y: auto;
   display: flex;
