@@ -598,8 +598,9 @@ const MoonstoneTitle = styled.div`
   padding-left: 8px;
   text-align: center;
   width: 100%;
+  justify-content: flex-end;
   position: absolute;
-  top: 3%;
+  top: 5%;
   left: 0;
   right: 0;
 `;
