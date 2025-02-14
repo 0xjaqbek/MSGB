@@ -329,7 +329,7 @@ const removeFriend = async (friendId: string) => {
   border-radius: 8px;
   padding: 8px 12px;
   color: #0FF;
-  width: 80%; // Reduced width to match invite section content
+  width: 70%; // Reduced width to fit inside ramka
   font-family: 'REM', sans-serif;
   font-size: 0.9rem;
   margin-bottom: 8px;
@@ -349,7 +349,7 @@ const SectionContainer = styled.div`
   background-image: url(${ramka});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 20px; // Matched padding with invite section
+  padding: 10px 10px; // Added horizontal padding to prevent overlap
   margin-bottom: 15px;
   width: 90%;
   max-width: 400px;
