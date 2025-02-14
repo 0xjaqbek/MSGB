@@ -3288,7 +3288,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   border-radius: 8px;
   padding: 8px 12px;
   color: #0FF;
-  width: 80%; // Reduced width to match invite section content
+  width: 70%; // Reduced width to fit inside ramka
   font-family: 'REM', sans-serif;
   font-size: 0.9rem;
   margin-bottom: 8px;
@@ -3306,7 +3306,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   background-image: url(${tw});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 20px; // Matched padding with invite section
+  padding: 10px 10px; // Added horizontal padding to prevent overlap
   margin-bottom: 15px;
   width: 90%;
   max-width: 400px;
