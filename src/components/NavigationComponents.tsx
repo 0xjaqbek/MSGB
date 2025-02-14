@@ -374,171 +374,178 @@ const innerContainerStyle = {
   maxWidth: '100%'
 } as const;
 
-return (
-  <div className="page-container" style={{ marginTop: '20px' }}>
-    <h1 className="text-glow text-xl mb-1">Friends</h1>
+  return (
+    <div className="page-container" style={{ marginTop: '20px' }}>
+      <h1 className="text-glow text-xl mb-1">Friends</h1>
 
-    {/* Add Friend/Pending Requests Section */}
-    <div style={{...ramkaStyle, marginTop: '10px'}}>
-      <div style={innerContainerStyle}>
-        {pendingRequests.length > 0 ? (
-          <>
-            <h2 className="text-glow text-lg mb-1">Pending Requests</h2>
-            {pendingRequests.map((request) => (
-              <div key={request.fromUserId} 
+      {/* Add Friend/Pending Requests Section */}
+      <div style={{...ramkaStyle, marginTop: '10px'}}>
+        <div style={innerContainerStyle}>
+          {pendingRequests.length > 0 ? (
+            <>
+              <h2 className="text-glow text-lg mb-1">Pending Requests</h2>
+              {pendingRequests.map((request) => (
+                <div key={request.fromUserId} 
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: '100%',
+                    marginBottom: '8px'
+                  }}
+                >
+                  <span style={{ color: 'white', marginBottom: '8px' }}>{request.fromUserName}</span>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
+                      Accept
+                    </ActionButton>
+                    <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
+                      Reject
+                    </ActionButton>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              <p className="text-info mb-1" style={{ color: 'white' }}>
+                Get extra ticket<br/>for every 2 friends added
+              </p>
+              <div style={{ 
+                position: 'relative',
+                width: '90%',
+                maxWidth: '300px',
+                marginTop: '16px',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                paddingLeft: '10px' 
+              }}>
+                {error && (
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: '-30px', 
+                    left: '50%', 
+                    transform: 'translateX(-50%)', 
+                    background: 'rgba(0, 0, 0, 0.8)', 
+                    padding: '8px 16px', 
+                    borderRadius: '8px', 
+                    color: error.includes('sent') ? '#0FF' : '#FF4444', 
+                    fontSize: '0.9rem', 
+                    whiteSpace: 'nowrap', 
+                    zIndex: 10, 
+                    pointerEvents: 'none' 
+                  }}>
+                    {error}
+                  </div>
+                )}
+                <input
+                  type="text"
+                  placeholder="Enter User ID"
+                  value={friendId}
+                  onChange={(e) => setFriendId(e.target.value)}
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    border: '1px solid rgba(0, 255, 255, 0.15)', 
+                    borderRadius: '8px',
+                    padding: '12px 16px',
+                    paddingRight: '110px', // Fixed width for button + padding
+                    color: '#0FF',
+                    width: '100%',
+                    fontFamily: 'REM, sans-serif',
+                    fontSize: '1rem'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  right: '4px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <ActionButton 
+                    onClick={sendFriendRequest} 
+                    $variant="white"
+                    style={{
+                      margin: 0,
+                      padding: '8px 16px',
+                      height: 'calc(100% - 8px)',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Add Friend
+                  </ActionButton>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Invite Section */}
+      <div style={ramkaStyle}>
+        <div style={innerContainerStyle}>
+          <p className="text-info mb-2" style={{ color: 'white' }}>
+            Invite players —each adds<br/>
+            <span style={{ color: '#FFD700' }}> +1 ticket permanently</span><br/>
+            for both of you!
+          </p>
+        </div>
+      </div>
+      
+      <div className="mt-4 flex justify-center">
+        <InviteComponent 
+          botUsername="moonstonesgamebot" 
+          userId={telegramUser?.id.toString()}
+        />
+      </div>
+
+      {/* Friends List Section */}
+      {friends.length > 0 && (
+        <div style={ramkaStyle}>
+          <div style={innerContainerStyle}>
+            <h2 className="text-glow text-lg mb-2">My Friends</h2>
+            {friends.map((friend) => (
+              <div key={friend.userId} 
                 style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  alignItems: 'center',
                   width: '100%',
+                  borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
+                  padding: '8px 0',
                   marginBottom: '8px'
                 }}
               >
-                <span style={{ color: 'white', marginBottom: '8px' }}>{request.fromUserName}</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
-                    Accept
-                  </ActionButton>
-                  <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
-                    Reject
-                  </ActionButton>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <div style={{ color: 'white' }}>{friend.userName}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
+                      {formatLastActive(friend.lastActive)}
+                    </div>
+                  </div>
+                  {showConfirmRemove === friend.userId ? (
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
+                        Confirm
+                      </ActionButton>
+                      <ActionButton onClick={() => setShowConfirmRemove(null)}>
+                        Cancel
+                      </ActionButton>
+                    </div>
+                  ) : (
+                    <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
+                      Remove
+                    </ActionButton>
+                  )}
                 </div>
               </div>
             ))}
-          </>
-        ) : (
-          <>
-            <p className="text-info mb-1" style={{ color: 'white' }}>
-              Get extra ticket<br/>for every 2 friends added
-            </p>
-            <div style={{ 
-              position: 'relative',
-              width: '90%',
-              maxWidth: '300px',
-              marginTop: '12px',
-              marginBottom: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              paddingLeft: '10px' 
-            }}>
-              <input
-                type="text"
-                placeholder="Enter User ID"
-                value={friendId}
-                onChange={(e) => setFriendId(e.target.value)}
-                style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(0, 255, 255, 0.15)', 
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  paddingRight: '110px', // Fixed width for button + padding
-                  color: '#0FF',
-                  width: '100%',
-                  fontFamily: 'REM, sans-serif',
-                  fontSize: '1rem'
-                }}
-              />
-              <div style={{
-                position: 'absolute',
-                right: '4px',
-                display: 'flex',
-                alignItems: 'center'
-              }}>
-                <ActionButton 
-                  onClick={sendFriendRequest} 
-                  $variant="white"
-                  style={{
-                    margin: 0,
-                    padding: '8px 16px',
-                    height: 'calc(100% - 8px)',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Add Friend
-                </ActionButton>
-              </div>
-            </div>
-            {error && (
-              <div style={{ 
-                color: error.includes('sent') ? '#0FF' : '#FF4444',
-                fontSize: '0.8rem',
-                marginTop: '4px',
-                maxWidth: '100%', 
-                wordBreak: 'break-word'
-              }}>
-                {error}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-
-    {/* Invite Section */}
-    <div style={ramkaStyle}>
-      <div style={innerContainerStyle}>
-        <p className="text-info mb-2" style={{ color: 'white' }}>
-          Invite players —each adds<br/>
-          <span style={{ color: '#FFD700' }}> +1 ticket permanently</span><br/>
-          for both of you!
-        </p>
-      </div>
-    </div>
-    
-    <div className="mt-4 flex justify-center">
-      <InviteComponent 
-        botUsername="moonstonesgamebot" 
-        userId={telegramUser?.id.toString()}
-      />
-    </div>
-
-    {/* Friends List Section */}
-    {friends.length > 0 && (
-      <div style={ramkaStyle}>
-        <div style={innerContainerStyle}>
-          <h2 className="text-glow text-lg mb-2">My Friends</h2>
-          {friends.map((friend) => (
-            <div key={friend.userId} 
-              style={{ 
-                width: '100%',
-                borderBottom: '1px solid rgba(0, 255, 255, 0.2)',
-                padding: '8px 0',
-                marginBottom: '8px'
-              }}
-            >
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center'
-              }}>
-                <div>
-                  <div style={{ color: 'white' }}>{friend.userName}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'rgba(0, 255, 255, 0.7)' }}>
-                    {formatLastActive(friend.lastActive)}
-                  </div>
-                </div>
-                {showConfirmRemove === friend.userId ? (
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <ActionButton $variant="danger" onClick={() => removeFriend(friend.userId)}>
-                      Confirm
-                    </ActionButton>
-                    <ActionButton onClick={() => setShowConfirmRemove(null)}>
-                      Cancel
-                    </ActionButton>
-                  </div>
-                ) : (
-                  <ActionButton $variant="danger" onClick={() => setShowConfirmRemove(friend.userId)}>
-                    Remove
-                  </ActionButton>
-                )}
-              </div>
-            </div>
-          ))}
+          </div>
         </div>
-      </div>
-    )}
-  </div>
-);
+      )}
+    </div>
+  );
 };
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
