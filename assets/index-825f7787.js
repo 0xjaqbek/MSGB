@@ -3035,19 +3035,17 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   font-size: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `,pe=rt.div`
-  justify-content: center;
-  display: flex;
-  color: white;
-  font-size: 1rem;
-  padding-top: 30px;
-  padding-left: 8px;
-  text-align: center;
-  width: 100%;
-  justify-content: flex-end;
   position: absolute;
-  top: 5%;
+  top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1rem;
+  pointer-events: none;
 `,_e=rt.div`
   position: fixed;
   bottom: 20px;
