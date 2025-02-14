@@ -415,10 +415,11 @@ return (
               position: 'relative',
               width: '90%',
               maxWidth: '300px',
-              marginTop: '16px',
+              marginTop: '12px',
               marginBottom: '16px',
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              paddingLeft: '10px' 
             }}>
               <input
                 type="text"
