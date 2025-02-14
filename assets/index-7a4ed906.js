@@ -3295,6 +3295,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: 80vh;
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  margin-top: 20px;
   padding: 20px;
   position: relative;
   overflow-y: auto;
