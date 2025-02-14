@@ -406,8 +406,8 @@ return (
           color: '#0FF',
           textAlign: 'center'
         }}>
-          <div className="mb-2 px-4" style={{ width: '100%' }}>
-            <p className="text-info" style={{ color: 'white' }}>
+          <div style={{ width: '90%', maxWidth: '90%' }}>
+            <p className="text-info mb-2" style={{ color: 'white' }}>
               Get extra ticket<br/>for every 2 friends added
             </p>
             <input
