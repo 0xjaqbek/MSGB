@@ -27,6 +27,11 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 2px solid rgba(0, 255, 255, 0.3); // Cyan border
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); // Cyan glow effect
+  backdrop-filter: blur(10px); // Additional blur effect
+  background: rgba(0, 0, 0, 0.7); // Slightly transparent background
 
   &::-webkit-scrollbar {
     width: 8px;
