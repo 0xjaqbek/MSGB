@@ -442,7 +442,7 @@ return (
           </>
         ) : (
           <>
-            <p className="text-info mb-2" style={{ color: 'white' }}>
+            <p className="text-info mb-1" style={{ color: 'white' }}>
               Get extra ticket<br/>for every 2 friends added
             </p>
             <input
