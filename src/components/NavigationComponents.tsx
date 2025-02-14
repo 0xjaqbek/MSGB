@@ -406,39 +406,43 @@ return (
           color: '#0FF',
           textAlign: 'center'
         }}>
-          <p className="text-info mb-2 px-4" style={{ color: 'white' }}>
-            Get extra ticket<br/>for every 2 friends added
-            <br/><span style={{ color: '#FFD700' }}></span>
-          </p>
-          <input
-            type="text"
-            placeholder="Enter User ID"
-            value={friendId}
-            onChange={(e) => setFriendId(e.target.value)}
-            style={{
-              background: 'rgba(0, 0, 0, 0.3)',
-              border: '1px solid rgba(0, 255, 255, 0.3)',
-              borderRadius: '8px',
-              padding: '8px 12px',
-              color: '#0FF',
-              width: '60%',
-              fontFamily: 'REM, sans-serif',
-              fontSize: '0.9rem',
-              marginBottom: '8px'
-            }}
-          />
-          <ActionButton onClick={sendFriendRequest} $variant="white">
-            Add Friend
-          </ActionButton>
-          {error && (
-            <div style={{ 
-              color: error.includes('sent') ? '#0FF' : '#FF4444',
-              fontSize: '0.8rem',
-              marginTop: '4px'
-            }}>
-              {error}
+          <div className="mb-2 px-4" style={{ width: '100%' }}>
+            <p className="text-info" style={{ color: 'white' }}>
+              Get extra ticket<br/>for every 2 friends added
+            </p>
+            <input
+              type="text"
+              placeholder="Enter User ID"
+              value={friendId}
+              onChange={(e) => setFriendId(e.target.value)}
+              style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(0, 255, 255, 0.3)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                color: '#0FF',
+                width: '60%',
+                fontFamily: 'REM, sans-serif',
+                fontSize: '0.9rem',
+                marginTop: '8px',
+                marginBottom: '8px'
+              }}
+            />
+            <div>
+              <ActionButton onClick={sendFriendRequest} $variant="white">
+                Add Friend
+              </ActionButton>
+              {error && (
+                <div style={{ 
+                  color: error.includes('sent') ? '#0FF' : '#FF4444',
+                  fontSize: '0.8rem',
+                  marginTop: '4px'
+                }}>
+                  {error}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Invite Section */}
