@@ -467,7 +467,7 @@ return (
               style={{
                 background: 'rgba(0, 0, 0, 0.3)',
                 border: '1px solid rgba(0, 255, 255, 0.15)', 
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '12px 16px',
                 paddingRight: '110px', 
                 color: '#0FF',
