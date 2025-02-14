@@ -378,7 +378,7 @@ return (
         textAlign: 'center'
       }}>
         <p className="text-info mb-2 px-2" style={{ color: 'white', fontSize: '0.9rem' }}>
-          Get extra ticket for every 2 friends added
+          Get extra ticket for<br/>every 2 friends added
         </p>
         <input
           type="text"
