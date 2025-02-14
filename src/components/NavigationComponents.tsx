@@ -411,41 +411,57 @@ return (
             <p className="text-info mb-1" style={{ color: 'white' }}>
               Get extra ticket<br/>for every 2 friends added
             </p>
-            <input
-              type="text"
-              placeholder="Enter User ID"
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-              style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(0, 255, 255, 0.3)',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                color: '#0FF',
-                width: '80%',
-                maxWidth: '250px',
-                fontFamily: 'REM, sans-serif',
-                fontSize: '0.9rem',
-                marginTop: '4px',
-                marginBottom: '8px'
-              }}
-            />
-            <div>
-              <ActionButton onClick={sendFriendRequest} $variant="white">
+            <div style={{ 
+              position: 'relative',
+              width: '90%',
+              maxWidth: '300px',
+              marginTop: '16px',
+              marginBottom: '16px'
+            }}>
+              <input
+                type="text"
+                placeholder="Enter User ID"
+                value={friendId}
+                onChange={(e) => setFriendId(e.target.value)}
+                style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(0, 255, 255, 0.15)', 
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  color: '#0FF',
+                  width: '100%',
+                  fontFamily: 'REM, sans-serif',
+                  fontSize: '1rem',
+                  paddingRight: '120px' // Make space for button
+                }}
+              />
+              <ActionButton 
+                onClick={sendFriendRequest} 
+                $variant="white"
+                style={{
+                  position: 'absolute',
+                  right: '4px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  margin: 0,
+                  padding: '8px 16px',
+                  height: 'calc(100% - 8px)'
+                }}
+              >
                 Add Friend
               </ActionButton>
-              {error && (
-                <div style={{ 
-                  color: error.includes('sent') ? '#0FF' : '#FF4444',
-                  fontSize: '0.8rem',
-                  marginTop: '4px',
-                  maxWidth: '100%', 
-                  wordBreak: 'break-word'
-                }}>
-                  {error}
-                </div>
-              )}
             </div>
+            {error && (
+              <div style={{ 
+                color: error.includes('sent') ? '#0FF' : '#FF4444',
+                fontSize: '0.8rem',
+                marginTop: '4px',
+                maxWidth: '100%', 
+                wordBreak: 'break-word'
+              }}>
+                {error}
+              </div>
+            )}
           </>
         )}
       </div>
