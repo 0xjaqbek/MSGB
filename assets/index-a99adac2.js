@@ -3038,11 +3038,12 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   display: flex;
   color: white;
   font-size: 1rem;
-
+  padding-top: 30px;
   padding-left: 8px;
   text-align: center;
   width: 100%;
-  top: 5%;
+  position: absolute;
+  top: 3%;
   left: 0;
   right: 0;
 `,_e=rt.div`
