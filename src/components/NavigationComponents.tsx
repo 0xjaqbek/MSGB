@@ -378,8 +378,7 @@ return (
       textAlign: 'center'
     }}>
       <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
-      Invite players<br/>
-      —each adds<span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
+      Invite players —each adds<span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
       <br/>for both of you!  
       </p>
     </div>
@@ -406,6 +405,9 @@ return (
       color: '#0FF',
       textAlign: 'center'
     }}>
+      <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
+        Get extra ticket for every 2 friends added
+      </p>
       <input
         type="text"
         placeholder="Enter User ID"
@@ -423,9 +425,9 @@ return (
           marginBottom: '8px'
         }}
       />
-        <ActionButton onClick={sendFriendRequest} $variant="white">
-          Add Friend
-        </ActionButton>
+      <ActionButton onClick={sendFriendRequest} $variant="white">
+        Add Friend
+      </ActionButton>
       {error && (
         <div style={{ 
           color: error.includes('sent') ? '#0FF' : '#FF4444',
