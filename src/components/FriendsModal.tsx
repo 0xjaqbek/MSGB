@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Friend } from '../types';
-import ramka from '../assets/ramka.svg';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -20,7 +19,6 @@ const ModalOverlay = styled.div`
 const ModalContent = styled.div`
   width: 80vw;
   height: 80vh;
-  background-image: url(${ramka});
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 30px;
