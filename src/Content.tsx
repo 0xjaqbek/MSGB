@@ -591,14 +591,14 @@ const TotalPointsValue = styled.div`
 `;
 
 const MoonstoneTitle = styled.div`
+  display: flex;
   color: white;
   font-size: 1rem;
-  padding-top: 30px;
+
   padding-left: 8px;
   text-align: center;
   width: 100%;
-  position: absolute;
-  top: 3%;
+  top: 5%;
   left: 0;
   right: 0;
 `;

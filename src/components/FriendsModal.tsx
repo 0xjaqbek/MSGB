@@ -21,18 +21,18 @@ const ModalContent = styled.div`
   height: 80vh;
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  margin-top: 35px;
+  margin-top: 40px;
   padding: 20px;
   position: relative;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 2px solid rgba(0, 255, 255, 0.3); // Cyan border
+  border: 2px solid rgb(0, 255, 255); // Cyan border
   border-radius: 16px;
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); // Cyan glow effect
   backdrop-filter: blur(10px); // Additional blur effect
-  background: rgba(0, 0, 0, 0.5); // Slightly transparent background
+  background: rgba(0, 0, 0, 0.31); // Slightly transparent background
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -56,7 +56,7 @@ const CloseButton = styled.button`
   background: transparent;
   border: none;
   color: #0FF;
-  font-size: 24px;
+  font-size: 32px;
   cursor: pointer;
   z-index: 2;
   padding: 8px;
