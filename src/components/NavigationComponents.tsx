@@ -610,18 +610,21 @@ const calculateLeaderboardPosition = async (userId: string): Promise<number> => 
 const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) => {
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number>(0);
+  const [invitesCount, setInvitesCount] = useState<number>(0);
+  const [friendsCount, setFriendsCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
       if (telegramUser) {
         try {
-          // Fetch total points
           const db = getDatabase();
-          const playerScoresRef = ref(db, `/${telegramUser.id}/scores`);
-          const snapshot = await get(playerScoresRef);
           
-          if (snapshot.exists()) {
-            const scores = snapshot.val();
+          // Fetch total points
+          const playerScoresRef = ref(db, `/${telegramUser.id}/scores`);
+          const scoresSnapshot = await get(playerScoresRef);
+          
+          if (scoresSnapshot.exists()) {
+            const scores = scoresSnapshot.val();
             const total = Object.values(scores).reduce((sum: number, entry: any) => {
               return sum + (entry.score || 0);
             }, 0);
@@ -631,6 +634,23 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
           // Calculate leaderboard position
           const position = await calculateLeaderboardPosition(telegramUser.id.toString());
           setLeaderboardPosition(position);
+
+          // Fetch invites count
+          const invitesRef = ref(db, `users/${telegramUser.id}/referrals/invitedUsers`);
+          const invitesSnapshot = await get(invitesRef);
+          if (invitesSnapshot.exists()) {
+            const invites = invitesSnapshot.val();
+            setInvitesCount(Array.isArray(invites) ? invites.length : 0);
+          }
+
+          // Fetch friends count
+          const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+          const friendsSnapshot = await get(friendsRef);
+          if (friendsSnapshot.exists()) {
+            const friends = friendsSnapshot.val();
+            setFriendsCount(Object.keys(friends).length);
+          }
+
         } catch (error) {
           console.error('Error fetching data:', error);
         }
@@ -663,6 +683,14 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
             <span className="text-info">Leaderboard Position:</span>
             <span className="text-value">#{leaderboardPosition}</span>
           </div>
+          <div className="stat-row">
+            <span className="text-info">Invites:</span>
+            <span className="text-value">{invitesCount}</span>
+          </div>
+          <div className="stat-row">
+            <span className="text-info">Friends:</span>
+            <span className="text-value">{friendsCount}</span>
+          </div>
           {userStats && (
             <>
               <div className="stat-row">
@@ -684,6 +712,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
     </div>
   );
 };
+
 const TasksPage: React.FC = () => {
   return (
     <div className="page-container" style={{ marginTop: '30px' }}>
