@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
 const InviteButton = styled.button`
   background: transparent;
   border: 2px solid #FFD700;
@@ -29,13 +34,21 @@ const InviteButton = styled.button`
   }
 `;
 
-const NotificationText = styled.p<{ $visible: boolean }>`
+const NotificationOverlay = styled.div<{ $visible: boolean }>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 8px 16px;
+  border-radius: 8px;
   color: white;
-  text-align: center;
   font-size: 0.9rem;
-  margin-top: 10px;
   opacity: ${props => props.$visible ? '1' : '0'};
+  pointer-events: none;
   transition: opacity 0.3s ease;
+  white-space: nowrap;
+  z-index: 10;
 `;
 
 const ClickToCopyText = styled.p`
@@ -66,15 +79,15 @@ const InviteComponent: React.FC<InviteComponentProps> = ({ botUsername, userId }
   };
 
   return (
-    <div>
+    <Container>
       <InviteButton onClick={handleInvite}>
-        <span>INVITE A FREN</span>
+        <span>INVITE TO GAME</span>
       </InviteButton>
-      <ClickToCopyText>Click to copy invite link</ClickToCopyText>
-      <NotificationText $visible={showNotification}>
+      <NotificationOverlay $visible={showNotification}>
         Invite link copied to clipboard!
-      </NotificationText>
-    </div>
+      </NotificationOverlay>
+      <ClickToCopyText>Click to copy invite link</ClickToCopyText>
+    </Container>
   );
 };
 
