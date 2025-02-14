@@ -362,6 +362,34 @@ const removeFriend = async (friendId: string) => {
 return (
   <div className="page-container" style={{ marginTop: '30px' }}>
     <h1 className="text-glow text-xl mb-4">Friends</h1>
+        {/* Invite Section */}
+        <div style={{
+      backgroundImage: `url(${ramka})`,
+      backgroundSize: '100% 100%',
+      backgroundRepeat: 'no-repeat',
+      padding: '20px',
+      marginTop: '20px',
+      width: '90%',
+      maxWidth: '400px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      color: '#0FF',
+      textAlign: 'center'
+    }}>
+      <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
+      Invite players<br/>
+      —each adds<span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
+      <br/>for both of you!  
+      </p>
+    </div>
+    
+    <div className="mt-4 flex justify-center">
+      <InviteComponent 
+        botUsername="moonstonesgamebot" 
+        userId={telegramUser?.id.toString()}
+      />
+    </div>
 
     {/* Add Friend Section */}
     <div style={{
@@ -506,34 +534,6 @@ return (
         ))}
       </div>
     )}
-
-    {/* Invite Section */}
-    <div style={{
-      backgroundImage: `url(${ramka})`,
-      backgroundSize: '100% 100%',
-      backgroundRepeat: 'no-repeat',
-      padding: '20px',
-      marginTop: '20px',
-      width: '90%',
-      maxWidth: '400px',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      color: '#0FF',
-      textAlign: 'center'
-    }}>
-      <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
-        Invite friends.<br/>Each invited friend<br/>gives you and him 
-        <span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
-      </p>
-    </div>
-    
-    <div className="mt-4 flex justify-center">
-      <InviteComponent 
-        botUsername="moonstonesgamebot" 
-        userId={telegramUser?.id.toString()}
-      />
-    </div>
   </div>
 );
 };
