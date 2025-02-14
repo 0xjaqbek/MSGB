@@ -410,14 +410,14 @@ const innerContainerStyle = {
 
 return (
   <div className="page-container" style={{ marginTop: '30px' }}>
-    <h1 className="text-glow text-xl mb-4">Friends</h1>
+    <h1 className="text-glow text-xl mb-2">Friends</h1>
 
     {/* Add Friend/Pending Requests Section */}
     <div style={ramkaStyle}>
       <div style={innerContainerStyle}>
         {pendingRequests.length > 0 ? (
           <>
-            <h2 className="text-glow text-lg mb-2">Pending Requests</h2>
+            <h2 className="text-glow text-lg mb-1">Pending Requests</h2>
             {pendingRequests.map((request) => (
               <div key={request.fromUserId} 
                 style={{ 
