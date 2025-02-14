@@ -3295,7 +3295,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: 80vh;
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  margin-top: 30px;
+  margin-top: 35px;
   padding: 20px;
   position: relative;
   overflow-y: auto;
@@ -3306,7 +3306,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   border-radius: 16px;
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); // Cyan glow effect
   backdrop-filter: blur(10px); // Additional blur effect
-  background: rgba(0, 0, 0, 0.7); // Slightly transparent background
+  background: rgba(0, 0, 0, 0.5); // Slightly transparent background
 
   &::-webkit-scrollbar {
     width: 8px;
