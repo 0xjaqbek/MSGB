@@ -377,8 +377,8 @@ return (
       color: '#0FF',
       textAlign: 'center'
     }}>
-      <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
-      Invite players —each adds<span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
+      <p className="text-info mb-2 px-4" style={{ color: 'white' }}>
+      Invite players —each adds<br/><span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
       <br/>for both of you!  
       </p>
     </div>
@@ -405,7 +405,7 @@ return (
       color: '#0FF',
       textAlign: 'center'
     }}>
-      <p className="text-info mb-4 px-4" style={{ color: 'white' }}>
+      <p className="text-info mb-2 px-2" style={{ color: 'white', fontSize: '0.9rem' }}>
         Get extra ticket for every 2 friends added
       </p>
       <input
