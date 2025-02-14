@@ -306,22 +306,58 @@ const removeFriend = async (friendId: string) => {
     </div>
   );
 
-  const ActionButton = styled.button<{ $variant?: 'danger' | 'success' }>`
-    background: transparent;
-    border: 1px solid ${props => props.$variant === 'danger' ? '#FF4444' : '#0FF'};
-    color: ${props => props.$variant === 'danger' ? '#FF4444' : '#0FF'};
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-family: 'REM', sans-serif;
-    font-size: 0.9rem;
-    margin: 4px;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: ${props => props.$variant === 'danger' ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 255, 255, 0.1)'};
-      box-shadow: 0 0 10px ${props => props.$variant === 'danger' ? 'rgba(255, 68, 68, 0.3)' : 'rgba(0, 255, 255, 0.3)'};
+  const ActionButton = styled.button<{ $variant?: 'danger' | 'success' | 'white' }>`
+  background: transparent;
+  border: 1px solid ${props => {
+    switch (props.$variant) {
+      case 'danger':
+        return '#FF4444';
+      case 'white':
+        return '#FFFFFF';
+      default:
+        return '#0FF';
     }
-  `;
+  }};
+  color: ${props => {
+    switch (props.$variant) {
+      case 'danger':
+        return '#FF4444';
+      case 'white':
+        return '#FFFFFF';
+      default:
+        return '#0FF';
+    }
+  }};
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: 'REM', sans-serif;
+  font-size: 0.9rem;
+  margin: 4px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${props => {
+      switch (props.$variant) {
+        case 'danger':
+          return 'rgba(255, 68, 68, 0.1)';
+        case 'white':
+          return 'rgba(255, 255, 255, 0.1)';
+        default:
+          return 'rgba(0, 255, 255, 0.1)';
+      }
+    }};
+    box-shadow: 0 0 10px ${props => {
+      switch (props.$variant) {
+        case 'danger':
+          return 'rgba(255, 68, 68, 0.3)';
+        case 'white':
+          return 'rgba(255, 255, 255, 0.3)';
+        default:
+          return 'rgba(0, 255, 255, 0.3)';
+      }
+    }};
+  }
+`;
 
 return (
   <div className="page-container" style={{ marginTop: '30px' }}>
@@ -359,9 +395,9 @@ return (
           marginBottom: '8px'
         }}
       />
-      <ActionButton onClick={sendFriendRequest}>
-        Add Friend
-      </ActionButton>
+        <ActionButton onClick={sendFriendRequest} $variant="white">
+          Add Friend
+        </ActionButton>
       {error && (
         <div style={{ 
           color: error.includes('sent') ? '#0FF' : '#FF4444',
