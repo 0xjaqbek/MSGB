@@ -446,23 +446,21 @@ return (
               marginTop: '16px',
               marginBottom: '16px',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               paddingLeft: '10px',
               paddingRight: '10px' 
             }}>
               {error && (
                 <div style={{ 
-                  position: 'absolute', 
-                  top: '-30px', 
-                  left: '50%', 
-                  transform: 'translateX(-50%)', 
+                  marginBottom: '10px', // Space between error and input
                   background: 'rgba(0, 0, 0, 0.8)', 
                   padding: '8px 16px', 
                   borderRadius: '8px', 
                   color: error.includes('sent') ? '#0FF' : '#FF4444', 
                   fontSize: '0.9rem', 
                   whiteSpace: 'nowrap', 
-                  zIndex: 10, 
+                  zIndex: 10,
                   pointerEvents: 'none' 
                 }}>
                   {error}
