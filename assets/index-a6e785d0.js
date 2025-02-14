@@ -3035,14 +3035,14 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   font-size: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 `,pe=rt.div`
+  display: flex;
   color: white;
   font-size: 1rem;
-  padding-top: 30px;
+
   padding-left: 8px;
   text-align: center;
   width: 100%;
-  position: absolute;
-  top: 3%;
+  top: 5%;
   left: 0;
   right: 0;
 `,_e=rt.div`
@@ -3295,18 +3295,18 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   height: 80vh;
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  margin-top: 35px;
+  margin-top: 40px;
   padding: 20px;
   position: relative;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 2px solid rgba(0, 255, 255, 0.3); // Cyan border
+  border: 2px solid rgb(0, 255, 255); // Cyan border
   border-radius: 16px;
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); // Cyan glow effect
   backdrop-filter: blur(10px); // Additional blur effect
-  background: rgba(0, 0, 0, 0.5); // Slightly transparent background
+  background: rgba(0, 0, 0, 0.31); // Slightly transparent background
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -3328,7 +3328,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   background: transparent;
   border: none;
   color: #0FF;
-  font-size: 24px;
+  font-size: 32px;
   cursor: pointer;
   z-index: 2;
   padding: 8px;
