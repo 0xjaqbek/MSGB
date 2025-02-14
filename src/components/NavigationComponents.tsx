@@ -416,7 +416,9 @@ return (
               width: '90%',
               maxWidth: '300px',
               marginTop: '16px',
-              marginBottom: '16px'
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center'
             }}>
               <input
                 type="text"
@@ -428,28 +430,32 @@ return (
                   border: '1px solid rgba(0, 255, 255, 0.15)', 
                   borderRadius: '8px',
                   padding: '12px 16px',
+                  paddingRight: '110px', // Fixed width for button + padding
                   color: '#0FF',
                   width: '100%',
                   fontFamily: 'REM, sans-serif',
-                  fontSize: '1rem',
-                  paddingRight: '120px' // Make space for button
+                  fontSize: '1rem'
                 }}
               />
-              <ActionButton 
-                onClick={sendFriendRequest} 
-                $variant="white"
-                style={{
-                  position: 'absolute',
-                  right: '4px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  margin: 0,
-                  padding: '8px 16px',
-                  height: 'calc(100% - 8px)'
-                }}
-              >
-                Add Friend
-              </ActionButton>
+              <div style={{
+                position: 'absolute',
+                right: '4px',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <ActionButton 
+                  onClick={sendFriendRequest} 
+                  $variant="white"
+                  style={{
+                    margin: 0,
+                    padding: '8px 16px',
+                    height: 'calc(100% - 8px)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Add Friend
+                </ActionButton>
+              </div>
             </div>
             {error && (
               <div style={{ 
