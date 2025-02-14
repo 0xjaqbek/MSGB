@@ -409,11 +409,11 @@ const innerContainerStyle = {
 } as const;
 
 return (
-  <div className="page-container" style={{ marginTop: '30px' }}>
-    <h1 className="text-glow text-xl mb-2">Friends</h1>
+  <div className="page-container" style={{ marginTop: '20px' }}>
+    <h1 className="text-glow text-xl mb-1">Friends</h1>
 
     {/* Add Friend/Pending Requests Section */}
-    <div style={ramkaStyle}>
+    <div style={{...ramkaStyle, marginTop: '10px'}}>
       <div style={innerContainerStyle}>
         {pendingRequests.length > 0 ? (
           <>
@@ -459,7 +459,7 @@ return (
                 width: '60%',
                 fontFamily: 'REM, sans-serif',
                 fontSize: '0.9rem',
-                marginTop: '8px',
+                marginTop: '4px',
                 marginBottom: '8px'
               }}
             />
