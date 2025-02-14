@@ -407,104 +407,83 @@ return (
     <h1 className="text-glow text-xl mb-1">Friends</h1>
 
     {/* Add Friend/Pending Requests Section */}
-    <div style={{...ramkaStyle, marginTop: '10px'}}>
-      <div style={innerContainerStyle}>
-        {pendingRequests.length > 0 ? (
-          <>
-            <h2 className="text-glow text-lg mb-1">Pending Requests</h2>
-            {pendingRequests.map((request) => (
-              <div key={request.fromUserId} 
-                style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  width: '100%',
-                  marginBottom: '8px'
+    <div style={ramkaStyle}>
+      <div style={{ width: '100%', maxWidth: '100%' }}>
+        <p className="text-info mb-1" style={{ color: 'white' }}>
+          Get extra ticket<br/>for every 2 friends added
+        </p>
+        <div style={{ 
+          position: 'relative',
+          width: '85%', // Slightly narrower than ramka
+          marginTop: '16px',
+          marginBottom: '16px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          {error && (
+            <div style={{ 
+              position: 'absolute', 
+              top: '-30px', 
+              left: '50%', 
+              transform: 'translateX(-50%)', 
+              background: 'rgba(0, 0, 0, 0.8)', 
+              padding: '8px 16px', 
+              borderRadius: '8px', 
+              color: error.includes('sent') ? '#0FF' : '#FF4444', 
+              fontSize: '0.9rem', 
+              whiteSpace: 'nowrap', 
+              zIndex: 10, 
+              pointerEvents: 'none' 
+            }}>
+              {error}
+            </div>
+          )}
+          <div style={{
+            position: 'relative',
+            width: '100%', 
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <input
+              type="text"
+              placeholder="Enter User ID"
+              value={friendId}
+              onChange={(e) => setFriendId(e.target.value)}
+              style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(0, 255, 255, 0.15)', 
+                borderRadius: '8px',
+                padding: '12px 16px',
+                paddingRight: '110px', 
+                color: '#0FF',
+                width: '100%', 
+                fontFamily: 'REM, sans-serif',
+                fontSize: '1rem'
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              right: '4px',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              <ActionButton 
+                onClick={sendFriendRequest} 
+                $variant="white"
+                style={{
+                  margin: 0,
+                  padding: '8px 16px',
+                  height: 'calc(100% - 8px)',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <span style={{ color: 'white', marginBottom: '8px' }}>{request.fromUserName}</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <ActionButton onClick={() => handleRequest(request.fromUserId, 'accept')}>
-                    Accept
-                  </ActionButton>
-                  <ActionButton $variant="danger" onClick={() => handleRequest(request.fromUserId, 'reject')}>
-                    Reject
-                  </ActionButton>
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            <p className="text-info mb-1" style={{ color: 'white' }}>
-              Get extra ticket<br/>for every 2 friends added
-            </p>
-            <div style={{ 
-              position: 'relative',
-              width: '100%',
-              maxWidth: '300px',
-              marginTop: '16px',
-              marginBottom: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              paddingLeft: '10px',
-              paddingRight: '10px' 
-            }}>
-              {error && (
-                <div style={{ 
-                  marginBottom: '10px', // Space between error and input
-                  background: 'rgba(0, 0, 0, 0.8)', 
-                  padding: '8px 16px', 
-                  borderRadius: '8px', 
-                  color: error.includes('sent') ? '#0FF' : '#FF4444', 
-                  fontSize: '0.9rem', 
-                  whiteSpace: 'nowrap', 
-                  zIndex: 10,
-                  pointerEvents: 'none' 
-                }}>
-                  {error}
-                </div>
-              )}
-              <input
-                type="text"
-                placeholder="Enter User ID"
-                value={friendId}
-                onChange={(e) => setFriendId(e.target.value)}
-                style={{
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(0, 255, 255, 0.15)', 
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  paddingRight: '110px', // Fixed width for button + padding
-                  color: '#0FF',
-                  width: '100%',
-                  fontFamily: 'REM, sans-serif',
-                  fontSize: '1rem'
-                }}
-              />
-              <div style={{
-                position: 'relative',
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center'
-              }}>
-                <ActionButton 
-                  onClick={sendFriendRequest} 
-                  $variant="white"
-                  style={{
-                    margin: 0,
-                    padding: '8px 16px',
-                    height: 'calc(100% - 8px)',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Add Friend
-                </ActionButton>
-              </div>
+                Add Friend
+              </ActionButton>
             </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
 
