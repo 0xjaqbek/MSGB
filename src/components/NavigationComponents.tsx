@@ -400,12 +400,14 @@ const ramkaStyle = {
   flexDirection: 'column',
   alignItems: 'center',
   color: '#0FF',
-  textAlign: 'center'
+  textAlign: 'center',
+  position: 'relative',
+  overflow: 'hidden'
 } as const;
 
 const innerContainerStyle = {
-  width: '90%',
-  maxWidth: '90%'
+  width: '100%',
+  maxWidth: '100%'
 } as const;
 
 return (
@@ -456,7 +458,8 @@ return (
                 borderRadius: '8px',
                 padding: '8px 12px',
                 color: '#0FF',
-                width: '60%',
+                width: '80%',
+                maxWidth: '250px',
                 fontFamily: 'REM, sans-serif',
                 fontSize: '0.9rem',
                 marginTop: '4px',
@@ -471,7 +474,9 @@ return (
                 <div style={{ 
                   color: error.includes('sent') ? '#0FF' : '#FF4444',
                   fontSize: '0.8rem',
-                  marginTop: '4px'
+                  marginTop: '4px',
+                  maxWidth: '100%', 
+                  wordBreak: 'break-word'
                 }}>
                   {error}
                 </div>
