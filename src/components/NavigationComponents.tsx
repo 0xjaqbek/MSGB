@@ -323,54 +323,41 @@ const removeFriend = async (friendId: string) => {
     }
   `;
 
-  const StyledInput = styled.input`
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: #0FF;
-  width: 70%; // Reduced width to fit inside ramka
-  font-family: 'REM', sans-serif;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-
-  &::placeholder {
-    color: rgba(0, 255, 255, 0.5);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: rgba(0, 255, 255, 0.6);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-  }
-`;
-
-const SectionContainer = styled.div`
-  background-image: url(${ramka});
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  padding: 10px 10px; // Added horizontal padding to prevent overlap
-  margin-bottom: 15px;
-  width: 90%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #0FF;
-  text-align: center;
-`;
-
 return (
   <div className="page-container" style={{ marginTop: '30px' }}>
     <h1 className="text-glow text-xl mb-4">Friends</h1>
 
     {/* Add Friend Section */}
-    <SectionContainer>
-      <StyledInput
+    <div style={{
+      backgroundImage: `url(${ramka})`,
+      backgroundSize: '100% 100%',
+      backgroundRepeat: 'no-repeat',
+      padding: '20px',
+      marginTop: '20px',
+      width: '90%',
+      maxWidth: '400px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      color: '#0FF',
+      textAlign: 'center'
+    }}>
+      <input
         type="text"
         placeholder="Enter User ID"
         value={friendId}
         onChange={(e) => setFriendId(e.target.value)}
+        style={{
+          background: 'rgba(0, 0, 0, 0.3)',
+          border: '1px solid rgba(0, 255, 255, 0.3)',
+          borderRadius: '8px',
+          padding: '8px 12px',
+          color: '#0FF',
+          width: '60%',
+          fontFamily: 'REM, sans-serif',
+          fontSize: '0.9rem',
+          marginBottom: '8px'
+        }}
       />
       <ActionButton onClick={sendFriendRequest}>
         Add Friend
@@ -384,11 +371,24 @@ return (
           {error}
         </div>
       )}
-    </SectionContainer>
+    </div>
 
     {/* Pending Requests Section */}
     {pendingRequests.length > 0 && (
-      <SectionContainer>
+      <div style={{
+        backgroundImage: `url(${ramka})`,
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat',
+        padding: '20px',
+        marginTop: '20px',
+        width: '90%',
+        maxWidth: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        color: '#0FF',
+        textAlign: 'center'
+      }}>
         <h2 className="text-glow text-lg mb-2">Pending Requests</h2>
         {pendingRequests.map((request) => (
           <div key={request.fromUserId} 
@@ -411,12 +411,25 @@ return (
             </div>
           </div>
         ))}
-      </SectionContainer>
+      </div>
     )}
 
     {/* Friends List Section */}
     {friends.length > 0 && (
-      <SectionContainer>
+      <div style={{
+        backgroundImage: `url(${ramka})`,
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat',
+        padding: '20px',
+        marginTop: '20px',
+        width: '90%',
+        maxWidth: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        color: '#0FF',
+        textAlign: 'center'
+      }}>
         <h2 className="text-glow text-lg mb-2">My Friends</h2>
         {friends.map((friend) => (
           <div key={friend.userId} 
@@ -455,10 +468,10 @@ return (
             </div>
           </div>
         ))}
-      </SectionContainer>
+      </div>
     )}
 
-    {/* Your existing Invite Section stays the same */}
+    {/* Invite Section */}
     <div style={{
       backgroundImage: `url(${ramka})`,
       backgroundSize: '100% 100%',
@@ -478,7 +491,7 @@ return (
         <span style={{ color: '#FFD700' }}> +1 ticket permanently</span>
       </p>
     </div>
-      
+    
     <div className="mt-4 flex justify-center">
       <InviteComponent 
         botUsername="moonstonesgamebot" 
