@@ -391,59 +391,55 @@ const removeFriend = async (friendId: string) => {
 return (
   <div className="page-container" style={{ marginTop: '30px' }}>
     <h1 className="text-glow text-xl mb-4">Friends</h1>
-        {/* Add Friend Section */}
-        <div style={{
-          backgroundImage: `url(${ramka})`,
-          backgroundSize: '100% 100%',
-          backgroundRepeat: 'no-repeat',
-          padding: '20px',
-          marginTop: '20px',
-          width: '90%',
-          maxWidth: '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          color: '#0FF',
-          textAlign: 'center'
-        }}>
-          <div style={{ width: '90%', maxWidth: '90%' }}>
-            <p className="text-info mb-2" style={{ color: 'white' }}>
-              Get extra ticket<br/>for every 2 friends added
-            </p>
-            <input
-              type="text"
-              placeholder="Enter User ID"
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-              style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(0, 255, 255, 0.3)',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                color: '#0FF',
-                width: '60%',
-                fontFamily: 'REM, sans-serif',
-                fontSize: '0.9rem',
-                marginTop: '8px',
-                marginBottom: '8px'
-              }}
-            />
-            <div>
-              <ActionButton onClick={sendFriendRequest} $variant="white">
+     {/* Add Friend Section */}
+     <div style={{
+        backgroundImage: `url(${ramka})`,
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat',
+        padding: '20px',
+        marginTop: '20px',
+        width: '90%',
+        maxWidth: '90%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        color: '#0FF',
+        textAlign: 'center'
+      }}>
+        <div className="mb-2 px-4" style={{ width: '100%' }}>
+          <p className="text-info" style={{ color: 'white' }}>
+            Get extra ticket<br/>for every 2 friends added
+          </p>
+          <input
+            type="text"
+            placeholder="Enter User ID"
+            value={friendId}
+            onChange={(e) => setFriendId(e.target.value)}
+            style={{
+              background: 'rgba(0, 0, 0, 0.3)',
+              border: '1px solid rgba(0, 255, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '8px 12px',
+              color: '#0FF',
+              width: '60%',
+              fontFamily: 'REM, sans-serif',
+              fontSize: '0.9rem',
+              marginTop: '8px',
+              marginBottom: '8px'
+            }}
+          />
+          <div>
+          <ActionButton onClick={sendFriendRequest} $variant="white">
                 Add Friend
               </ActionButton>
-              {error && (
-                <div style={{ 
-                  color: error.includes('sent') ? '#0FF' : '#FF4444',
-                  fontSize: '0.8rem',
-                  marginTop: '4px'
-                }}>
-                  {error}
-                </div>
-              )}
-            </div>
+            {error && (
+              <div style={{ color: error.includes('sent') ? '#0FF' : '#FF4444', fontSize: '0.8rem', marginTop: '4px' }}>
+                {error}
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
         {/* Invite Section */}
         <div style={{
