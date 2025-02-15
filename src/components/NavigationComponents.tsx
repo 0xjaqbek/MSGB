@@ -138,6 +138,7 @@ const InviteText = styled.p`
   line-height: 1;
   margin-bottom: 16px;
   margin-left: 6px;
+  margin-right: 6px;
   width: 100%;
   
   span {

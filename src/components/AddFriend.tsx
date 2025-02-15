@@ -32,7 +32,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const AddButton = styled.button`
-  margin: 0;
+  margin: 5px;
   padding: 6px 12px;
   height: calc(100% - 8px);
   background: transparent;
