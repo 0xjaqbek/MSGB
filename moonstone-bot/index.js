@@ -174,7 +174,20 @@ bot.on('web_app_data', async (msg) => {
             `👋 ${data.removerName} has removed you from their friends list.`
           );
           break;
-      }
+          
+        case 'pendingRequests':
+          await bot.sendMessage(data.userId, 
+            `🔔 You have ${data.count} pending friend ${data.count === 1 ? 'request' : 'requests'}!\n\nOpen the game to respond.`,
+            {
+              reply_markup: {
+                inline_keyboard: [[
+                  { text: '🎮 Open Game', web_app: { url: 'https://0xjaqbek.github.io/MSGB' } }
+                ]]
+              }
+            }
+          );
+          break;
+              }
     } catch (error) {
       console.error('Error handling web_app_data:', error);
     }

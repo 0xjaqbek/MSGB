@@ -302,6 +302,37 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       setIsProcessing(false);
     }
   };
+
+  useEffect(() => {
+    const checkPendingRequests = async () => {
+      if (!telegramUser) return;
+  
+      try {
+        const db = getDatabase();
+        const requestsRef = ref(db, `users/${telegramUser.id}/friendRequests`);
+        const snapshot = await get(requestsRef);
+  
+        if (snapshot.exists()) {
+          const requests = Object.values(snapshot.val()).filter(
+            (req: any) => req.status === 'pending'
+          ) as FriendRequest[];
+  
+          if (requests.length > 0) {
+            // Send notification through Telegram
+            window.Telegram?.WebApp?.sendData(JSON.stringify({
+              action: 'pendingRequests',
+              count: requests.length,
+              userId: telegramUser.id
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error checking pending requests:', error);
+      }
+    };
+  
+    checkPendingRequests();
+  }, [telegramUser]);
   
   const handleRequest = async (requesterId: string, action: 'accept' | 'reject') => {
     if (!telegramUser) return;
