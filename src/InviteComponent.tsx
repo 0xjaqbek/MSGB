@@ -20,6 +20,7 @@ const InviteButton = styled.button`
   font-family: 'REM', monospace;
   width: 80%;
   margin: 20px auto;
+  line-height: 0.9;
 
   span {
     font-size: 22px;

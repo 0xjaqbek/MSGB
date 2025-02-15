@@ -29,7 +29,7 @@ const InfoText = styled.p`
 
 const InputContainer = styled.div`
   position: relative;
-  width: min(95%, 280px); // More constrained width
+  width: min(90%, 280px); // More constrained width
   margin: 12px auto;
   display: flex;
   align-items: center;

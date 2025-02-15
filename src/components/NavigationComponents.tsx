@@ -94,12 +94,90 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 
 export default NavigationBar;
 
-const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
-  const [friendId, setFriendId] = useState('');
+interface FriendsPageProps {
+  telegramUser: TelegramUser | null;
+}
+
+// Styled Components
+const PageContainer = styled.div`
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const PageTitle = styled.h1`
+  color: #0FF;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: 'REM', sans-serif;
+`;
+
+const InviteSection = styled.div`
+  background-image: url(${ramka});
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: 12px 20px;
+  margin-top: 10px;
+  width: min(90%, 360px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #0FF;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+`;
+
+const InviteText = styled.p`
+  color: white;
+  font-family: 'REM', sans-serif;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  width: 100%;
+  
+  span {
+    color: #FFD700;
+  }
+`;
+
+const InviteWrapper = styled.div`
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+`;
+
+const FriendsButton = styled.button`
+  width: min(80%, 300px);
+  margin: 20px auto;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid #0FF;
+  color: #0FF;
+  border-radius: 20px;
+  font-family: 'REM', sans-serif;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    transform: scale(1.02);
+  }
+`;
+
+export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [error, setError] = useState('');
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [errorTimeout, setErrorTimeout] = useState<NodeJS.Timeout | null>(null);
   const [showConfirmRemove, setShowConfirmRemove] = useState<string | null>(null);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -123,11 +201,10 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       }
     });
 
-    // Listen for friends list and their activities
+    // Listen for friends list
     onValue(friendsRef, (snapshot) => {
       if (snapshot.exists()) {
         const friendsList = Object.values(snapshot.val()) as Friend[];
-        // Sort friends by last active time
         friendsList.sort((a, b) => (b.lastActive || 0) - (a.lastActive || 0));
         setFriends(friendsList);
       } else {
@@ -135,7 +212,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       }
     });
 
-    // Update user's own active status
+    // Update user's status
     const userStatusRef = ref(db, `users/${telegramUser.id}/status`);
     set(userStatusRef, 'online');
     update(ref(db, `users/${telegramUser.id}`), {
@@ -143,31 +220,11 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     });
 
     return () => {
-      // Clean up listeners and set status to offline
       off(requestsRef);
       off(friendsRef);
       set(userStatusRef, 'offline');
     };
   }, [telegramUser]);
-
-  const showError = (message: string) => {
-    // Clear any existing timeout
-    if (errorTimeout) {
-      clearTimeout(errorTimeout);
-    }
-  
-    // Set the new error message
-    setError(message);
-  
-    // Set a new timeout to clear the error after 4 seconds
-    const newTimeout = setTimeout(() => {
-      setError('');
-      setErrorTimeout(null);
-    }, 4000);
-  
-    // Save the timeout reference
-    setErrorTimeout(newTimeout);
-  };
 
   const formatLastActive = (timestamp?: number) => {
     if (!timestamp) return 'Never';
@@ -180,363 +237,137 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
-  const sendFriendRequest = async () => {
-    if (!telegramUser || !friendId.trim()) {
-      showError('Please enter a User ID');
-      return;
-    }
-  
+  const handleSendRequest = async (friendId: string) => {
+    if (!telegramUser) return;
+    
+    setIsProcessing(true);
     try {
       const db = getDatabase();
+      
+      if (friendId === telegramUser.id.toString()) {
+        setError('Cannot add yourself as a friend');
+        return;
+      }
+
       const targetUserRef = ref(db, `users/${friendId}`);
       const snapshot = await get(targetUserRef);
-  
+
       if (!snapshot.exists()) {
-        showError('User not found');
+        setError('User not found');
         return;
       }
-  
-      if (friendId === telegramUser.id.toString()) {
-        showError('Cannot add yourself as a friend');
-        return;
-      }
-  
+
       const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
       const friendSnapshot = await get(existingFriendRef);
       if (friendSnapshot.exists()) {
-        showError('Already friends with this user');
+        setError('Already friends with this user');
         return;
       }
-  
-      const existingRequestRef = ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`);
-      const requestSnapshot = await get(existingRequestRef);
-      if (requestSnapshot.exists()) {
-        showError('Friend request already sent');
+
+      const [existingRequest, reverseRequest] = await Promise.all([
+        get(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`)),
+        get(ref(db, `users/${telegramUser.id}/friendRequests/${friendId}`))
+      ]);
+
+      if (existingRequest.exists() || reverseRequest.exists()) {
+        setError('Friend request already exists');
         return;
       }
-  
-      // Send friend request
+
       const request: FriendRequest = {
         fromUserId: telegramUser.id.toString(),
         fromUserName: telegramUser.first_name,
         status: 'pending',
         timestamp: Date.now()
       };
-  
+
       await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
       
-      // Send Telegram notification
       window.Telegram?.WebApp?.sendData(JSON.stringify({
         action: 'friendRequest',
         targetUserId: friendId,
         senderName: telegramUser.first_name
       }));
-  
-      setFriendId('');
-      showError('Friend request sent!');
+
+      setError('Friend request sent!');
+      
+      setTimeout(() => {
+        setError('');
+      }, 4000);
     } catch (err) {
       console.error('Error sending friend request:', err);
-      showError('Error sending friend request');
+      setError('Error sending friend request');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (errorTimeout) {
-        clearTimeout(errorTimeout);
-      }
-    };
-  }, [errorTimeout]);
-
-const handleRequest = async (requesterId: string, action: 'accept' | 'reject') => {
-  if (!telegramUser) return;
-
-  const db = getDatabase();
-  const request = pendingRequests.find(req => req.fromUserId === requesterId);
-  
-  if (!request) return;
-
-  try {
-    await update(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`), {
-      status: action
-    });
-
-    if (action === 'accept') {
-      const newFriend: Friend = {
-        userId: request.fromUserId,
-        userName: request.fromUserName,
-        addedAt: Date.now(),
-        lastActive: Date.now(),
-        status: 'offline'
-      };
-      
-      const currentUserFriend: Friend = {
-        userId: telegramUser.id.toString(),
-        userName: telegramUser.first_name,
-        addedAt: Date.now(),
-        lastActive: Date.now(),
-        status: 'online'
-      };
-
-      // Get current friends count and calculate bonus tickets
-      const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
-      const friendsSnapshot = await get(friendsRef);
-      const currentFriendsCount = friendsSnapshot.exists() ? Object.keys(friendsSnapshot.val()).length : 0;
-      const newFriendsCount = currentFriendsCount + 1;
-      const bonusTickets = Math.floor(newFriendsCount / 2);
-      const previousBonusTickets = Math.floor(currentFriendsCount / 2);
-      
-      // Only update if bonus tickets increased
-      if (bonusTickets > previousBonusTickets) {
-        await update(ref(db, `users/${telegramUser.id}`), {
-          'ticketsFromFriends': bonusTickets
-        });
-      }
-
+  const removeFriend = async (friendId: string) => {
+    if (!telegramUser) return;
+    
+    try {
+      const db = getDatabase();
       await Promise.all([
-        set(ref(db, `users/${telegramUser.id}/friends/${request.fromUserId}`), newFriend),
-        set(ref(db, `users/${request.fromUserId}/friends/${telegramUser.id}`), currentUserFriend)
+        remove(ref(db, `users/${telegramUser.id}/friends/${friendId}`)),
+        remove(ref(db, `users/${friendId}/friends/${telegramUser.id}`))
       ]);
 
-      // Calculate and update bonus tickets for requester as well
-      const requesterFriendsRef = ref(db, `users/${request.fromUserId}/friends`);
-      const requesterFriendsSnapshot = await get(requesterFriendsRef);
-      const requesterFriendsCount = requesterFriendsSnapshot.exists() ? Object.keys(requesterFriendsSnapshot.val()).length : 0;
-      const requesterBonusTickets = Math.floor(requesterFriendsCount / 2);
-      const previousRequesterBonusTickets = Math.floor((requesterFriendsCount - 1) / 2);
-
-      if (requesterBonusTickets > previousRequesterBonusTickets) {
-        await update(ref(db, `users/${request.fromUserId}`), {
-          'ticketsFromFriends': requesterBonusTickets
-        });
-      }
-
-      // Send acceptance notification
       window.Telegram?.WebApp?.sendData(JSON.stringify({
-        action: 'friendRequestAccepted',
-        targetUserId: request.fromUserId,
-        accepterName: telegramUser.first_name
+        action: 'friendRemoved',
+        targetUserId: friendId,
+        removerName: telegramUser.first_name
       }));
+
+      setShowConfirmRemove(null);
+    } catch (err) {
+      console.error('Error removing friend:', err);
     }
+  };
 
-    await remove(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`));
-  } catch (err) {
-    console.error('Error handling friend request:', err);
-  }
-};
+  return (
+    <PageContainer>
+      <PageTitle>Friends</PageTitle>
 
-
-const removeFriend = async (friendId: string) => {
-  if (!telegramUser) return;
-  
-  try {
-    const db = getDatabase();
-    await Promise.all([
-      remove(ref(db, `users/${telegramUser.id}/friends/${friendId}`)),
-      remove(ref(db, `users/${friendId}/friends/${telegramUser.id}`))
-    ]);
-
-    // Send removal notification
-    window.Telegram?.WebApp?.sendData(JSON.stringify({
-      action: 'friendRemoved',
-      targetUserId: friendId,
-      removerName: telegramUser.first_name
-    }));
-
-    setShowConfirmRemove(null);
-  } catch (err) {
-    console.error('Error removing friend:', err);
-  }
-};
-
-  const renderBox = (title: string, children: React.ReactNode) => (
-    <div style={{
-      backgroundImage: `url(${ramka})`,
-      backgroundSize: '100% 100%',
-      backgroundRepeat: 'no-repeat',
-      padding: '20px',
-      marginBottom: '20px',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      color: '#0FF'
-    }}>
-      <h2 className="text-glow text-lg mb-4">{title}</h2>
-      {children}
-    </div>
-  );
-
-  const ActionButton = styled.button<{ $variant?: 'danger' | 'success' | 'white' }>`
-  background: transparent;
-  border: ${props => props.$variant === 'white' ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid ' + (props.$variant === 'danger' ? '#FF4444' : '#0FF')};
-  color: ${props => props.$variant === 'white' ? '#FFF' : props.$variant === 'danger' ? '#FF4444' : '#0FF'};
-  padding: 8px 24px;
-  border-radius: 20px; // More rounded corners
-  font-family: 'REM', sans-serif;
-  font-size: 1rem;
-  margin: 4px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: ${props => props.$variant === 'white' ? 'rgba(255, 255, 255, 0.1)' : props.$variant === 'danger' ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 255, 255, 0.1)'};
-    box-shadow: 0 0 15px ${props => props.$variant === 'white' ? 'rgba(255, 255, 255, 0.2)' : props.$variant === 'danger' ? 'rgba(255, 68, 68, 0.2)' : 'rgba(0, 255, 255, 0.2)'};
-  }
-`;
-
-const FriendsButton = styled(ActionButton)`
-  width: 80%;
-  margin: 20px auto;
-  padding: 12px;
-  font-size: 1.1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-`;
-
-const ramkaStyle = {
-  backgroundImage: `url(${ramka})`,
-  backgroundSize: '100% 100%',
-  backgroundRepeat: 'no-repeat',
-  padding: '12px 20px',
-  marginTop: '10px',
-  width: '90%',
-  maxWidth: '400px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  color: '#0FF',
-  textAlign: 'center',
-  position: 'relative',
-  overflow: 'hidden'
-} as const;
-
-const innerContainerStyle = {
-  width: '100%',
-  maxWidth: '100%'
-} as const;
-
-const handleSendRequest = async (friendId: string) => {
-  if (!telegramUser) return;
-  
-  setIsProcessing(true);
-  try {
-    const db = getDatabase();
-    
-    // Check if trying to add self
-    if (friendId === telegramUser.id.toString()) {
-      setError('Cannot add yourself as a friend');
-      return;
-    }
-
-    // Check if target user exists
-    const targetUserRef = ref(db, `users/${friendId}`);
-    const snapshot = await get(targetUserRef);
-
-    if (!snapshot.exists()) {
-      setError('User not found');
-      return;
-    }
-
-    // Check for existing friendship
-    const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
-    const friendSnapshot = await get(existingFriendRef);
-    if (friendSnapshot.exists()) {
-      setError('Already friends with this user');
-      return;
-    }
-
-    // Check for existing requests in both directions
-    const [existingRequest, reverseRequest] = await Promise.all([
-      get(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`)),
-      get(ref(db, `users/${telegramUser.id}/friendRequests/${friendId}`))
-    ]);
-
-    if (existingRequest.exists() || reverseRequest.exists()) {
-      setError('Friend request already exists');
-      return;
-    }
-
-    // Create the friend request
-    const request: FriendRequest = {
-      fromUserId: telegramUser.id.toString(),
-      fromUserName: telegramUser.first_name,
-      status: 'pending',
-      timestamp: Date.now()
-    };
-
-    await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
-    
-    // Send Telegram notification
-    window.Telegram?.WebApp?.sendData(JSON.stringify({
-      action: 'friendRequest',
-      targetUserId: friendId,
-      senderName: telegramUser.first_name
-    }));
-
-    setError('Friend request sent!');
-    
-    // Clear success message after 4 seconds
-    setTimeout(() => {
-      setError('');
-    }, 4000);
-  } catch (err) {
-    console.error('Error sending friend request:', err);
-    setError('Error sending friend request');
-  } finally {
-    setIsProcessing(false);
-  }
-};
-
-
-return (
-  <div className="page-container" style={{ marginTop: '20px' }}>
-    <h1 className="text-glow text-xl mb-1">Friends</h1>
-
-    <AddFriendSection
-      onSendRequest={handleSendRequest}
-      isProcessing={isProcessing}
-      error={error}
-    />
-
-    {/* Rest of your friends page content */}
-    <div style={ramkaStyle}>
-      <div style={innerContainerStyle}>
-        <p className="text-info mb-2" style={{ color: 'white' }}>
-          Invite players —each adds<br/>
-          <span style={{ color: '#FFD700' }}> +1 ticket permanently</span><br/>
-          for both of you!
-        </p>
-      </div>
-    </div>
-    
-    <div className="mt-4 flex justify-center">
-      <InviteComponent 
-        botUsername="moonstonesgamebot" 
-        userId={telegramUser?.id.toString()}
+      <AddFriendSection
+        onSendRequest={handleSendRequest}
+        isProcessing={isProcessing}
+        error={error}
       />
-    </div>
 
-    {friends.length > 0 && (
-      <>
-        <FriendsButton onClick={() => setShowFriendsModal(true)}>
-          My Friends ({friends.length})
-        </FriendsButton>
-        
-        <FriendsModal
-          isOpen={showFriendsModal}
-          onClose={() => setShowFriendsModal(false)}
-          friends={friends}
-          formatLastActive={formatLastActive}
-          onRemoveFriend={removeFriend}
-          showConfirmRemove={showConfirmRemove}
-          setShowConfirmRemove={setShowConfirmRemove}
+      <InviteSection>
+        <InviteText>
+          Invite players —each adds<br/>
+          <span>+1 ticket permanently</span><br/>
+          for both of you!
+        </InviteText>
+      </InviteSection>
+      
+      <InviteWrapper>
+        <InviteComponent 
+          botUsername="moonstonesgamebot" 
+          userId={telegramUser?.id.toString()}
         />
-      </>
-    )}
-  </div>
-);
+      </InviteWrapper>
+
+      {friends.length > 0 && (
+        <>
+          <FriendsButton onClick={() => setShowFriendsModal(true)}>
+            My Friends ({friends.length})
+          </FriendsButton>
+          
+          <FriendsModal
+            isOpen={showFriendsModal}
+            onClose={() => setShowFriendsModal(false)}
+            friends={friends}
+            formatLastActive={formatLastActive}
+            onRemoveFriend={removeFriend}
+            showConfirmRemove={showConfirmRemove}
+            setShowConfirmRemove={setShowConfirmRemove}
+          />
+        </>
+      )}
+    </PageContainer>
+  );
 };
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
@@ -710,7 +541,6 @@ const TasksPage: React.FC = () => {
 
 export {
   NavigationBar,
-  FriendsPage,
   AccountPage,
   TasksPage
 };
