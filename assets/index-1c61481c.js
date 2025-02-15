@@ -2968,7 +2968,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
 `,Wq=Qe.div`
   width: 90%; // Adjust this value to change the width of the progress bar
   max-width: 317px;
-`,Hq=({duration:e,isPlaying:t})=>{const[r,n]=ze.useState(1);return ze.useEffect(()=>{if(!t){n(1);return}const o=Date.now(),i=()=>{const a=Date.now()-o,l=Math.max(0,1-a/(e*1e3));n(l),l>0&&t&&requestAnimationFrame(i)},s=requestAnimationFrame(i);return()=>cancelAnimationFrame(s)},[e,t]),be(zq,{children:be(Wq,{children:He("svg",{width:"100%",height:"15",viewBox:"0 0 317 15",fill:"none",xmlns:"http://www.w3.org/2000/svg",preserveAspectRatio:"none",children:[He("defs",{children:[be("mask",{id:"progress-mask",children:be("rect",{x:"0",y:"0",width:317*r,height:"15",fill:"white"})}),He("linearGradient",{id:"paint0_linear_175_6050",x1:"0",y1:"7.85483",x2:"317",y2:"7.85483",gradientUnits:"userSpaceOnUse",children:[be("stop",{stopColor:"#00FFFF",stopOpacity:"0"}),be("stop",{offset:"0.429022",stopColor:"#A86DFF"}),be("stop",{offset:"0.700315",stopColor:"#A86DFF"}),be("stop",{offset:"1",stopColor:"#F4B92E"})]}),He("linearGradient",{id:"paint1_linear_175_6050",x1:"0",y1:"7.85483",x2:"317",y2:"7.85483",gradientUnits:"userSpaceOnUse",children:[be("stop",{stopColor:"#00FFFF",stopOpacity:"0"}),be("stop",{offset:"0.429022",stopColor:"#A86DFF"}),be("stop",{offset:"0.700315",stopColor:"#A86DFF"}),be("stop",{offset:"1",stopColor:"#F4B92E"})]})]}),He("g",{mask:"url(#progress-mask)",children:[be("rect",{y:"0.854828",width:"317",height:"14",rx:"7",fill:"url(#paint0_linear_175_6050)"}),be("rect",{x:"0.5",y:"1.35483",width:"316",height:"13",rx:"6.5",fill:"url(#paint1_linear_175_6050)",stroke:"#00FFFF"})]})]})})})},Vq="/MSGB/assets/points-3060d2de.svg",Kq={apiKey:"AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",authDomain:"moonstones-8e2e4.firebaseapp.com",databaseURL:"https://moonstones-8e2e4-default-rtdb.europe-west1.firebasedatabase.app",projectId:"moonstones-8e2e4",storageBucket:"moonstones-8e2e4.appspot.com",messagingSenderId:"645616414210",appId:"1:645616414210:web:236885687711d65c45011b"},Gq=qx(Kq),zf=60,J8=({onGameStateChange:e,userStats:t,onGameOver:r,onNavigateToFriends:n})=>{var Ue;const[o,i]=ze.useState(!1),[s,a]=ze.useState(!1),[l,f]=ze.useState(0),[c,h]=ze.useState(!1),[d,g]=ze.useState([]),[y,b]=ze.useState(1),[A,S]=ze.useState(0),[k,T]=ze.useState(zf),[B,L]=ze.useState(!1),[j,W]=ze.useState(null),[H,Y]=ze.useState(zl),[ee,D]=ze.useState(null),[w,m]=ze.useState(null),[u,p]=ze.useState(5),[_,C]=ze.useState(1),[M,I]=ze.useState(null),[x,E]=ze.useState(!1),[v,R]=ze.useState("game-over"),[X,re]=ze.useState(0),[U,ne]=ze.useState(!1);ze.useEffect(()=>{(async()=>{if(ee)try{const we=await G(ee.id.toString());re(we)}catch(we){console.error("Error fetching total points:",we)}})()},[ee]);const G=async Ee=>{const we=Xn(),ke=ar(we,`/${Ee}/scores`);try{const it=await zr(ke);if(!it.exists())return 0;const je=it.val();return Object.values(je).reduce((Oe,mt)=>Oe+(mt.score||0),0)}catch(it){return console.error("Error getting total points:",it),0}};ze.useEffect(()=>{(async()=>{var it,je;const ke=(it=window.Telegram)==null?void 0:it.WebApp;if(ke){ke.ready(),ke.expand(),"requestFullscreen"in ke&&ke.requestFullscreen(),ke.disableVerticalSwipes(),ke.setHeaderColor("#000000"),ke.setBottomBarColor("#000000");const Oe=(je=ke.initDataUnsafe)==null?void 0:je.user;if(Oe){D(Oe);try{const mt=await _l(Oe.id.toString()),rt=await J2(Oe.id.toString(),Oe.first_name);I(rt),p(mt),m(mt-(rt.playsToday||0)),C(rt.currentStreak);const Fe=await G(Oe.id.toString());re(Fe)}catch(mt){console.error("Error loading user stats:",mt)}}}})();const we=async()=>{var ke,it;if(ee!=null&&ee.id)try{const je=await _l(ee.id.toString()),mt=((ke=(await zr(ar(le,`users/${ee.id}/visits`))).val())==null?void 0:ke.playsToday)||0;if(mt>=je){R("no-plays"),E(!0);return}m(je-mt),ne(!1),a(!0),f(0),h(!1),b(1),g([]),S(0),T(zf);const rt=(it=window.Telegram)==null?void 0:it.WebApp;rt&&(rt.MainButton.hide(),rt.sendData(JSON.stringify({action:"gameStarted"})))}catch(je){console.error("Error starting game:",je),alert("There was an error starting the game. Please try again.")}};return window.addEventListener("start-game",we),()=>{window.removeEventListener("start-game",we)}},[ee]),ze.useEffect(()=>{e(s)},[s,e]);const te=async()=>{var we,ke,it;const Ee=(we=window.Telegram)==null?void 0:we.WebApp;(it=(ke=Ee==null?void 0:Ee.initDataUnsafe)==null?void 0:ke.user)!=null&&it.id&&ne(!0)},ie=async()=>{var we,ke,it,je;const Ee=(we=window.Telegram)==null?void 0:we.WebApp;if((it=(ke=Ee==null?void 0:Ee.initDataUnsafe)==null?void 0:ke.user)!=null&&it.id)try{const Oe=Ee.initDataUnsafe.user.id.toString(),mt=await _l(Oe),Fe=((je=(await zr(ar(le,`users/${Oe}/visits`))).val())==null?void 0:je.playsToday)||0;if(Fe>=mt){R("no-plays"),E(!0);return}p(mt),m(mt-Fe),a(!0),f(0),h(!1),b(1),g([]),S(0),T(zf);try{Ee.MainButton.hide(),Ee.sendData(JSON.stringify({action:"gameStarted"}))}catch($t){console.warn("Telegram UI operation failed:",$t)}}catch(Oe){console.error("Error starting game:",Oe),alert("There was an error starting the game. Please try again.")}};ze.useEffect(()=>{if(s&&!c){const Ee=setInterval(()=>{T(we=>we<=1?(h(!0),0):we-1),b(we=>we+.03)},1e3);return()=>clearInterval(Ee)}},[s,c]);const q=ze.useCallback(Ee=>{const we=window.innerWidth,ke=window.innerHeight;let it,je,Oe,mt,rt,Fe;if(Ee==="horizontal"){const Ye=Math.random()<.5;it=Ye?-500:we,je=Ye?we:-we,Fe=Math.random()*(ke-50)}else Oe=-500,mt=ke,rt=Math.random()*(we-50);const $t=Math.random();let st;$t<.3?st=0:$t<.55?st=1:$t<.75?st=2:st=3;const Je=4-y*.3,Zt=Math.max(.5,Je),dt={id:A,type:st,speed:Zt,startX:it,endX:je,startY:Oe,endY:mt,posX:rt,posY:Fe,direction:Ee};return S(Ye=>Ye+1),dt},[y,A]),$=ze.useCallback((Ee,we,ke,it)=>{navigator.vibrate&&navigator.vibrate(50),we===3?(f(je=>je-10),W({posX:ke,posY:it}),Y(zl),L(!0),navigator.vibrate([100,50,100]),setTimeout(()=>{Y(a0)},100),setTimeout(()=>{L(!1)},200)):(W({posX:ke,posY:it}),Y(zl),L(!0),setTimeout(()=>{Y(a0)},100),setTimeout(()=>{L(!1)},200),f(je=>je+1)),g(je=>je.filter(Oe=>Oe.id!==Ee))},[]);ze.useEffect(()=>{if(s&&!c){const we=setInterval(()=>{const ke=Math.random()<.5,it=q(ke?"vertical":"horizontal");g(je=>[...je,it])},500);return()=>{clearInterval(we)}}},[s,c,q]);const se=Ee=>new Date(Ee).toLocaleString(),le=Xn(Gq),de=ze.useCallback(async()=>{var Ee;try{const we=(ee==null?void 0:ee.id.toString())||"anonymous",ke=(ee==null?void 0:ee.first_name.toString())||"anonymous",it=ar(le,`/${we}/scores`),je=Date.now();await za(it,{[je]:{userName:ke,score:l,remainingTime:k,timestamp:se(je)}});const Oe=ar(le,`users/${we}`),mt=await zr(Oe);if(!mt.exists())return;const rt=mt.val(),Fe=await _l(we),st=(((Ee=rt.plays)==null?void 0:Ee.today)||0)+1;await za(Oe,{plays:{today:st,max:Fe,remaining:Math.max(0,Fe-st),lastPlayed:Date.now()}}),m(Math.max(0,Fe-st));const Je=await G(we);re(Je),console.log("Score and plays updated:",{score:l,newPlaysCount:st,maxTickets:Fe,remaining:Fe-st})}catch(we){console.error("Error updating score:",we)}},[l,k,ee,le]);ze.useEffect(()=>{c&&(async()=>{var ke;a(!1),R("game-over"),E(!0),await de();const we=(ke=window.Telegram)==null?void 0:ke.WebApp;we&&(we.MainButton.text="Play Again",we.MainButton.hide(),we.sendData(JSON.stringify({action:"gameOver",score:l}))),r==null||r(l),(t==null?void 0:t.playsRemaining)===0&&(n==null||n())})()},[c,l,de,r,n,t==null?void 0:t.playsRemaining]);const K=Qe.div`
+`,Hq=({duration:e,isPlaying:t})=>{const[r,n]=ze.useState(1);return ze.useEffect(()=>{if(!t){n(1);return}const o=Date.now(),i=()=>{const a=Date.now()-o,l=Math.max(0,1-a/(e*1e3));n(l),l>0&&t&&requestAnimationFrame(i)},s=requestAnimationFrame(i);return()=>cancelAnimationFrame(s)},[e,t]),be(zq,{children:be(Wq,{children:He("svg",{width:"100%",height:"15",viewBox:"0 0 317 15",fill:"none",xmlns:"http://www.w3.org/2000/svg",preserveAspectRatio:"none",children:[He("defs",{children:[be("mask",{id:"progress-mask",children:be("rect",{x:"0",y:"0",width:317*r,height:"15",fill:"white"})}),He("linearGradient",{id:"paint0_linear_175_6050",x1:"0",y1:"7.85483",x2:"317",y2:"7.85483",gradientUnits:"userSpaceOnUse",children:[be("stop",{stopColor:"#00FFFF",stopOpacity:"0"}),be("stop",{offset:"0.429022",stopColor:"#A86DFF"}),be("stop",{offset:"0.700315",stopColor:"#A86DFF"}),be("stop",{offset:"1",stopColor:"#F4B92E"})]}),He("linearGradient",{id:"paint1_linear_175_6050",x1:"0",y1:"7.85483",x2:"317",y2:"7.85483",gradientUnits:"userSpaceOnUse",children:[be("stop",{stopColor:"#00FFFF",stopOpacity:"0"}),be("stop",{offset:"0.429022",stopColor:"#A86DFF"}),be("stop",{offset:"0.700315",stopColor:"#A86DFF"}),be("stop",{offset:"1",stopColor:"#F4B92E"})]})]}),He("g",{mask:"url(#progress-mask)",children:[be("rect",{y:"0.854828",width:"317",height:"14",rx:"7",fill:"url(#paint0_linear_175_6050)"}),be("rect",{x:"0.5",y:"1.35483",width:"316",height:"13",rx:"6.5",fill:"url(#paint1_linear_175_6050)",stroke:"#00FFFF"})]})]})})})},Vq="/MSGB/assets/points-3060d2de.svg",Kq={apiKey:"AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",authDomain:"moonstones-8e2e4.firebaseapp.com",databaseURL:"https://moonstones-8e2e4-default-rtdb.europe-west1.firebasedatabase.app",projectId:"moonstones-8e2e4",storageBucket:"moonstones-8e2e4.appspot.com",messagingSenderId:"645616414210",appId:"1:645616414210:web:236885687711d65c45011b"},Gq=qx(Kq),Yq=()=>["iPad Simulator","iPhone Simulator","iPod Simulator","iPad","iPhone","iPod"].includes(navigator.platform)||navigator.userAgent.includes("Mac")&&"ontouchend"in document,zf=60,J8=({onGameStateChange:e,userStats:t,onGameOver:r,onNavigateToFriends:n})=>{var Ue;const[o,i]=ze.useState(!1),[s,a]=ze.useState(!1),[l,f]=ze.useState(0),[c,h]=ze.useState(!1),[d,g]=ze.useState([]),[y,b]=ze.useState(1),[A,S]=ze.useState(0),[k,T]=ze.useState(zf),[B,L]=ze.useState(!1),[j,W]=ze.useState(null),[H,Y]=ze.useState(zl),[ee,D]=ze.useState(null),[w,m]=ze.useState(null),[u,p]=ze.useState(5),[_,C]=ze.useState(1),[M,I]=ze.useState(null),[x,E]=ze.useState(!1),[v,R]=ze.useState("game-over"),[X,re]=ze.useState(0),[U,ne]=ze.useState(!1);ze.useEffect(()=>{(async()=>{if(ee)try{const we=await G(ee.id.toString());re(we)}catch(we){console.error("Error fetching total points:",we)}})()},[ee]);const G=async Ee=>{const we=Xn(),ke=ar(we,`/${Ee}/scores`);try{const it=await zr(ke);if(!it.exists())return 0;const je=it.val();return Object.values(je).reduce((Oe,mt)=>Oe+(mt.score||0),0)}catch(it){return console.error("Error getting total points:",it),0}};ze.useEffect(()=>{(async()=>{var it,je;const ke=(it=window.Telegram)==null?void 0:it.WebApp;if(ke){ke.ready(),ke.expand(),"requestFullscreen"in ke&&ke.requestFullscreen(),ke.disableVerticalSwipes(),ke.setHeaderColor("#000000"),ke.setBottomBarColor("#000000");const Oe=(je=ke.initDataUnsafe)==null?void 0:je.user;if(Oe){D(Oe);try{const mt=await _l(Oe.id.toString()),rt=await J2(Oe.id.toString(),Oe.first_name);I(rt),p(mt),m(mt-(rt.playsToday||0)),C(rt.currentStreak);const Fe=await G(Oe.id.toString());re(Fe)}catch(mt){console.error("Error loading user stats:",mt)}}}})();const we=async()=>{var ke,it;if(ee!=null&&ee.id)try{const je=await _l(ee.id.toString()),mt=((ke=(await zr(ar(le,`users/${ee.id}/visits`))).val())==null?void 0:ke.playsToday)||0;if(mt>=je){R("no-plays"),E(!0);return}m(je-mt),ne(!1),a(!0),f(0),h(!1),b(1),g([]),S(0),T(zf);const rt=(it=window.Telegram)==null?void 0:it.WebApp;rt&&(rt.MainButton.hide(),rt.sendData(JSON.stringify({action:"gameStarted"})))}catch(je){console.error("Error starting game:",je),alert("There was an error starting the game. Please try again.")}};return window.addEventListener("start-game",we),()=>{window.removeEventListener("start-game",we)}},[ee]),ze.useEffect(()=>{e(s)},[s,e]);const te=async()=>{var we,ke,it;const Ee=(we=window.Telegram)==null?void 0:we.WebApp;(it=(ke=Ee==null?void 0:Ee.initDataUnsafe)==null?void 0:ke.user)!=null&&it.id&&ne(!0)},ie=async()=>{var we,ke,it,je;const Ee=(we=window.Telegram)==null?void 0:we.WebApp;if((it=(ke=Ee==null?void 0:Ee.initDataUnsafe)==null?void 0:ke.user)!=null&&it.id)try{const Oe=Ee.initDataUnsafe.user.id.toString(),mt=await _l(Oe),Fe=((je=(await zr(ar(le,`users/${Oe}/visits`))).val())==null?void 0:je.playsToday)||0;if(Fe>=mt){R("no-plays"),E(!0);return}p(mt),m(mt-Fe),a(!0),f(0),h(!1),b(1),g([]),S(0),T(zf);try{Ee.MainButton.hide(),Ee.sendData(JSON.stringify({action:"gameStarted"}))}catch($t){console.warn("Telegram UI operation failed:",$t)}}catch(Oe){console.error("Error starting game:",Oe),alert("There was an error starting the game. Please try again.")}};ze.useEffect(()=>{if(s&&!c){const Ee=setInterval(()=>{T(we=>we<=1?(h(!0),0):we-1),b(we=>we+.03)},1e3);return()=>clearInterval(Ee)}},[s,c]);const q=ze.useCallback(Ee=>{const we=window.innerWidth,ke=window.innerHeight;let it,je,Oe,mt,rt,Fe;if(Ee==="horizontal"){const Ye=Math.random()<.5;it=Ye?-500:we,je=Ye?we:-we,Fe=Math.random()*(ke-50)}else Oe=-500,mt=ke,rt=Math.random()*(we-50);const $t=Math.random();let st;$t<.3?st=0:$t<.55?st=1:$t<.75?st=2:st=3;const Je=4-y*.3,Zt=Math.max(.5,Je),dt={id:A,type:st,speed:Zt,startX:it,endX:je,startY:Oe,endY:mt,posX:rt,posY:Fe,direction:Ee};return S(Ye=>Ye+1),dt},[y,A]),$=ze.useCallback((Ee,we,ke,it)=>{navigator.vibrate&&!Yq()&&(we===3?navigator.vibrate([100,50,100]):navigator.vibrate(50)),we===3?(f(je=>je-10),W({posX:ke,posY:it}),Y(zl),L(!0),setTimeout(()=>{Y(a0)},100),setTimeout(()=>{L(!1)},200)):(W({posX:ke,posY:it}),Y(zl),L(!0),setTimeout(()=>{Y(a0)},100),setTimeout(()=>{L(!1)},200),f(je=>je+1)),g(je=>je.filter(Oe=>Oe.id!==Ee))},[]);ze.useEffect(()=>{if(s&&!c){const we=setInterval(()=>{const ke=Math.random()<.5,it=q(ke?"vertical":"horizontal");g(je=>[...je,it])},500);return()=>{clearInterval(we)}}},[s,c,q]);const se=Ee=>new Date(Ee).toLocaleString(),le=Xn(Gq),de=ze.useCallback(async()=>{var Ee;try{const we=(ee==null?void 0:ee.id.toString())||"anonymous",ke=(ee==null?void 0:ee.first_name.toString())||"anonymous",it=ar(le,`/${we}/scores`),je=Date.now();await za(it,{[je]:{userName:ke,score:l,remainingTime:k,timestamp:se(je)}});const Oe=ar(le,`users/${we}`),mt=await zr(Oe);if(!mt.exists())return;const rt=mt.val(),Fe=await _l(we),st=(((Ee=rt.plays)==null?void 0:Ee.today)||0)+1;await za(Oe,{plays:{today:st,max:Fe,remaining:Math.max(0,Fe-st),lastPlayed:Date.now()}}),m(Math.max(0,Fe-st));const Je=await G(we);re(Je),console.log("Score and plays updated:",{score:l,newPlaysCount:st,maxTickets:Fe,remaining:Fe-st})}catch(we){console.error("Error updating score:",we)}},[l,k,ee,le]);ze.useEffect(()=>{c&&(async()=>{var ke;a(!1),R("game-over"),E(!0),await de();const we=(ke=window.Telegram)==null?void 0:ke.WebApp;we&&(we.MainButton.text="Play Again",we.MainButton.hide(),we.sendData(JSON.stringify({action:"gameOver",score:l}))),r==null||r(l),(t==null?void 0:t.playsRemaining)===0&&(n==null||n())})()},[c,l,de,r,n,t==null?void 0:t.playsRemaining]);const K=Qe.div`
   position: absolute;
   top: 7%;
   left: 50%;
@@ -3065,7 +3065,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   color: white;
   font-size: 1.4rem;
   font-weight: bold;
-`,ye=()=>{var we;const Ee=(we=window.Telegram)==null?void 0:we.WebApp;Ee&&Ee.sendData(JSON.stringify({action:"share",score:v==="game-over"?l:void 0}))},qe=()=>{var we;E(!1);const Ee=(we=window.Telegram)==null?void 0:we.WebApp;Ee&&(Ee.MainButton.text="Start Game",Ee.MainButton.hide())},ot=()=>{E(!1);const Ee=new CustomEvent("start-game");window.dispatchEvent(Ee)};return be(SD,{children:x?be(Rq,{reason:v,score:v==="game-over"?l:void 0,ticketsLeft:(t==null?void 0:t.playsRemaining)||0,onPlayAgain:ot,onShare:ye,onClose:qe,onNavigateToFriends:n}):He(In,{children:[s&&be(jq,{}),"  ",B&&j&&be(MD,{src:H,posX:j.posX,posY:j.posY},H),be(CD,{isVisible:o}),!s&&ee&&M&&be(K,{children:He("div",{style:{display:"flex",flexDirection:"column",gap:"1rem"},children:[He("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[be("div",{style:{color:"white",fontSize:"0.9rem"},children:"Tickets left"}),He("div",{style:{color:"#0FF",fontSize:"1.6rem"},children:[w,"/",u]})]}),He("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[be("div",{style:{color:"white",fontSize:"0.9rem"},children:"Coin Balance"}),be("div",{style:{color:"#FFD700",fontSize:"2rem"},children:X})]}),_>1&&He("div",{style:{fontSize:"0.9rem",marginTop:"0.3rem"},children:["+",_-1," bonus ",_-1===1?"ticket":"tickets"," from streak!"]}),(M==null?void 0:M.ticketsFromInvites)&&M.ticketsFromInvites>0&&He("div",{style:{fontSize:"0.9rem",marginTop:"0.3rem",color:"#FFD700"},children:["+",M.ticketsFromInvites," permanent ",M.ticketsFromInvites===1?"ticket":"tickets"," from invites!"]})]})}),!s&&!U&&be("img",{src:ql,alt:"Stone",style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%, -50%)",width:"30vh",zIndex:50}}),U&&!s&&be(Nq,{onComplete:ie,isAnimating:U}),!s&&ee&&be(s8,{className:"scoreboard"}),!s&&!ee&&He(s8,{className:"scoreboard",children:["Welcome",be("br",{}),"in"]}),!s&&!U&&be(Tq,{onClick:te}),s&&He(In,{children:[He(N,{children:[be(pe,{children:"MOONSTONES"}),He(O,{children:[ee!=null&&ee.photo_url?be(z,{src:ee.photo_url,alt:`${ee.first_name}'s profile`}):be(z,{as:"div",style:{display:"flex",justifyContent:"center",alignItems:"center",backgroundColor:"rgba(0,255,255,0.2)"},children:((Ue=ee==null?void 0:ee.first_name)==null?void 0:Ue[0])||"?"}),be(oe,{children:ee==null?void 0:ee.first_name})]}),He(ce,{children:[be(ve,{children:"TOTAL POINTS:"}),be(Ae,{children:X})]})]}),be(Hq,{duration:zf,isPlaying:s}),be(_e,{children:be(Ie,{children:l})})]}),s&&!c&&d.map(Ee=>be(ED,{id:`stone-${Ee.id}`,src:[ql,kD,RD,ID][Ee.type],alt:`Stone ${Ee.type+1}`,speed:Ee.speed,startX:Ee.startX,endX:Ee.endX,startY:Ee.startY,endY:Ee.endY,posX:Ee.posX,posY:Ee.posY,direction:Ee.direction,onClick:()=>$(Ee.id,Ee.type,Ee.posX,Ee.posY),onAnimationEnd:()=>g(we=>we.filter(ke=>ke.id!==Ee.id))},`stone-${Ee.id}`)),c&&be(AD,{className:"scoreboard1",children:be("h2",{children:"Game Over"})})]})})},Yq=Qe.div`
+`,ye=()=>{var we;const Ee=(we=window.Telegram)==null?void 0:we.WebApp;Ee&&Ee.sendData(JSON.stringify({action:"share",score:v==="game-over"?l:void 0}))},qe=()=>{var we;E(!1);const Ee=(we=window.Telegram)==null?void 0:we.WebApp;Ee&&(Ee.MainButton.text="Start Game",Ee.MainButton.hide())},ot=()=>{E(!1);const Ee=new CustomEvent("start-game");window.dispatchEvent(Ee)};return be(SD,{children:x?be(Rq,{reason:v,score:v==="game-over"?l:void 0,ticketsLeft:(t==null?void 0:t.playsRemaining)||0,onPlayAgain:ot,onShare:ye,onClose:qe,onNavigateToFriends:n}):He(In,{children:[s&&be(jq,{}),"  ",B&&j&&be(MD,{src:H,posX:j.posX,posY:j.posY},H),be(CD,{isVisible:o}),!s&&ee&&M&&be(K,{children:He("div",{style:{display:"flex",flexDirection:"column",gap:"1rem"},children:[He("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[be("div",{style:{color:"white",fontSize:"0.9rem"},children:"Tickets left"}),He("div",{style:{color:"#0FF",fontSize:"1.6rem"},children:[w,"/",u]})]}),He("div",{style:{display:"flex",flexDirection:"column",gap:"0.3rem"},children:[be("div",{style:{color:"white",fontSize:"0.9rem"},children:"Coin Balance"}),be("div",{style:{color:"#FFD700",fontSize:"2rem"},children:X})]}),_>1&&He("div",{style:{fontSize:"0.9rem",marginTop:"0.3rem"},children:["+",_-1," bonus ",_-1===1?"ticket":"tickets"," from streak!"]}),(M==null?void 0:M.ticketsFromInvites)&&M.ticketsFromInvites>0&&He("div",{style:{fontSize:"0.9rem",marginTop:"0.3rem",color:"#FFD700"},children:["+",M.ticketsFromInvites," permanent ",M.ticketsFromInvites===1?"ticket":"tickets"," from invites!"]})]})}),!s&&!U&&be("img",{src:ql,alt:"Stone",style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%, -50%)",width:"30vh",zIndex:50}}),U&&!s&&be(Nq,{onComplete:ie,isAnimating:U}),!s&&ee&&be(s8,{className:"scoreboard"}),!s&&!ee&&He(s8,{className:"scoreboard",children:["Welcome",be("br",{}),"in"]}),!s&&!U&&be(Tq,{onClick:te}),s&&He(In,{children:[He(N,{children:[be(pe,{children:"MOONSTONES"}),He(O,{children:[ee!=null&&ee.photo_url?be(z,{src:ee.photo_url,alt:`${ee.first_name}'s profile`}):be(z,{as:"div",style:{display:"flex",justifyContent:"center",alignItems:"center",backgroundColor:"rgba(0,255,255,0.2)"},children:((Ue=ee==null?void 0:ee.first_name)==null?void 0:Ue[0])||"?"}),be(oe,{children:ee==null?void 0:ee.first_name})]}),He(ce,{children:[be(ve,{children:"TOTAL POINTS:"}),be(Ae,{children:X})]})]}),be(Hq,{duration:zf,isPlaying:s}),be(_e,{children:be(Ie,{children:l})})]}),s&&!c&&d.map(Ee=>be(ED,{id:`stone-${Ee.id}`,src:[ql,kD,RD,ID][Ee.type],alt:`Stone ${Ee.type+1}`,speed:Ee.speed,startX:Ee.startX,endX:Ee.endX,startY:Ee.startY,endY:Ee.endY,posX:Ee.posX,posY:Ee.posY,direction:Ee.direction,onClick:()=>$(Ee.id,Ee.type,Ee.posX,Ee.posY),onAnimationEnd:()=>g(we=>we.filter(ke=>ke.id!==Ee.id))},`stone-${Ee.id}`)),c&&be(AD,{className:"scoreboard1",children:be("h2",{children:"Game Over"})})]})})},Qq=Qe.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3074,18 +3074,18 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   top: 5%;
   left: 50%;
   transform: translateX(-50%);
-`,Qq=Qe.img`
+`,Zq=Qe.img`
   width: 65vw;
   height: auto;
   margin-bottom: -10px;
-`,Zq=Qe.div`
+`,Xq=Qe.div`
   position: relative;
   width: 80vw;
   z-index: 2; // Higher z-index to stay on top
-`,Xq=Qe.img`
+`,Jq=Qe.img`
   width: 100%;
   height: auto;
-`,Jq=Qe.div`
+`,ez=Qe.div`
   position: absolute;
   top: 45%;
   left: 50%;
@@ -3103,7 +3103,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   .highlight {
     color: #FFD700;
   }
-`,ew=({userName:e,ticketsLeft:t,isFirstVisit:r})=>He(Yq,{children:[be(Qq,{src:iC,alt:"Hero"}),He(Zq,{children:[be(Xq,{src:oC,alt:"Welcome Box"}),be(Jq,{children:r?He(In,{children:[He("div",{className:"text",children:["Play daily to grow your ",be("span",{className:"highlight",children:"streak"}),"."]}),be("div",{className:"text",children:"Miss a day, and it resets."}),be("div",{className:"text",children:"More streak = more points!"})]}):He(In,{children:[He("div",{className:"text",children:["Hello ",e]}),He("div",{className:"text",children:["You got ",He("span",{className:"highlight",children:[t," tickets"]})]}),be("div",{className:"text",children:t>0?"Use them wisely.":He(In,{children:["Invite a Friend",be("br",{}),"or get back Tomorrow."]})})]})})]})]}),Bd=Ls`
+`,ew=({userName:e,ticketsLeft:t,isFirstVisit:r})=>He(Qq,{children:[be(Zq,{src:iC,alt:"Hero"}),He(Xq,{children:[be(Jq,{src:oC,alt:"Welcome Box"}),be(ez,{children:r?He(In,{children:[He("div",{className:"text",children:["Play daily to grow your ",be("span",{className:"highlight",children:"streak"}),"."]}),be("div",{className:"text",children:"Miss a day, and it resets."}),be("div",{className:"text",children:"More streak = more points!"})]}):He(In,{children:[He("div",{className:"text",children:["Hello ",e]}),He("div",{className:"text",children:["You got ",He("span",{className:"highlight",children:[t," tickets"]})]}),be("div",{className:"text",children:t>0?"Use them wisely.":He(In,{children:["Invite a Friend",be("br",{}),"or get back Tomorrow."]})})]})})]})]}),Bd=Ls`
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -3112,11 +3112,11 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     opacity: 1;
     transform: translateY(0);
   }
-`,ez=Ls`
+`,tz=Ls`
   0% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
   100% { transform: translateY(0px); }
-`,tz=Qe.div`
+`,rz=Qe.div`
   position: fixed;
   top: 100px;
   left: 0;
@@ -3131,7 +3131,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   transition: opacity 0.5s ease-in-out;
   opacity: ${e=>e.$show?1:0};
   pointer-events: auto;
-`,rz=Qe.div`
+`,nz=Qe.div`
   margin-top: 30px; 
   margin-bottom: -10px;
   height: 60%; // Slightly reduced height to accommodate the streak message
@@ -3139,7 +3139,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: center;
   align-items: center;
   width: 100%;
-`,nz=Qe.div`
+`,iz=Qe.div`
   top: 25px;
   height: 30%;
   display: flex;
@@ -3147,7 +3147,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   align-items: center;
   width: 100%;
   z-index: 2; // Higher z-index to ensure it stays on top
-`,iz=Qe.div`
+`,oz=Qe.div`
   position: fixed; 
   bottom: 60px;       
   display: flex;
@@ -3158,11 +3158,11 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   gap: 10px;
   z-index: 1001;
   padding-bottom: env(safe-area-inset-bottom);
-`,oz=Qe.div`
+`,sz=Qe.div`
   color: #fff;
   font-size: 2.5rem;
   text-align: center;
-  animation: ${Bd} 1s ease-out, ${ez} 6s ease-in-out infinite;
+  animation: ${Bd} 1s ease-out, ${tz} 6s ease-in-out infinite;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 
   span {
@@ -3202,7 +3202,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     transform: scale(1.05);
     box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); 
   }
-`,sz=Qe(aC)`
+`,az=Qe(aC)`
   background: transparent;
   color: #0FF; 
   border: 2px solid #0FF; 
@@ -3229,10 +3229,10 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   animation: ${Bd} 1s ease-out;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
   z-index: 2;
-`,az=e=>{const t=e%10,r=e%100;return t===1&&r!==11?e+"st":t===2&&r!==12?e+"nd":t===3&&r!==13?e+"rd":e+"th"},lz=({telegramUser:e,onStart:t,onDirectStart:r,userStats:n})=>{const[o,i]=ze.useState(!0),s=n==null?void 0:n.isFirstVisit;ze.useEffect(()=>{var c;const f=(c=window.Telegram)==null?void 0:c.WebApp;f&&(f.ready(),f.expand(),f.disableVerticalSwipes(),f.setHeaderColor("#000000"),f.setBottomBarColor("#000000"))},[]);const a=()=>{t()},l=()=>{(n==null?void 0:n.playsRemaining)===0?r():(i(!1),setTimeout(()=>{r()},100))};return o?He(tz,{$show:o,children:[s?He(tw,{children:["Welcome ",e==null?void 0:e.first_name]}):n&&n.currentStreak>0&&He(In,{children:[He(tw,{children:["It's your ",az(n.currentStreak)," day straight!"]}),n.currentStreak>1&&He(sv,{children:["+",Math.min(69,n.currentStreak-1)," bonus tickets from streak!"]}),n.ticketsFromInvites&&n.ticketsFromInvites>0&&He(sv,{style:{color:"#0FF"},children:["+",n.ticketsFromInvites," permanent tickets from invites!"]}),n.ticketsFromFriends&&n.ticketsFromFriends>0&&He(sv,{style:{color:"#FFD700"},children:["+",n.ticketsFromFriends," bonus tickets from friends!"]})]}),be(rz,{children:s?be(oz,{}):null}),be(nz,{children:s?be(ew,{userName:(e==null?void 0:e.first_name)||"",ticketsLeft:(n==null?void 0:n.playsRemaining)||0,isFirstVisit:!0}):be(In,{children:e&&n&&be(ew,{userName:e.first_name,ticketsLeft:n.playsRemaining,isFirstVisit:!1})})}),He(iz,{children:[be(sz,{onClick:l,children:(n==null?void 0:n.playsRemaining)===0?"NO TICKETS LEFT":"START PLAYING"}),be(aC,{onClick:a,children:"GO TO MAIN PAGE"})]})]}):null},uz="/MSGB/assets/mainA-faf6def5.svg",fz="/MSGB/assets/mainD-8f1825ce.svg",cz="/MSGB/assets/friendsA-a6b43958.svg",dz="/MSGB/assets/friendsD-34752d89.svg",hz="/MSGB/assets/accountA-4bd859ca.svg",pz="/MSGB/assets/accountD-fafe9e1a.svg",vz="/MSGB/assets/taskasA-69bcd094.svg",gz="/MSGB/assets/tasksD-75f9f56e.svg",mz="/MSGB/assets/HUDbottom-3a29c1dd.svg",yz=Qe.div`
+`,lz=e=>{const t=e%10,r=e%100;return t===1&&r!==11?e+"st":t===2&&r!==12?e+"nd":t===3&&r!==13?e+"rd":e+"th"},uz=({telegramUser:e,onStart:t,onDirectStart:r,userStats:n})=>{const[o,i]=ze.useState(!0),s=n==null?void 0:n.isFirstVisit;ze.useEffect(()=>{var c;const f=(c=window.Telegram)==null?void 0:c.WebApp;f&&(f.ready(),f.expand(),f.disableVerticalSwipes(),f.setHeaderColor("#000000"),f.setBottomBarColor("#000000"))},[]);const a=()=>{t()},l=()=>{(n==null?void 0:n.playsRemaining)===0?r():(i(!1),setTimeout(()=>{r()},100))};return o?He(rz,{$show:o,children:[s?He(tw,{children:["Welcome ",e==null?void 0:e.first_name]}):n&&n.currentStreak>0&&He(In,{children:[He(tw,{children:["It's your ",lz(n.currentStreak)," day straight!"]}),n.currentStreak>1&&He(sv,{children:["+",Math.min(69,n.currentStreak-1)," bonus tickets from streak!"]}),n.ticketsFromInvites&&n.ticketsFromInvites>0&&He(sv,{style:{color:"#0FF"},children:["+",n.ticketsFromInvites," permanent tickets from invites!"]}),n.ticketsFromFriends&&n.ticketsFromFriends>0&&He(sv,{style:{color:"#FFD700"},children:["+",n.ticketsFromFriends," bonus tickets from friends!"]})]}),be(nz,{children:s?be(sz,{}):null}),be(iz,{children:s?be(ew,{userName:(e==null?void 0:e.first_name)||"",ticketsLeft:(n==null?void 0:n.playsRemaining)||0,isFirstVisit:!0}):be(In,{children:e&&n&&be(ew,{userName:e.first_name,ticketsLeft:n.playsRemaining,isFirstVisit:!1})})}),He(oz,{children:[be(az,{onClick:l,children:(n==null?void 0:n.playsRemaining)===0?"NO TICKETS LEFT":"START PLAYING"}),be(aC,{onClick:a,children:"GO TO MAIN PAGE"})]})]}):null},fz="/MSGB/assets/mainA-faf6def5.svg",cz="/MSGB/assets/mainD-8f1825ce.svg",dz="/MSGB/assets/friendsA-a6b43958.svg",hz="/MSGB/assets/friendsD-34752d89.svg",pz="/MSGB/assets/accountA-4bd859ca.svg",vz="/MSGB/assets/accountD-fafe9e1a.svg",gz="/MSGB/assets/taskasA-69bcd094.svg",mz="/MSGB/assets/tasksD-75f9f56e.svg",yz="/MSGB/assets/HUDbottom-3a29c1dd.svg",bz=Qe.div`
   position: relative;
   width: 100%;
-`,bz=Qe.button`
+`,wz=Qe.button`
   background: transparent;
   border: 2px solid #FFD700;
   color: #FFD700;
@@ -3259,7 +3259,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     transform: scale(1.05);
   }
-`,wz=Qe.div`
+`,_z=Qe.div`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -3274,13 +3274,13 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   transition: opacity 0.3s ease;
   white-space: nowrap;
   z-index: 10;
-`,_z=Qe.p`
+`,xz=Qe.p`
   color: white;
   text-align: center;
   font-size: 0.8rem;
   margin-top: 10px;
   opacity: 0.7;
-`,xz=({botUsername:e,userId:t})=>{const[r,n]=ze.useState(!1);return He(yz,{children:[be(bz,{onClick:async()=>{const i=`https://t.me/${e}?start=ref_${t}`;try{await navigator.clipboard.writeText(i),n(!0),setTimeout(()=>n(!1),2e3)}catch(s){console.error("Failed to copy invite link:",s)}},children:be("span",{children:"INVITE TO GAME"})}),be(wz,{$visible:r,children:"Invite link copied to clipboard!"}),be(_z,{children:"Click to copy invite link"})]})},Sz="/MSGB/assets/ramka-d9a20f72.svg",Cz=Qe.div`
+`,Sz=({botUsername:e,userId:t})=>{const[r,n]=ze.useState(!1);return He(bz,{children:[be(wz,{onClick:async()=>{const i=`https://t.me/${e}?start=ref_${t}`;try{await navigator.clipboard.writeText(i),n(!0),setTimeout(()=>n(!1),2e3)}catch(s){console.error("Failed to copy invite link:",s)}},children:be("span",{children:"INVITE TO GAME"})}),be(_z,{$visible:r,children:"Invite link copied to clipboard!"}),be(xz,{children:"Click to copy invite link"})]})},Cz="/MSGB/assets/ramka-d9a20f72.svg",Ez=Qe.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -3292,7 +3292,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   justify-content: center;
   align-items: center;
   z-index: 1000;
-`,Ez=Qe.div`
+`,Mz=Qe.div`
   width: 80vw;
   height: 80vh;
   background-size: 100% 100%;
@@ -3323,7 +3323,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     background: rgba(0, 255, 255, 0.3);
     border-radius: 4px;
   }
-`,Mz=Qe.button`
+`,Az=Qe.button`
   position: absolute;
   top: 20px;
   right: 20px;
@@ -3334,15 +3334,15 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   cursor: pointer;
   z-index: 2;
   padding: 8px;
-`,Az=Qe.h2`
+`,kz=Qe.h2`
   color: #0FF;
   font-size: 1.5rem;
   margin-bottom: 20px;
   text-align: center;
-`,kz=Qe.div`
+`,Rz=Qe.div`
   width: 100%;
   padding: 0 20px;
-`,Rz=Qe.div`
+`,Iz=Qe.div`
   border-bottom: 1px solid rgba(0, 255, 255, 0.2);
   padding: 12px 0;
   margin-bottom: 8px;
@@ -3351,11 +3351,11 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   &:last-child {
     border-bottom: none;
   }
-`,Iz=Qe.div`
+`,Tz=Qe.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-`,Tz=Qe.div`
+`,Pz=Qe.div`
   div:first-child {
     color: white;
   }
@@ -3378,8 +3378,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   &:hover {
     background: ${e=>e.$variant==="danger"?"rgba(255, 68, 68, 0.1)":"rgba(0, 255, 255, 0.1)"};
   }
-`,Pz=({isOpen:e,onClose:t,friends:r,formatLastActive:n,onRemoveFriend:o,showConfirmRemove:i,setShowConfirmRemove:s})=>e?be(Cz,{onClick:t,children:He(Ez,{onClick:a=>a.stopPropagation(),children:[be(Mz,{onClick:t,children:"×"}),be(Az,{children:"My Friends"}),be(kz,{children:r.map(a=>be(Rz,{children:He(Iz,{children:[He(Tz,{children:[be("div",{children:a.userName}),be("div",{children:n(a.lastActive)})]}),i===a.userId?He("div",{children:[be(av,{$variant:"danger",onClick:()=>o(a.userId),children:"Confirm"}),be(av,{onClick:()=>s(null),children:"Cancel"})]}):be(av,{$variant:"danger",onClick:()=>s(a.userId),children:"Remove"})]})},a.userId))})]})}):null,Bz="/MSGB/assets/ramkaZ-f1273bb1.svg",Nz=Qe.div`
-  background-image: url(${Bz});
+`,Bz=({isOpen:e,onClose:t,friends:r,formatLastActive:n,onRemoveFriend:o,showConfirmRemove:i,setShowConfirmRemove:s})=>e?be(Ez,{onClick:t,children:He(Mz,{onClick:a=>a.stopPropagation(),children:[be(Az,{onClick:t,children:"×"}),be(kz,{children:"My Friends"}),be(Rz,{children:r.map(a=>be(Iz,{children:He(Tz,{children:[He(Pz,{children:[be("div",{children:a.userName}),be("div",{children:n(a.lastActive)})]}),i===a.userId?He("div",{children:[be(av,{$variant:"danger",onClick:()=>o(a.userId),children:"Confirm"}),be(av,{onClick:()=>s(null),children:"Cancel"})]}):be(av,{$variant:"danger",onClick:()=>s(a.userId),children:"Remove"})]})},a.userId))})]})}):null,Nz="/MSGB/assets/ramkaZ-f1273bb1.svg",Oz=Qe.div`
+  background-image: url(${Nz});
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 20px 20px;
@@ -3392,20 +3392,20 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   text-align: center;
   position: relative;
   box-sizing: border-box;
-`,Oz=Qe.p`
+`,Lz=Qe.p`
   color: white;
   margin-bottom: 8px;
   font-family: 'REM', sans-serif;
   line-height: 0.9;
   width: 100%;
-`,Lz=Qe.div`
+`,Dz=Qe.div`
   position: relative;
   width: min(80%, 280px); // More constrained width
   margin: 12px 12px;
   display: flex;
   align-items: center;
   box-sizing: border-box;
-`,Dz=Qe.input`
+`,Fz=Qe.input`
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 255, 255, 0.31);
   border-radius: 24px;
@@ -3425,13 +3425,13 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     opacity: 0.5;
     cursor: not-allowed;
   }
-`,Fz=Qe.div`
+`,$z=Qe.div`
   position: absolute;
   right: 4px;
   display: flex;
   align-items: center;
   height: 100%;
-`,$z=Qe.button`
+`,Uz=Qe.button`
   margin: 0;
   padding: 6px 12px;
   height: calc(100% - 8px);
@@ -3453,7 +3453,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     opacity: 0.5;
     cursor: not-allowed;
   }
-`,Uz=Qe.div`
+`,jz=Qe.div`
   position: absolute;
   top: -30px;
   left: 50%;
@@ -3467,21 +3467,21 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   z-index: 10;
   pointer-events: none;
   font-family: 'REM', sans-serif;
-`,jz=({onSendRequest:e,isProcessing:t,error:r})=>{const[n,o]=ze.useState(""),i=async()=>{!n.trim()||t||(await e(n),o(""))},s=a=>{a.key==="Enter"&&i()};return He(Nz,{children:[He(Oz,{children:["Get extra ticket",be("br",{}),"for every 2 friends added"]}),He(Lz,{children:[r&&be(Uz,{$isSuccess:r.includes("sent"),children:r}),be(Dz,{type:"text",placeholder:"Enter User ID",value:n,onChange:a=>o(a.target.value),disabled:t,onKeyPress:s}),be(Fz,{children:be($z,{onClick:i,disabled:t||!n.trim(),children:"Add Friend"})})]})]})},qz=({currentPage:e,onNavigate:t})=>be("div",{style:{position:"fixed",bottom:"0",left:0,right:0,zIndex:9999,display:"flex",justifyContent:"space-around",alignItems:"flex-start",background:`url(${mz}) no-repeat center bottom`,backgroundSize:"100% 100%",maxWidth:"100vw",overflow:"hidden",padding:"15px 10px 0"},children:[{page:"main",activeImg:uz,defaultImg:fz},{page:"friends",activeImg:cz,defaultImg:dz},{page:"account",activeImg:hz,defaultImg:pz},{page:"tasks",activeImg:vz,defaultImg:gz}].map(({page:r,activeImg:n,defaultImg:o})=>be("button",{onClick:()=>t(r),style:{display:"flex",alignItems:"center",justifyContent:"center",background:"transparent",border:"none",padding:0,margin:0,marginTop:"5px",width:"10vh",height:"10vh",overflow:"hidden",cursor:"pointer"},children:be("img",{src:e===r?n:o,alt:r,style:{width:"100%",height:"100%",objectFit:"contain",maxWidth:"100%",maxHeight:"100%"}})},r))}),zz=Qe.div`
+`,qz=({onSendRequest:e,isProcessing:t,error:r})=>{const[n,o]=ze.useState(""),i=async()=>{!n.trim()||t||(await e(n),o(""))},s=a=>{a.key==="Enter"&&i()};return He(Oz,{children:[He(Lz,{children:["Get extra ticket",be("br",{}),"for every 2 friends added"]}),He(Dz,{children:[r&&be(jz,{$isSuccess:r.includes("sent"),children:r}),be(Fz,{type:"text",placeholder:"Enter User ID",value:n,onChange:a=>o(a.target.value),disabled:t,onKeyPress:s}),be($z,{children:be(Uz,{onClick:i,disabled:t||!n.trim(),children:"Add Friend"})})]})]})},zz=({currentPage:e,onNavigate:t})=>be("div",{style:{position:"fixed",bottom:"0",left:0,right:0,zIndex:9999,display:"flex",justifyContent:"space-around",alignItems:"flex-start",background:`url(${yz}) no-repeat center bottom`,backgroundSize:"100% 100%",maxWidth:"100vw",overflow:"hidden",padding:"15px 10px 0"},children:[{page:"main",activeImg:fz,defaultImg:cz},{page:"friends",activeImg:dz,defaultImg:hz},{page:"account",activeImg:pz,defaultImg:vz},{page:"tasks",activeImg:gz,defaultImg:mz}].map(({page:r,activeImg:n,defaultImg:o})=>be("button",{onClick:()=>t(r),style:{display:"flex",alignItems:"center",justifyContent:"center",background:"transparent",border:"none",padding:0,margin:0,marginTop:"5px",width:"10vh",height:"10vh",overflow:"hidden",cursor:"pointer"},children:be("img",{src:e===r?n:o,alt:r,style:{width:"100%",height:"100%",objectFit:"contain",maxWidth:"100%",maxHeight:"100%"}})},r))}),Wz=Qe.div`
   margin-top: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-`,Wz=Qe.h1`
+`,Hz=Qe.h1`
   color: #0FF;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   text-align: center;
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
   font-family: 'REM', sans-serif;
-`,Hz=Qe.div`
-  background-image: url(${Sz});
+`,Vz=Qe.div`
+  background-image: url(${Cz});
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 20px 20px;
@@ -3494,7 +3494,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   text-align: center;
   position: relative;
   box-sizing: border-box;
-`,Vz=Qe.p`
+`,Kz=Qe.p`
   color: white;
   font-family: 'REM', sans-serif;
   line-height: 1;
@@ -3506,12 +3506,12 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   span {
     color: #FFD700;
   }
-`,Kz=Qe.div`
+`,Gz=Qe.div`
   margin-top: 1rem;
   display: flex;
   justify-content: center;
   width: 100%;
-`,Gz=Qe.button`
+`,Yz=Qe.button`
   width: min(80%, 300px);
   margin: 20px auto;
   padding: 12px;
@@ -3532,4 +3532,4 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
     transform: scale(1.02);
   }
-`,Yz=({telegramUser:e})=>{const[t,r]=ze.useState(""),[n,o]=ze.useState([]),[i,s]=ze.useState([]),[a,l]=ze.useState(null),[f,c]=ze.useState(!1),[h,d]=ze.useState(!1);ze.useEffect(()=>{if(!e)return;const S=Xn(),k=ar(S,`users/${e.id}/friendRequests`),T=ar(S,`users/${e.id}/friends`);Q8(k,L=>{if(L.exists()){const j=Object.values(L.val()).filter(W=>W.status==="pending");o(j)}else o([])}),Q8(T,L=>{if(L.exists()){const j=Object.values(L.val());j.sort((W,H)=>(H.lastActive||0)-(W.lastActive||0)),s(j)}else s([])});const B=ar(S,`users/${e.id}/status`);return Sa(B,"online"),za(ar(S,`users/${e.id}`),{lastActive:Date.now()}),()=>{Z8(k),Z8(T),Sa(B,"offline")}},[e]);const g=S=>{if(!S)return"Never";const k=Date.now()-S,T=Math.floor(k/6e4);if(T<1)return"Just now";if(T<60)return`${T}m ago`;const B=Math.floor(T/60);return B<24?`${B}h ago`:`${Math.floor(B/24)}d ago`},y=S=>{r(S),setTimeout(()=>r(""),4e3)},b=async S=>{var k,T;if(e){d(!0);try{const B=Xn();if(S===e.id.toString()){y("Cannot add yourself as a friend");return}const L=ar(B,`users/${S}`);if(!(await zr(L)).exists()){y("User not found");return}const W=ar(B,`users/${e.id}/friends/${S}`);if((await zr(W)).exists()){y("Already friends with this user");return}const[Y,ee]=await Promise.all([zr(ar(B,`users/${S}/friendRequests/${e.id}`)),zr(ar(B,`users/${e.id}/friendRequests/${S}`))]);if(Y.exists()||ee.exists()){y("Friend request already exists");return}const D={fromUserId:e.id.toString(),fromUserName:e.first_name,status:"pending",timestamp:Date.now()};await Sa(ar(B,`users/${S}/friendRequests/${e.id}`),D),(T=(k=window.Telegram)==null?void 0:k.WebApp)==null||T.sendData(JSON.stringify({action:"friendRequest",targetUserId:S,senderName:e.first_name})),y("Friend request sent!")}catch(B){console.error("Error sending friend request:",B),y("Error sending friend request")}finally{d(!1)}}},A=async S=>{var k,T;if(e)try{const B=Xn();await Promise.all([Y8(ar(B,`users/${e.id}/friends/${S}`)),Y8(ar(B,`users/${S}/friends/${e.id}`))]),(T=(k=window.Telegram)==null?void 0:k.WebApp)==null||T.sendData(JSON.stringify({action:"friendRemoved",targetUserId:S,removerName:e.first_name})),l(null)}catch(B){console.error("Error removing friend:",B)}};return He(zz,{children:[be(Wz,{children:"Friends"}),be(jz,{onSendRequest:b,isProcessing:h,error:t}),be(Hz,{children:He(Vz,{children:["Invite players —each adds",be("br",{}),be("span",{children:"+1 ticket permanently"}),be("br",{}),"for both of you!"]})}),be(Kz,{children:be(xz,{botUsername:"moonstonesgamebot",userId:e==null?void 0:e.id.toString()})}),i.length>0&&He(In,{children:[He(Gz,{onClick:()=>c(!0),children:["My Friends (",i.length,")"]}),be(Pz,{isOpen:f,onClose:()=>c(!1),friends:i,formatLastActive:g,onRemoveFriend:A,showConfirmRemove:a,setShowConfirmRemove:l})]})]})},Qz=async e=>{const t=Xn(),r=ar(t,"/");try{const n=await zr(r);if(!n.exists())return 0;const o=n.val(),i=[];for(const[a,l]of Object.entries(o))if(typeof l=="object"&&l!==null&&"scores"in l){const c=Object.values(l.scores).reduce((h,d)=>h+(d.score||0),0);i.push({userId:a,totalPoints:c})}return i.sort((a,l)=>l.totalPoints-a.totalPoints),i.findIndex(a=>a.userId===e)+1}catch(n){return console.error("Error calculating leaderboard position:",n),0}},Zz=({telegramUser:e,userStats:t})=>{const[r,n]=ze.useState(0),[o,i]=ze.useState(0),[s,a]=ze.useState(0),[l,f]=ze.useState(0);return ze.useEffect(()=>{(async()=>{if(e)try{const h=Xn(),d=ar(h,`/${e.id}/scores`),g=await zr(d);if(g.exists()){const T=g.val(),B=Object.values(T).reduce((L,j)=>L+(j.score||0),0);n(B)}const y=await Qz(e.id.toString());i(y);const b=ar(h,`users/${e.id}/referrals/invitedUsers`),A=await zr(b);if(A.exists()){const T=A.val();a(Array.isArray(T)?T.length:0)}const S=ar(h,`users/${e.id}/friends`),k=await zr(S);if(k.exists()){const T=k.val();f(Object.keys(T).length)}}catch(h){console.error("Error fetching data:",h)}})()},[e]),e?He("div",{className:"page-container",style:{marginTop:"30px"},children:[be("h1",{className:"text-glow text-xl mb-4",children:"My Account"}),be("div",{className:"card",children:He("div",{className:"space-y-2",children:[He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Name:"}),be("span",{className:"text-value",children:e.first_name})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"User ID:"}),be("span",{className:"text-value",children:e.id})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Leaderboard Position:"}),He("span",{className:"text-value",children:["#",o]})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Invites:"}),be("span",{className:"text-value",children:s})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Friends:"}),be("span",{className:"text-value",children:l})]}),t&&He(In,{children:[He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Current Streak:"}),He("span",{className:"text-value",children:[t.currentStreak," days"]})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Highest Streak:"}),He("span",{className:"text-value",children:[t.highestStreak," days"]})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Total Points:"}),be("span",{className:"text-value",children:r})]})]})]})})]}):be("div",{className:"page-container",children:be("span",{className:"text-glow animate-pulse",children:"Loading..."})})},Xz=()=>He("div",{className:"page-container",style:{marginTop:"30px"},children:[be("h1",{className:"text-glow text-xl mb-4",children:"Daily Tasks"}),He("div",{className:"card",children:[be("h2",{className:"text-glow text-lg mb-2",children:"Today's Tasks"}),He("div",{className:"space-y-2",children:[He("div",{className:"stat-row",children:[be("span",{children:"Play 5 games"}),be("span",{className:"text-glow",children:"0/5"})]}),He("div",{className:"stat-row",children:[be("span",{children:"Score 50 points"}),be("span",{className:"text-glow",children:"0/50"})]}),He("div",{className:"stat-row",children:[be("span",{children:"Visit the app"}),be("span",{className:"text-green-400",children:"✓"})]})]})]}),He("div",{className:"card",children:[be("h2",{className:"text-glow text-lg mb-2",children:"Weekly Challenges"}),be("p",{className:"text-info",children:"Coming soon..."})]})]});function Jz(){xL();const[e,t]=ze.useState(!0),[r,n]=ze.useState(null),[o,i]=ze.useState(null),[s,a]=ze.useState("main"),[l,f]=ze.useState(!1),[c,h]=ze.useState(!0);ze.useEffect(()=>{(async()=>{var B,L,j,W,H,Y;const T=(B=window.Telegram)==null?void 0:B.WebApp;if(T){const ee=new URLSearchParams(window.location.search),D=ee.get("tgWebAppStartParam");console.log("App initialization:",{urlParams:Object.fromEntries(ee.entries()),inviteParam:D,user:(L=T.initDataUnsafe)==null?void 0:L.user}),T.ready(),T.expand(),T.isOrientationLocked||T.lockOrientation();const w=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);h(w),(j=T.requestFullscreen)==null||j.call(T);const m=(W=T.initDataUnsafe)==null?void 0:W.user;if(m){n(m);try{D&&D.startsWith("ref_")&&(console.log("Found invite parameter:",D),await bq(m.id.toString(),D));const u=Xn(),p=ar(u,`users/${m.id}`),C=((Y=(H=(await zr(p)).val())==null?void 0:H.referrals)==null?void 0:Y.ticketsFromInvites)||0,M=await J2(m.id.toString(),m.first_name);i({...M,ticketsFromInvites:C})}catch(u){console.error("Error in initialization:",u)}}}})()},[]);const d=()=>{a("friends")},g=k=>{(o==null?void 0:o.playsRemaining)===0&&d()},y=async()=>{var T;if(o!=null&&o.isFirstVisit&&r)try{const B=await J2(r.id.toString(),r.first_name);i(B)}catch(B){console.error("Error updating user stats:",B)}t(!1),a("main");const k=(T=window.Telegram)==null?void 0:T.WebApp;k!=null&&k.MainButton&&k.MainButton.hide()},b=k=>{f(k)},A=async()=>{if(r)try{if(await wq(r.id.toString())<0)return;t(!1);const T=new CustomEvent("start-game");setTimeout(()=>{window.dispatchEvent(T)},100)}catch(k){console.error("Error updating play count:",k)}};return He("div",{style:{height:"100vh",overflow:"hidden",position:"relative"},children:[be("div",{className:`background-container ${l?"game-bg":"main-bg"}`}),S(),!e&&!l&&be(qz,{currentPage:s,onNavigate:a})]});function S(){if(e)return be(lz,{telegramUser:r,onStart:y,onDirectStart:A,userStats:o});switch(s){case"main":return be(J8,{onGameStateChange:b,userStats:o,onGameOver:g,onNavigateToFriends:d});case"friends":return be(Yz,{telegramUser:r});case"account":return be(Zz,{telegramUser:r,userStats:o});case"tasks":return be(Xz,{});default:return be(J8,{onGameStateChange:b,userStats:o,onGameOver:g,onNavigateToFriends:d})}}}const eW="https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/tonconnect-manifest.json",tW=new YC({defaultOptions:{queries:{refetchOnWindowFocus:!1}}});E2.createRoot(document.getElementById("root")).render(be(yL,{manifestUrl:eW,children:be(rA,{client:tW,children:be(Jz,{})})}));
+`,Qz=({telegramUser:e})=>{const[t,r]=ze.useState(""),[n,o]=ze.useState([]),[i,s]=ze.useState([]),[a,l]=ze.useState(null),[f,c]=ze.useState(!1),[h,d]=ze.useState(!1);ze.useEffect(()=>{if(!e)return;const S=Xn(),k=ar(S,`users/${e.id}/friendRequests`),T=ar(S,`users/${e.id}/friends`);Q8(k,L=>{if(L.exists()){const j=Object.values(L.val()).filter(W=>W.status==="pending");o(j)}else o([])}),Q8(T,L=>{if(L.exists()){const j=Object.values(L.val());j.sort((W,H)=>(H.lastActive||0)-(W.lastActive||0)),s(j)}else s([])});const B=ar(S,`users/${e.id}/status`);return Sa(B,"online"),za(ar(S,`users/${e.id}`),{lastActive:Date.now()}),()=>{Z8(k),Z8(T),Sa(B,"offline")}},[e]);const g=S=>{if(!S)return"Never";const k=Date.now()-S,T=Math.floor(k/6e4);if(T<1)return"Just now";if(T<60)return`${T}m ago`;const B=Math.floor(T/60);return B<24?`${B}h ago`:`${Math.floor(B/24)}d ago`},y=S=>{r(S),setTimeout(()=>r(""),4e3)},b=async S=>{var k,T;if(e){d(!0);try{const B=Xn();if(S===e.id.toString()){y("Cannot add yourself as a friend");return}const L=ar(B,`users/${S}`);if(!(await zr(L)).exists()){y("User not found");return}const W=ar(B,`users/${e.id}/friends/${S}`);if((await zr(W)).exists()){y("Already friends with this user");return}const[Y,ee]=await Promise.all([zr(ar(B,`users/${S}/friendRequests/${e.id}`)),zr(ar(B,`users/${e.id}/friendRequests/${S}`))]);if(Y.exists()||ee.exists()){y("Friend request already exists");return}const D={fromUserId:e.id.toString(),fromUserName:e.first_name,status:"pending",timestamp:Date.now()};await Sa(ar(B,`users/${S}/friendRequests/${e.id}`),D),(T=(k=window.Telegram)==null?void 0:k.WebApp)==null||T.sendData(JSON.stringify({action:"friendRequest",targetUserId:S,senderName:e.first_name})),y("Friend request sent!")}catch(B){console.error("Error sending friend request:",B),y("Error sending friend request")}finally{d(!1)}}},A=async S=>{var k,T;if(e)try{const B=Xn();await Promise.all([Y8(ar(B,`users/${e.id}/friends/${S}`)),Y8(ar(B,`users/${S}/friends/${e.id}`))]),(T=(k=window.Telegram)==null?void 0:k.WebApp)==null||T.sendData(JSON.stringify({action:"friendRemoved",targetUserId:S,removerName:e.first_name})),l(null)}catch(B){console.error("Error removing friend:",B)}};return He(Wz,{children:[be(Hz,{children:"Friends"}),be(qz,{onSendRequest:b,isProcessing:h,error:t}),be(Vz,{children:He(Kz,{children:["Invite players —each adds",be("br",{}),be("span",{children:"+1 ticket permanently"}),be("br",{}),"for both of you!"]})}),be(Gz,{children:be(Sz,{botUsername:"moonstonesgamebot",userId:e==null?void 0:e.id.toString()})}),i.length>0&&He(In,{children:[He(Yz,{onClick:()=>c(!0),children:["My Friends (",i.length,")"]}),be(Bz,{isOpen:f,onClose:()=>c(!1),friends:i,formatLastActive:g,onRemoveFriend:A,showConfirmRemove:a,setShowConfirmRemove:l})]})]})},Zz=async e=>{const t=Xn(),r=ar(t,"/");try{const n=await zr(r);if(!n.exists())return 0;const o=n.val(),i=[];for(const[a,l]of Object.entries(o))if(typeof l=="object"&&l!==null&&"scores"in l){const c=Object.values(l.scores).reduce((h,d)=>h+(d.score||0),0);i.push({userId:a,totalPoints:c})}return i.sort((a,l)=>l.totalPoints-a.totalPoints),i.findIndex(a=>a.userId===e)+1}catch(n){return console.error("Error calculating leaderboard position:",n),0}},Xz=({telegramUser:e,userStats:t})=>{const[r,n]=ze.useState(0),[o,i]=ze.useState(0),[s,a]=ze.useState(0),[l,f]=ze.useState(0);return ze.useEffect(()=>{(async()=>{if(e)try{const h=Xn(),d=ar(h,`/${e.id}/scores`),g=await zr(d);if(g.exists()){const T=g.val(),B=Object.values(T).reduce((L,j)=>L+(j.score||0),0);n(B)}const y=await Zz(e.id.toString());i(y);const b=ar(h,`users/${e.id}/referrals/invitedUsers`),A=await zr(b);if(A.exists()){const T=A.val();a(Array.isArray(T)?T.length:0)}const S=ar(h,`users/${e.id}/friends`),k=await zr(S);if(k.exists()){const T=k.val();f(Object.keys(T).length)}}catch(h){console.error("Error fetching data:",h)}})()},[e]),e?He("div",{className:"page-container",style:{marginTop:"30px"},children:[be("h1",{className:"text-glow text-xl mb-4",children:"My Account"}),be("div",{className:"card",children:He("div",{className:"space-y-2",children:[He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Name:"}),be("span",{className:"text-value",children:e.first_name})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"User ID:"}),be("span",{className:"text-value",children:e.id})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Leaderboard Position:"}),He("span",{className:"text-value",children:["#",o]})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Invites:"}),be("span",{className:"text-value",children:s})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Friends:"}),be("span",{className:"text-value",children:l})]}),t&&He(In,{children:[He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Current Streak:"}),He("span",{className:"text-value",children:[t.currentStreak," days"]})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Highest Streak:"}),He("span",{className:"text-value",children:[t.highestStreak," days"]})]}),He("div",{className:"stat-row",children:[be("span",{className:"text-info",children:"Total Points:"}),be("span",{className:"text-value",children:r})]})]})]})})]}):be("div",{className:"page-container",children:be("span",{className:"text-glow animate-pulse",children:"Loading..."})})},Jz=()=>He("div",{className:"page-container",style:{marginTop:"30px"},children:[be("h1",{className:"text-glow text-xl mb-4",children:"Daily Tasks"}),He("div",{className:"card",children:[be("h2",{className:"text-glow text-lg mb-2",children:"Today's Tasks"}),He("div",{className:"space-y-2",children:[He("div",{className:"stat-row",children:[be("span",{children:"Play 5 games"}),be("span",{className:"text-glow",children:"0/5"})]}),He("div",{className:"stat-row",children:[be("span",{children:"Score 50 points"}),be("span",{className:"text-glow",children:"0/50"})]}),He("div",{className:"stat-row",children:[be("span",{children:"Visit the app"}),be("span",{className:"text-green-400",children:"✓"})]})]})]}),He("div",{className:"card",children:[be("h2",{className:"text-glow text-lg mb-2",children:"Weekly Challenges"}),be("p",{className:"text-info",children:"Coming soon..."})]})]});function eW(){xL();const[e,t]=ze.useState(!0),[r,n]=ze.useState(null),[o,i]=ze.useState(null),[s,a]=ze.useState("main"),[l,f]=ze.useState(!1),[c,h]=ze.useState(!0);ze.useEffect(()=>{(async()=>{var B,L,j,W,H,Y;const T=(B=window.Telegram)==null?void 0:B.WebApp;if(T){const ee=new URLSearchParams(window.location.search),D=ee.get("tgWebAppStartParam");console.log("App initialization:",{urlParams:Object.fromEntries(ee.entries()),inviteParam:D,user:(L=T.initDataUnsafe)==null?void 0:L.user}),T.ready(),T.expand(),T.isOrientationLocked||T.lockOrientation();const w=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);h(w),(j=T.requestFullscreen)==null||j.call(T);const m=(W=T.initDataUnsafe)==null?void 0:W.user;if(m){n(m);try{D&&D.startsWith("ref_")&&(console.log("Found invite parameter:",D),await bq(m.id.toString(),D));const u=Xn(),p=ar(u,`users/${m.id}`),C=((Y=(H=(await zr(p)).val())==null?void 0:H.referrals)==null?void 0:Y.ticketsFromInvites)||0,M=await J2(m.id.toString(),m.first_name);i({...M,ticketsFromInvites:C})}catch(u){console.error("Error in initialization:",u)}}}})()},[]);const d=()=>{a("friends")},g=k=>{(o==null?void 0:o.playsRemaining)===0&&d()},y=async()=>{var T;if(o!=null&&o.isFirstVisit&&r)try{const B=await J2(r.id.toString(),r.first_name);i(B)}catch(B){console.error("Error updating user stats:",B)}t(!1),a("main");const k=(T=window.Telegram)==null?void 0:T.WebApp;k!=null&&k.MainButton&&k.MainButton.hide()},b=k=>{f(k)},A=async()=>{if(r)try{if(await wq(r.id.toString())<0)return;t(!1);const T=new CustomEvent("start-game");setTimeout(()=>{window.dispatchEvent(T)},100)}catch(k){console.error("Error updating play count:",k)}};return He("div",{style:{height:"100vh",overflow:"hidden",position:"relative"},children:[be("div",{className:`background-container ${l?"game-bg":"main-bg"}`}),S(),!e&&!l&&be(zz,{currentPage:s,onNavigate:a})]});function S(){if(e)return be(uz,{telegramUser:r,onStart:y,onDirectStart:A,userStats:o});switch(s){case"main":return be(J8,{onGameStateChange:b,userStats:o,onGameOver:g,onNavigateToFriends:d});case"friends":return be(Qz,{telegramUser:r});case"account":return be(Xz,{telegramUser:r,userStats:o});case"tasks":return be(Jz,{});default:return be(J8,{onGameStateChange:b,userStats:o,onGameOver:g,onNavigateToFriends:d})}}}const tW="https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/tonconnect-manifest.json",rW=new YC({defaultOptions:{queries:{refetchOnWindowFocus:!1}}});E2.createRoot(document.getElementById("root")).render(be(yL,{manifestUrl:tW,children:be(rA,{client:rW,children:be(eW,{})})}));
