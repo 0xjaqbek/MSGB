@@ -7,10 +7,9 @@ const RamkaContainer = styled.div`
   background-image: url(${ramka});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 8px 20px; // Increased horizontal padding
+  padding: 8px 20px;
   margin-top: 5px;
-  width: 90%;
-  max-width: 400px;
+  width: min(90%, 360px); // Use min() to cap the width
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,9 +19,17 @@ const RamkaContainer = styled.div`
   box-sizing: border-box;
 `;
 
+const InfoText = styled.p`
+  color: white;
+  margin-bottom: 8px;
+  font-family: 'REM', sans-serif;
+  line-height: 0.9;
+  width: 100%;
+`;
+
 const InputContainer = styled.div`
   position: relative;
-  width: 90%; // Reduced from 85%
+  width: min(95%, 280px); // More constrained width
   margin: 12px auto;
   display: flex;
   align-items: center;
@@ -34,11 +41,11 @@ const StyledInput = styled.input`
   border: 1px solid rgba(0, 255, 255, 0.31);
   border-radius: 24px;
   padding: 10px 16px;
-  padding-right: 85px; // Reduced to accommodate smaller button
+  padding-right: 85px;
   color: #0FF;
   width: 100%;
   font-family: 'REM', sans-serif;
-  font-size: 0.9rem; // Slightly smaller font
+  font-size: 0.9rem;
   box-sizing: border-box;
 
   &::placeholder {
@@ -51,9 +58,17 @@ const StyledInput = styled.input`
   }
 `;
 
+const ButtonWrapper = styled.div`
+  position: absolute;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+`;
+
 const AddButton = styled.button`
   margin: 0;
-  padding: 6px 12px; // Reduced padding
+  padding: 6px 12px;
   height: calc(100% - 8px);
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -62,7 +77,7 @@ const AddButton = styled.button`
   white-space: nowrap;
   font-family: 'REM', sans-serif;
   transition: all 0.3s ease;
-  font-size: 0.85rem; // Slightly smaller font
+  font-size: 0.85rem;
 
   &:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
@@ -73,20 +88,6 @@ const AddButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`;
-
-const InfoText = styled.p`
-  color: white;
-  margin-bottom: 8px;
-  font-family: 'REM', sans-serif;
-  line-height: 0.9;
-`;
-
-const ButtonWrapper = styled.div`
-  position: absolute;
-  right: 4px;
-  display: flex;
-  align-items: center;
 `;
 
 const ErrorMessage = styled.div<{ $isSuccess?: boolean }>`
