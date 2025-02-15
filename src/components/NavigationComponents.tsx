@@ -137,6 +137,7 @@ const InviteText = styled.p`
   font-family: 'REM', sans-serif;
   line-height: 1;
   margin-bottom: 16px;
+  margin-left: 6px;
   width: 100%;
   
   span {
