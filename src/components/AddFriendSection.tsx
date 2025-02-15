@@ -9,7 +9,7 @@ const RamkaContainer = styled.div`
   background-repeat: no-repeat;
   padding: 8px 20px;
   margin-top: 5px;
-  width: min(90%, 360px); // Use min() to cap the width
+  
   display: flex;
   flex-direction: column;
   align-items: center;
