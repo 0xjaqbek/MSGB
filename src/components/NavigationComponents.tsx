@@ -237,6 +237,11 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
+  const showTimedError = (message: string) => {
+    setError(message);
+    setTimeout(() => setError(''), 4000);
+  };
+  
   const handleSendRequest = async (friendId: string) => {
     if (!telegramUser) return;
     
@@ -245,42 +250,42 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       const db = getDatabase();
       
       if (friendId === telegramUser.id.toString()) {
-        setError('Cannot add yourself as a friend');
+        showTimedError('Cannot add yourself as a friend');
         return;
       }
-
+  
       const targetUserRef = ref(db, `users/${friendId}`);
       const snapshot = await get(targetUserRef);
-
+  
       if (!snapshot.exists()) {
-        setError('User not found');
+        showTimedError('User not found');
         return;
       }
-
+  
       const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
       const friendSnapshot = await get(existingFriendRef);
       if (friendSnapshot.exists()) {
-        setError('Already friends with this user');
+        showTimedError('Already friends with this user');
         return;
       }
-
+  
       const [existingRequest, reverseRequest] = await Promise.all([
         get(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`)),
         get(ref(db, `users/${telegramUser.id}/friendRequests/${friendId}`))
       ]);
-
+  
       if (existingRequest.exists() || reverseRequest.exists()) {
-        setError('Friend request already exists');
+        showTimedError('Friend request already exists');
         return;
       }
-
+  
       const request: FriendRequest = {
         fromUserId: telegramUser.id.toString(),
         fromUserName: telegramUser.first_name,
         status: 'pending',
         timestamp: Date.now()
       };
-
+  
       await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
       
       window.Telegram?.WebApp?.sendData(JSON.stringify({
@@ -288,15 +293,12 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         targetUserId: friendId,
         senderName: telegramUser.first_name
       }));
-
-      setError('Friend request sent!');
-      
-      setTimeout(() => {
-        setError('');
-      }, 4000);
+  
+      showTimedError('Friend request sent!');
+  
     } catch (err) {
       console.error('Error sending friend request:', err);
-      setError('Error sending friend request');
+      showTimedError('Error sending friend request');
     } finally {
       setIsProcessing(false);
     }
