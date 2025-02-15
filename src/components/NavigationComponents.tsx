@@ -94,9 +94,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentPage, onNavigate }
 
 export default NavigationBar;
 
-interface FriendsPageProps {
-  telegramUser: TelegramUser | null;
-}
 
 // Styled Components
 const PageContainer = styled.div`
@@ -252,7 +249,7 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       const db = getDatabase();
       
       if (friendId === telegramUser.id.toString()) {
-        showTimedError('Cannot add yourself as a friend');
+        setError('Cannot add yourself as a friend');
         return;
       }
   
@@ -260,14 +257,14 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       const snapshot = await get(targetUserRef);
   
       if (!snapshot.exists()) {
-        showTimedError('User not found');
+        setError('User not found');
         return;
       }
   
       const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
       const friendSnapshot = await get(existingFriendRef);
       if (friendSnapshot.exists()) {
-        showTimedError('Already friends with this user');
+        setError('Already friends with this user');
         return;
       }
   
@@ -277,7 +274,7 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       ]);
   
       if (existingRequest.exists() || reverseRequest.exists()) {
-        showTimedError('Friend request already exists');
+        setError('Friend request already exists');
         return;
       }
   
@@ -290,22 +287,91 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   
       await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
       
+      // Send Telegram notification - matches your bot's case 'friendRequest'
       window.Telegram?.WebApp?.sendData(JSON.stringify({
         action: 'friendRequest',
         targetUserId: friendId,
         senderName: telegramUser.first_name
       }));
   
-      showTimedError('Friend request sent!');
-  
+      setError('Friend request sent!');
     } catch (err) {
       console.error('Error sending friend request:', err);
-      showTimedError('Error sending friend request');
+      setError('Error sending friend request');
     } finally {
       setIsProcessing(false);
     }
   };
-
+  
+  const handleRequest = async (requesterId: string, action: 'accept' | 'reject') => {
+    if (!telegramUser) return;
+    setIsProcessing(true);
+  
+    try {
+      const db = getDatabase();
+      const request = pendingRequests.find(req => req.fromUserId === requesterId);
+      if (!request) return;
+  
+      if (action === 'accept') {
+        const updates: { [key: string]: any } = {};
+        
+        updates[`users/${telegramUser.id}/friends/${requesterId}`] = {
+          userId: requesterId,
+          userName: request.fromUserName,
+          addedAt: Date.now(),
+          lastActive: Date.now()
+        };
+        
+        updates[`users/${requesterId}/friends/${telegramUser.id}`] = {
+          userId: telegramUser.id.toString(),
+          userName: telegramUser.first_name,
+          addedAt: Date.now(),
+          lastActive: Date.now()
+        };
+  
+        // Calculate friends count for bonus tickets
+        const [userFriendsSnapshot, requesterFriendsSnapshot] = await Promise.all([
+          get(ref(db, `users/${telegramUser.id}/friends`)),
+          get(ref(db, `users/${requesterId}/friends`))
+        ]);
+  
+        const userFriendsCount = userFriendsSnapshot.exists() ? 
+          Object.keys(userFriendsSnapshot.val()).length : 0;
+        const requesterFriendsCount = requesterFriendsSnapshot.exists() ? 
+          Object.keys(requesterFriendsSnapshot.val()).length : 0;
+  
+        const userBonusTickets = Math.floor((userFriendsCount + 1) / 2);
+        const requesterBonusTickets = Math.floor((requesterFriendsCount + 1) / 2);
+  
+        updates[`users/${telegramUser.id}/ticketsFromFriends`] = userBonusTickets;
+        updates[`users/${requesterId}/ticketsFromFriends`] = requesterBonusTickets;
+        updates[`users/${telegramUser.id}/friendRequests/${requesterId}/status`] = 'accepted';
+  
+        await update(ref(db), updates);
+  
+        // Remove the request after successful update
+        await remove(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`));
+  
+        // Send acceptance notification only after successful database update
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.sendData(JSON.stringify({
+            action: 'friendRequestAccepted',
+            targetUserId: requesterId,
+            accepterName: telegramUser.first_name
+          }));
+        }
+      } else {
+        // Remove the request if rejected
+        await remove(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`));
+      }
+    } catch (err) {
+      console.error('Error handling friend request:', err);
+      showTimedError('Error processing friend request');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
   const removeFriend = async (friendId: string) => {
     if (!telegramUser) return;
     
@@ -315,14 +381,14 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         remove(ref(db, `users/${telegramUser.id}/friends/${friendId}`)),
         remove(ref(db, `users/${friendId}/friends/${telegramUser.id}`))
       ]);
-
+  
+      // Send removal notification - matches your bot's case 'friendRemoved'
       window.Telegram?.WebApp?.sendData(JSON.stringify({
         action: 'friendRemoved',
         targetUserId: friendId,
         removerName: telegramUser.first_name
       }));
-
-      setShowConfirmRemove(null);
+  
     } catch (err) {
       console.error('Error removing friend:', err);
     }
