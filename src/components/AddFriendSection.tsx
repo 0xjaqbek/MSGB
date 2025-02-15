@@ -8,8 +8,8 @@ const RamkaContainer = styled.div`
   background-image: url(${ramka});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 12px 20px;
-  margin-top: 10px;
+  padding: 8px 8px;
+  margin-top: 5px;
   width: 90%;
   max-width: 400px;
   display: flex;
@@ -24,7 +24,7 @@ const InfoText = styled.p`
   color: white;
   margin-bottom: 8px;
   font-family: 'REM', sans-serif;
-  line-height: 1.4;
+  line-height: 0.9;
 `;
 
 const InputContainer = styled.div`
@@ -37,10 +37,10 @@ const InputContainer = styled.div`
 
 const StyledInput = styled.input`
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(0, 255, 255, 0.15);
+  border: 1px solid rgba(0, 255, 255, 0.31);
   border-radius: 24px;
   padding: 12px 16px;
-  padding-right: 110px;
+  padding-right: 90px;
   color: #0FF;
   width: 100%;
   font-family: 'REM', sans-serif;
