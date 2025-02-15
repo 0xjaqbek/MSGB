@@ -3,12 +3,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ramka from '../assets/ramka.svg';
 
-// Styled components...
 const RamkaContainer = styled.div`
   background-image: url(${ramka});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 8px 8px;
+  padding: 8px 20px; // Increased horizontal padding
   margin-top: 5px;
   width: 90%;
   max-width: 400px;
@@ -18,33 +17,28 @@ const RamkaContainer = styled.div`
   color: #0FF;
   text-align: center;
   position: relative;
-`;
-
-const InfoText = styled.p`
-  color: white;
-  margin-bottom: 8px;
-  font-family: 'REM', sans-serif;
-  line-height: 0.9;
+  box-sizing: border-box;
 `;
 
 const InputContainer = styled.div`
   position: relative;
-  width: 85%;
-  margin: 16px auto;
+  width: 90%; // Reduced from 85%
+  margin: 12px auto;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
 `;
 
 const StyledInput = styled.input`
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 255, 255, 0.31);
   border-radius: 24px;
-  padding: 12px 16px;
-  padding-right: 90px;
+  padding: 10px 16px;
+  padding-right: 85px; // Reduced to accommodate smaller button
   color: #0FF;
   width: 100%;
   font-family: 'REM', sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem; // Slightly smaller font
   box-sizing: border-box;
 
   &::placeholder {
@@ -57,16 +51,9 @@ const StyledInput = styled.input`
   }
 `;
 
-const ButtonWrapper = styled.div`
-  position: absolute;
-  right: 4px;
-  display: flex;
-  align-items: center;
-`;
-
 const AddButton = styled.button`
   margin: 0;
-  padding: 8px 16px;
+  padding: 6px 12px; // Reduced padding
   height: calc(100% - 8px);
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -75,7 +62,7 @@ const AddButton = styled.button`
   white-space: nowrap;
   font-family: 'REM', sans-serif;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 0.85rem; // Slightly smaller font
 
   &:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
@@ -86,6 +73,20 @@ const AddButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   }
+`;
+
+const InfoText = styled.p`
+  color: white;
+  margin-bottom: 8px;
+  font-family: 'REM', sans-serif;
+  line-height: 0.9;
+`;
+
+const ButtonWrapper = styled.div`
+  position: absolute;
+  right: 4px;
+  display: flex;
+  align-items: center;
 `;
 
 const ErrorMessage = styled.div<{ $isSuccess?: boolean }>`
