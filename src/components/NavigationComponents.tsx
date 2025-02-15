@@ -180,6 +180,7 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [showConfirmRemove, setShowConfirmRemove] = useState<string | null>(null);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
 
   useEffect(() => {
     if (!telegramUser) return;
@@ -187,6 +188,18 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
     const db = getDatabase();
     const requestsRef = ref(db, `users/${telegramUser.id}/friendRequests`);
     const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+    const sentRequestsRef = ref(db, `users/${telegramUser.id}/sentRequests`);
+
+    onValue(sentRequestsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const requests = Object.values(snapshot.val()).filter(
+          (req: any) => req.status === 'pending'
+        ) as FriendRequest[];
+        setSentRequests(requests);
+      } else {
+        setSentRequests([]);
+      }
+    });
 
     // Listen for friend requests
     onValue(requestsRef, (snapshot) => {
@@ -268,12 +281,13 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         return;
       }
   
-      const [existingRequest, reverseRequest] = await Promise.all([
+      const [existingRequest, reverseRequest, sentRequest] = await Promise.all([
         get(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`)),
-        get(ref(db, `users/${telegramUser.id}/friendRequests/${friendId}`))
+        get(ref(db, `users/${telegramUser.id}/friendRequests/${friendId}`)),
+        get(ref(db, `users/${telegramUser.id}/sentRequests/${friendId}`))
       ]);
   
-      if (existingRequest.exists() || reverseRequest.exists()) {
+      if (existingRequest.exists() || reverseRequest.exists() || sentRequest.exists()) {
         setError('Friend request already exists');
         return;
       }
@@ -285,7 +299,12 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
         timestamp: Date.now()
       };
   
-      await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
+      const updates: { [key: string]: any } = {
+        [`users/${friendId}/friendRequests/${telegramUser.id}`]: request,
+        [`users/${telegramUser.id}/sentRequests/${friendId}`]: request
+      };
+  
+      await update(ref(db), updates);
       
       // Send Telegram notification - matches your bot's case 'friendRequest'
       window.Telegram?.WebApp?.sendData(JSON.stringify({
@@ -360,44 +379,16 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
           lastActive: Date.now()
         };
   
-        // Calculate friends count for bonus tickets
-        const [userFriendsSnapshot, requesterFriendsSnapshot] = await Promise.all([
-          get(ref(db, `users/${telegramUser.id}/friends`)),
-          get(ref(db, `users/${requesterId}/friends`))
-        ]);
-  
-        const userFriendsCount = userFriendsSnapshot.exists() ? 
-          Object.keys(userFriendsSnapshot.val()).length : 0;
-        const requesterFriendsCount = requesterFriendsSnapshot.exists() ? 
-          Object.keys(requesterFriendsSnapshot.val()).length : 0;
-  
-        const userBonusTickets = Math.floor((userFriendsCount + 1) / 2);
-        const requesterBonusTickets = Math.floor((requesterFriendsCount + 1) / 2);
-  
-        updates[`users/${telegramUser.id}/ticketsFromFriends`] = userBonusTickets;
-        updates[`users/${requesterId}/ticketsFromFriends`] = requesterBonusTickets;
-        updates[`users/${telegramUser.id}/friendRequests/${requesterId}/status`] = 'accepted';
+        // Remove the request
+        updates[`users/${telegramUser.id}/friendRequests/${requesterId}`] = null;
   
         await update(ref(db), updates);
-  
-        // Remove the request after successful update
-        await remove(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`));
-  
-        // Send acceptance notification only after successful database update
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.sendData(JSON.stringify({
-            action: 'friendRequestAccepted',
-            targetUserId: requesterId,
-            accepterName: telegramUser.first_name
-          }));
-        }
       } else {
-        // Remove the request if rejected
+        // Simply remove the request if rejected
         await remove(ref(db, `users/${telegramUser.id}/friendRequests/${requesterId}`));
       }
     } catch (err) {
       console.error('Error handling friend request:', err);
-      showTimedError('Error processing friend request');
     } finally {
       setIsProcessing(false);
     }
@@ -430,7 +421,11 @@ export const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
       <PageTitle>Friends</PageTitle>
 
       <AddFriendSection
+        pendingRequests={pendingRequests}
+        sentRequests={sentRequests}
         onSendRequest={handleSendRequest}
+        onAcceptRequest={handleRequest}
+        onRejectRequest={handleRequest}
         isProcessing={isProcessing}
         error={error}
       />

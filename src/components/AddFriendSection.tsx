@@ -1,15 +1,13 @@
-// src/components/AddFriendSection.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ramkaZ from '../assets/ramkaZ.svg';
+import { FriendRequest } from '../types';
 
 const RamkaContainer = styled.div`
   background-image: url(${ramkaZ});
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 18px 20px;
-  
-  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,13 +21,13 @@ const InfoText = styled.p`
   color: white;
   margin-bottom: 8px;
   font-family: 'REM', sans-serif;
-  line-height: 0.9;
+  line-height: 1.2;
   width: 100%;
 `;
 
 const InputContainer = styled.div`
   position: relative;
-  width: min(80%, 280px); // More constrained width
+  width: min(80%, 280px);
   margin: 12px 12px;
   display: flex;
   align-items: center;
@@ -66,13 +64,21 @@ const ButtonWrapper = styled.div`
   height: 100%;
 `;
 
-const AddButton = styled.button`
+const AddButton = styled.button<{ $variant?: 'accept' | 'reject' | 'send' }>`
   margin: 0;
   padding: 6px 12px;
   height: calc(100% - 8px);
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #FFF;
+  border: 1px solid ${props => 
+    props.$variant === 'accept' ? 'rgba(0, 255, 0, 0.5)' :
+    props.$variant === 'reject' ? 'rgba(255, 0, 0, 0.5)' :
+    'rgba(255, 255, 255, 0.3)'
+  };
+  color: ${props => 
+    props.$variant === 'accept' ? '#0F0' :
+    props.$variant === 'reject' ? '#F00' :
+    '#FFF'
+  };
   border-radius: 20px;
   white-space: nowrap;
   font-family: 'REM', sans-serif;
@@ -90,38 +96,70 @@ const AddButton = styled.button`
   }
 `;
 
-const ErrorMessage = styled.div<{ $isSuccess?: boolean }>`
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  padding: 8px 16px;
-  border-radius: 8px;
-  color: ${props => props.$isSuccess ? '#0FF' : '#FF4444'};
-  font-size: 0.9rem;
-  white-space: nowrap;
-  z-index: 10;
-  pointer-events: none;
+const RequestContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
+`;
+
+const RequestInfo = styled.div`
+  color: white;
   font-family: 'REM', sans-serif;
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const TabContainer = styled.div`
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+`;
+
+const Tab = styled.button<{ $active: boolean }>`
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px;
+  color: ${props => props.$active ? '#0FF' : 'rgba(255,255,255,0.5)'};
+  border-bottom: 2px solid ${props => props.$active ? '#0FF' : 'transparent'};
+  font-family: 'REM', sans-serif;
+  transition: all 0.3s ease;
+`;
+
 interface AddFriendSectionProps {
-  onSendRequest: (friendId: string) => Promise<void>;
-  isProcessing: boolean;
+  pendingRequests?: FriendRequest[];
+  sentRequests?: FriendRequest[];
+  onSendRequest?: (friendId: string) => Promise<void>;
+  onAcceptRequest?: (userId: string, action: 'accept' | 'reject') => void;
+  onRejectRequest?: (userId: string, action: 'accept' | 'reject') => void;
+  isProcessing?: boolean;
   error?: string;
 }
 
 export const AddFriendSection: React.FC<AddFriendSectionProps> = ({
+  pendingRequests = [],
+  sentRequests = [],
   onSendRequest,
-  isProcessing,
+  onAcceptRequest,
+  onRejectRequest,
+  isProcessing = false,
   error
 }) => {
+  const [activeTab, setActiveTab] = useState<'receive' | 'send'>('receive');
   const [friendId, setFriendId] = useState('');
 
   const handleSubmit = async () => {
     if (!friendId.trim() || isProcessing) return;
-    await onSendRequest(friendId);
+    await onSendRequest?.(friendId);
     setFriendId('');
   };
 
@@ -137,29 +175,89 @@ export const AddFriendSection: React.FC<AddFriendSectionProps> = ({
         Get extra ticket<br/>
         for every 2 friends added
       </InfoText>
-      <InputContainer>
-        {error && (
-          <ErrorMessage $isSuccess={error.includes('sent')}>
-            {error}
-          </ErrorMessage>
-        )}
-        <StyledInput
-          type="text"
-          placeholder="Enter User ID"
-          value={friendId}
-          onChange={(e) => setFriendId(e.target.value)}
-          disabled={isProcessing}
-          onKeyPress={handleKeyPress}
-        />
-        <ButtonWrapper>
-          <AddButton
-            onClick={handleSubmit}
-            disabled={isProcessing || !friendId.trim()}
-          >
-            Add Friend
-          </AddButton>
-        </ButtonWrapper>
-      </InputContainer>
+
+      <TabContainer>
+        <Tab 
+          $active={activeTab === 'receive'}
+          onClick={() => setActiveTab('receive')}
+        >
+          Receive
+        </Tab>
+        <Tab 
+          $active={activeTab === 'send'}
+          onClick={() => setActiveTab('send')}
+        >
+          Send
+        </Tab>
+      </TabContainer>
+
+      {activeTab === 'receive' ? (
+        pendingRequests.length > 0 ? (
+          pendingRequests.map((request) => (
+            <RequestContainer key={request.fromUserId}>
+              <RequestInfo>
+                {request.fromUserName} wants to be your friend
+              </RequestInfo>
+              <ButtonGroup>
+                <AddButton 
+                    $variant="accept"
+                    onClick={() => onAcceptRequest?.(request.fromUserId, 'accept')}
+                >
+                    Accept
+                </AddButton>
+                <AddButton 
+                    $variant="reject"
+                    onClick={() => onRejectRequest?.(request.fromUserId, 'reject')}
+                >
+                    Reject
+                </AddButton>
+                </ButtonGroup>
+            </RequestContainer>
+          ))
+        ) : (
+          <InfoText style={{ color: 'rgba(255,255,255,0.7)' }}>
+            No pending friend requests
+          </InfoText>
+        )
+      ) : (
+        <>
+          <InputContainer>
+            <StyledInput
+              type="text"
+              placeholder="Enter User ID"
+              value={friendId}
+              onChange={(e) => setFriendId(e.target.value)}
+              disabled={isProcessing}
+              onKeyPress={handleKeyPress}
+            />
+            <ButtonWrapper>
+              <AddButton
+                onClick={handleSubmit}
+                disabled={isProcessing || !friendId.trim()}
+              >
+                Add Friend
+              </AddButton>
+            </ButtonWrapper>
+          </InputContainer>
+
+          {sentRequests.length > 0 && (
+            <>
+              {sentRequests.map((request) => (
+                <RequestContainer key={request.fromUserId}>
+                  <RequestInfo>
+                    Request sent to {request.fromUserName}
+                  </RequestInfo>
+                  <ButtonGroup>
+                    <AddButton $variant="reject">
+                      Cancel
+                    </AddButton>
+                  </ButtonGroup>
+                </RequestContainer>
+              ))}
+            </>
+          )}
+        </>
+      )}
     </RamkaContainer>
   );
 };
