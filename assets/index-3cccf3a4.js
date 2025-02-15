@@ -3400,8 +3400,8 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   width: 100%;
 `,Lz=Qe.div`
   position: relative;
-  width: min(90%, 280px); // More constrained width
-  margin: 12px auto;
+  width: min(80%, 280px); // More constrained width
+  margin: 12px 12px;
   display: flex;
   align-items: center;
   box-sizing: border-box;
