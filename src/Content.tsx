@@ -85,6 +85,14 @@ interface ContentProps {
   onNavigateToFriends?: () => void;      // Move this out of userStats
 }
 
+const isIOS = () => {
+  return (
+    ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+};
+
 export const getUserVisitStats = async (userId: string): Promise<UserVisit | null> => {
   const db = getDatabase();
   const userVisitsRef = ref(db, `users/${userId}/visits`);
@@ -360,8 +368,13 @@ useEffect(() => {
   }, [difficulty, stoneIdCounter]);
 
   const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
+    // Handle vibration only for non-iOS devices
+    if (navigator.vibrate && !isIOS()) {
+      if (type === 3) {
+        navigator.vibrate([100, 50, 100]); // Penalty vibration
+      } else {
+        navigator.vibrate(50); // Normal vibration
+      }
     }
   
     if (type === 3) {
@@ -369,12 +382,11 @@ useEffect(() => {
       setBlastPosition({ posX, posY });
       setCurrentBlastImage(blastImage0);
       setShowBlast(true);
-      navigator.vibrate([100, 50, 100]); // Different vibration pattern for penalty
-
+  
       setTimeout(() => {
         setCurrentBlastImage(blastImage1);
       }, 100);
-
+  
       setTimeout(() => {
         setShowBlast(false);
       }, 200);
@@ -382,20 +394,21 @@ useEffect(() => {
       setBlastPosition({ posX, posY });
       setCurrentBlastImage(blastImage0);
       setShowBlast(true);
-
+  
       setTimeout(() => {
         setCurrentBlastImage(blastImage1);
       }, 100);
-
+  
       setTimeout(() => {
         setShowBlast(false);
       }, 200);
-
+  
       setScore(prev => prev + 1);
     }
     
+    // Always remove the stone, regardless of device type
     setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
-}, []);
+  }, []);
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
