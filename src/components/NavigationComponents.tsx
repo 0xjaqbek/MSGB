@@ -135,7 +135,7 @@ const InviteSection = styled.div`
 const InviteText = styled.p`
   color: white;
   font-family: 'REM', sans-serif;
-  line-height: 1.4;
+  line-height: 0.9;
   margin-bottom: 8px;
   width: 100%;
   
