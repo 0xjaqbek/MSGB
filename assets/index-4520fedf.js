@@ -3431,6 +3431,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   display: flex;
   align-items: center;
   height: 100%;
+  margin: 5px;
 `,$z=Qe.button`
   margin: 0;
   padding: 6px 12px;
