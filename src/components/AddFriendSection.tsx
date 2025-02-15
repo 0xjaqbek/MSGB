@@ -7,7 +7,7 @@ const RamkaContainer = styled.div`
   background-image: url(${ramkaZ});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 8px 20px;
+  padding: 20px 20px;
   margin-top: 5px;
   
   display: flex;
