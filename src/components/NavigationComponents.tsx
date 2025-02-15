@@ -17,6 +17,7 @@ import InviteComponent from '../InviteComponent';
 import ramka from '../assets/ramka.svg';
 import styled from 'styled-components';
 import FriendsModal from './FriendsModal';
+import { AddFriendSection } from './AddFriendSection'; 
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -101,6 +102,7 @@ const FriendsPage: React.FC<FriendsPageProps> = ({ telegramUser }) => {
   const [errorTimeout, setErrorTimeout] = useState<NodeJS.Timeout | null>(null);
   const [showConfirmRemove, setShowConfirmRemove] = useState<string | null>(null);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!telegramUser) return;
@@ -415,92 +417,90 @@ const innerContainerStyle = {
   maxWidth: '100%'
 } as const;
 
+const handleSendRequest = async (friendId: string) => {
+  if (!telegramUser) return;
+  
+  setIsProcessing(true);
+  try {
+    const db = getDatabase();
+    
+    // Check if trying to add self
+    if (friendId === telegramUser.id.toString()) {
+      setError('Cannot add yourself as a friend');
+      return;
+    }
+
+    // Check if target user exists
+    const targetUserRef = ref(db, `users/${friendId}`);
+    const snapshot = await get(targetUserRef);
+
+    if (!snapshot.exists()) {
+      setError('User not found');
+      return;
+    }
+
+    // Check for existing friendship
+    const existingFriendRef = ref(db, `users/${telegramUser.id}/friends/${friendId}`);
+    const friendSnapshot = await get(existingFriendRef);
+    if (friendSnapshot.exists()) {
+      setError('Already friends with this user');
+      return;
+    }
+
+    // Check for existing requests in both directions
+    const [existingRequest, reverseRequest] = await Promise.all([
+      get(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`)),
+      get(ref(db, `users/${telegramUser.id}/friendRequests/${friendId}`))
+    ]);
+
+    if (existingRequest.exists() || reverseRequest.exists()) {
+      setError('Friend request already exists');
+      return;
+    }
+
+    // Create the friend request
+    const request: FriendRequest = {
+      fromUserId: telegramUser.id.toString(),
+      fromUserName: telegramUser.first_name,
+      status: 'pending',
+      timestamp: Date.now()
+    };
+
+    await set(ref(db, `users/${friendId}/friendRequests/${telegramUser.id}`), request);
+    
+    // Send Telegram notification
+    window.Telegram?.WebApp?.sendData(JSON.stringify({
+      action: 'friendRequest',
+      targetUserId: friendId,
+      senderName: telegramUser.first_name
+    }));
+
+    setError('Friend request sent!');
+    
+    // Clear success message after 4 seconds
+    setTimeout(() => {
+      setError('');
+    }, 4000);
+  } catch (err) {
+    console.error('Error sending friend request:', err);
+    setError('Error sending friend request');
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
+
 return (
   <div className="page-container" style={{ marginTop: '20px' }}>
     <h1 className="text-glow text-xl mb-1">Friends</h1>
 
-    {/* Add Friend/Pending Requests Section */}
-    <div style={ramkaStyle}>
-      <div style={{ width: '100%', maxWidth: '100%' }}>
-        <p className="text-info mb-1" style={{ color: 'white' }}>
-          Get extra ticket<br/>for every 2 friends added
-        </p>
-        <div style={{ 
-          position: 'relative',
-          width: '85%', // Slightly narrower than ramka
-          marginTop: '16px',
-          marginBottom: '16px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          {error && (
-            <div style={{ 
-              position: 'absolute', 
-              top: '-30px', 
-              left: '50%', 
-              transform: 'translateX(-50%)', 
-              background: 'rgba(0, 0, 0, 0.8)', 
-              padding: '8px 16px', 
-              borderRadius: '8px', 
-              color: error.includes('sent') ? '#0FF' : '#FF4444', 
-              fontSize: '0.9rem', 
-              whiteSpace: 'nowrap', 
-              zIndex: 10, 
-              pointerEvents: 'none' 
-            }}>
-              {error}
-            </div>
-          )}
-          <div style={{
-            position: 'relative',
-            width: '100%', 
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <input
-              type="text"
-              placeholder="Enter User ID"
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-              style={{
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(0, 255, 255, 0.15)', 
-                borderRadius: '24px',
-                padding: '12px 16px',
-                paddingRight: '110px', 
-                color: '#0FF',
-                width: '100%', 
-                fontFamily: 'REM, sans-serif',
-                fontSize: '1rem'
-              }}
-            />
-            <div style={{
-              position: 'absolute',
-              right: '4px',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <ActionButton 
-                onClick={sendFriendRequest} 
-                $variant="white"
-                style={{
-                  margin: 0,
-                  padding: '8px 16px',
-                  height: 'calc(100% - 8px)',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                Add Friend
-              </ActionButton>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AddFriendSection
+      onSendRequest={handleSendRequest}
+      isProcessing={isProcessing}
+      error={error}
+    />
 
-    {/* Invite Section */}
+    {/* Rest of your friends page content */}
     <div style={ramkaStyle}>
       <div style={innerContainerStyle}>
         <p className="text-info mb-2" style={{ color: 'white' }}>
@@ -518,26 +518,23 @@ return (
       />
     </div>
 
-    {/* Friends List Section */}
     {friends.length > 0 && (
-  <>
-    <FriendsButton 
-      onClick={() => setShowFriendsModal(true)}
-    >
-      My Friends ({friends.length})
-    </FriendsButton>
-    
-    <FriendsModal
-      isOpen={showFriendsModal}
-      onClose={() => setShowFriendsModal(false)}
-      friends={friends}
-      formatLastActive={formatLastActive}
-      onRemoveFriend={removeFriend}
-      showConfirmRemove={showConfirmRemove}
-      setShowConfirmRemove={setShowConfirmRemove}
-    />
-  </>
-)}
+      <>
+        <FriendsButton onClick={() => setShowFriendsModal(true)}>
+          My Friends ({friends.length})
+        </FriendsButton>
+        
+        <FriendsModal
+          isOpen={showFriendsModal}
+          onClose={() => setShowFriendsModal(false)}
+          friends={friends}
+          formatLastActive={formatLastActive}
+          onRemoveFriend={removeFriend}
+          showConfirmRemove={showConfirmRemove}
+          setShowConfirmRemove={setShowConfirmRemove}
+        />
+      </>
+    )}
   </div>
 );
 };
