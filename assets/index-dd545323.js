@@ -3382,7 +3382,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   background-image: url(${Bz});
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding: 8px 20px;
+  padding: 20px 20px;
   margin-top: 5px;
   
   display: flex;
