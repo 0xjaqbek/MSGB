@@ -1,6 +1,5 @@
-// Create a new file: src/components/AddFriend.tsx
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, get, set, update, onValue, off } from 'firebase/database';
+import { getDatabase, ref, get, set, update, onValue, off, remove } from 'firebase/database';
 import styled from 'styled-components';
 import { Friend, FriendRequest } from '@/types';
 
@@ -47,6 +46,7 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
   const [error, setError] = useState('');
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const db = getDatabase();
@@ -60,6 +60,8 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
           (req: any) => req.status === 'pending'
         ) as FriendRequest[];
         setPendingRequests(requests);
+      } else {
+        setPendingRequests([]);
       }
     });
 
@@ -68,6 +70,8 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
       if (snapshot.exists()) {
         const friendsList = Object.values(snapshot.val()) as Friend[];
         setFriends(friendsList);
+      } else {
+        setFriends([]);
       }
     });
 
@@ -78,13 +82,23 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
   }, [currentUserId]);
 
   const sendFriendRequest = async () => {
+    if (isProcessing) return;
     if (!friendId.trim()) {
       setError('Please enter a User ID');
       return;
     }
 
+    setIsProcessing(true);
     try {
       const db = getDatabase();
+      
+      // Check if trying to add self
+      if (friendId === currentUserId) {
+        setError('Cannot add yourself as a friend');
+        return;
+      }
+
+      // Check if target user exists
       const targetUserRef = ref(db, `users/${friendId}`);
       const snapshot = await get(targetUserRef);
 
@@ -93,7 +107,7 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
         return;
       }
 
-      // Check if already friends
+      // Check for existing friendship
       const existingFriendRef = ref(db, `users/${currentUserId}/friends/${friendId}`);
       const friendSnapshot = await get(existingFriendRef);
       if (friendSnapshot.exists()) {
@@ -101,7 +115,18 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
         return;
       }
 
-      // Send friend request
+      // Check for existing requests in both directions
+      const [existingRequest, reverseRequest] = await Promise.all([
+        get(ref(db, `users/${friendId}/friendRequests/${currentUserId}`)),
+        get(ref(db, `users/${currentUserId}/friendRequests/${friendId}`))
+      ]);
+
+      if (existingRequest.exists() || reverseRequest.exists()) {
+        setError('Friend request already exists');
+        return;
+      }
+
+      // Create the friend request
       const request: FriendRequest = {
         fromUserId: currentUserId,
         fromUserName: currentUserName,
@@ -110,47 +135,89 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
       };
 
       await set(ref(db, `users/${friendId}/friendRequests/${currentUserId}`), request);
+      
+      // Send Telegram notification
+      window.Telegram?.WebApp?.sendData(JSON.stringify({
+        action: 'friendRequest',
+        targetUserId: friendId,
+        senderName: currentUserName
+      }));
+
       setFriendId('');
       setError('Friend request sent!');
     } catch (err) {
+      console.error('Error sending friend request:', err);
       setError('Error sending friend request');
-      console.error(err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleRequest = async (requesterId: string, action: 'accept' | 'reject') => {
-    const db = getDatabase();
-    const request = pendingRequests.find(req => req.fromUserId === requesterId);
-    
-    if (!request) return;
+    if (isProcessing) return;
+    setIsProcessing(true);
 
     try {
-      // Update request status
-      await update(ref(db, `users/${currentUserId}/friendRequests/${requesterId}`), {
-        status: action
-      });
+      const db = getDatabase();
+      const request = pendingRequests.find(req => req.fromUserId === requesterId);
+      if (!request) return;
 
       if (action === 'accept') {
-        // Add to both users' friends lists
-        const newFriend: Friend = {
-          userId: request.fromUserId,
+        // Update both users' friends lists and calculate bonus tickets
+        const updates: { [key: string]: any } = {};
+        
+        // Add to friends lists
+        updates[`users/${currentUserId}/friends/${requesterId}`] = {
+          userId: requesterId,
           userName: request.fromUserName,
-          addedAt: Date.now()
+          addedAt: Date.now(),
+          lastActive: Date.now()
         };
         
-        const currentUserFriend: Friend = {
+        updates[`users/${requesterId}/friends/${currentUserId}`] = {
           userId: currentUserId,
           userName: currentUserName,
-          addedAt: Date.now()
+          addedAt: Date.now(),
+          lastActive: Date.now()
         };
 
-        await Promise.all([
-          set(ref(db, `users/${currentUserId}/friends/${request.fromUserId}`), newFriend),
-          set(ref(db, `users/${request.fromUserId}/friends/${currentUserId}`), currentUserFriend)
+        // Calculate bonus tickets
+        const [userFriendsSnapshot, requesterFriendsSnapshot] = await Promise.all([
+          get(ref(db, `users/${currentUserId}/friends`)),
+          get(ref(db, `users/${requesterId}/friends`))
         ]);
+
+        const userFriendsCount = userFriendsSnapshot.exists() ? 
+          Object.keys(userFriendsSnapshot.val()).length : 0;
+        const requesterFriendsCount = requesterFriendsSnapshot.exists() ? 
+          Object.keys(requesterFriendsSnapshot.val()).length : 0;
+
+        const userBonusTickets = Math.floor((userFriendsCount + 1) / 2);
+        const requesterBonusTickets = Math.floor((requesterFriendsCount + 1) / 2);
+
+        updates[`users/${currentUserId}/ticketsFromFriends`] = userBonusTickets;
+        updates[`users/${requesterId}/ticketsFromFriends`] = requesterBonusTickets;
+
+        // Update request status
+        updates[`users/${currentUserId}/friendRequests/${requesterId}/status`] = 'accepted';
+
+        await update(ref(db), updates);
+
+        // Send acceptance notification
+        window.Telegram?.WebApp?.sendData(JSON.stringify({
+          action: 'friendRequestAccepted',
+          targetUserId: requesterId,
+          accepterName: currentUserName
+        }));
+      } else {
+        // Remove the request if rejected
+        await remove(ref(db, `users/${currentUserId}/friendRequests/${requesterId}`));
       }
     } catch (err) {
       console.error('Error handling friend request:', err);
+      setError('Error processing friend request');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -163,9 +230,22 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
           placeholder="Enter User ID"
           value={friendId}
           onChange={(e) => setFriendId(e.target.value)}
+          disabled={isProcessing}
         />
-        <ActionButton onClick={sendFriendRequest}>Send Request</ActionButton>
-        {error && <p style={{ color: '#FF4444', marginTop: '5px' }}>{error}</p>}
+        <ActionButton 
+          onClick={sendFriendRequest}
+          disabled={isProcessing}
+        >
+          Send Request
+        </ActionButton>
+        {error && (
+          <p style={{ 
+            color: error.includes('sent') ? '#0FF' : '#FF4444', 
+            marginTop: '5px' 
+          }}>
+            {error}
+          </p>
+        )}
       </div>
 
       <RequestsSection>
@@ -179,12 +259,14 @@ export const AddFriend: React.FC<AddFriendProps> = ({ currentUserId, currentUser
               <div>
                 <ActionButton 
                   onClick={() => handleRequest(request.fromUserId, 'accept')}
+                  disabled={isProcessing}
                 >
                   Accept
                 </ActionButton>
                 <ActionButton 
                   $variant="reject"
                   onClick={() => handleRequest(request.fromUserId, 'reject')}
+                  disabled={isProcessing}
                 >
                   Reject
                 </ActionButton>
