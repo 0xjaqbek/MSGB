@@ -64,6 +64,7 @@ const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
+  margin: 5px;
 `;
 
 const AddButton = styled.button`
