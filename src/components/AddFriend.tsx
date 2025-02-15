@@ -10,16 +10,27 @@ const StyledInput = styled.input`
   color: #0FF;
   width: 80%;
   font-family: 'REM', sans-serif;
-  font-size: 0.9rem;
+  font-size: 16px; // Changed to 16px to prevent iOS zoom
   box-sizing: border-box;
+  -webkit-appearance: none; // iOS fix
+  appearance: none;
+  outline: none;
+
+  // iOS specific fixes
+  @supports (-webkit-touch-callout: none) {
+    font-size: 16px;
+    line-height: normal;
+  }
 
   &::placeholder {
     color: rgba(0, 255, 255, 0.5);
+    opacity: 1; // iOS fix
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    -webkit-text-fill-color: #0FF; // iOS fix
   }
 `;
 
@@ -29,6 +40,7 @@ const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
+  -webkit-tap-highlight-color: transparent; // iOS fix
 `;
 
 const AddButton = styled.button`
@@ -43,6 +55,8 @@ const AddButton = styled.button`
   font-family: 'REM', sans-serif;
   transition: all 0.3s ease;
   font-size: 0.85rem;
+  -webkit-appearance: none; // iOS fix
+  appearance: none;
 
   &:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
@@ -53,6 +67,13 @@ const AddButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  // iOS specific tap state
+  @supports (-webkit-touch-callout: none) {
+    &:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
 `;
 
 const InputContainer = styled.div`
@@ -62,6 +83,15 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; // iOS fix
+`;
+
+const Form = styled.form`
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `;
 
 const ErrorMessage = styled.div<{ $isSuccess?: boolean }>`
@@ -93,41 +123,38 @@ export const AddFriend: React.FC<AddFriendProps> = ({
 }) => {
   const [friendId, setFriendId] = useState('');
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!friendId.trim() || isProcessing) return;
     await onSendRequest(friendId);
     setFriendId('');
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
-
   return (
-    <InputContainer>
-      {error && (
-        <ErrorMessage $isSuccess={error.includes('sent')}>
-          {error}
-        </ErrorMessage>
-      )}
-      <StyledInput
-        type="text"
-        placeholder="Enter User ID"
-        value={friendId}
-        onChange={(e) => setFriendId(e.target.value)}
-        disabled={isProcessing}
-        onKeyPress={handleKeyPress}
-      />
-      <ButtonWrapper>
-        <AddButton
-          onClick={handleSubmit}
-          disabled={isProcessing || !friendId.trim()}
-        >
-          Add Friend
-        </AddButton>
-      </ButtonWrapper>
-    </InputContainer>
+    <Form onSubmit={handleSubmit}>
+      <InputContainer>
+        {error && (
+          <ErrorMessage $isSuccess={error.includes('sent')}>
+            {error}
+          </ErrorMessage>
+        )}
+        <StyledInput
+          type="text"
+          inputMode="numeric"
+          placeholder="Enter User ID"
+          value={friendId}
+          onChange={(e) => setFriendId(e.target.value)}
+          disabled={isProcessing}
+        />
+        <ButtonWrapper>
+          <AddButton
+            type="submit"
+            disabled={isProcessing || !friendId.trim()}
+          >
+            Add Friend
+          </AddButton>
+        </ButtonWrapper>
+      </InputContainer>
+    </Form>
   );
 };
