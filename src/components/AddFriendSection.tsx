@@ -1,10 +1,10 @@
 // src/components/AddFriendSection.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ramka from '../assets/ramka.svg';
+import ramkaZ from '../assets/ramkaZ.svg';
 
 const RamkaContainer = styled.div`
-  background-image: url(${ramka});
+  background-image: url(${ramkaZ});
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding: 8px 20px;

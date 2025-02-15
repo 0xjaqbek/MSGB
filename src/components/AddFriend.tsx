@@ -58,7 +58,7 @@ const AddButton = styled.button`
 const InputContainer = styled.div`
   position: relative;
   width: min(85%, 280px);
-  margin: 8px auto;
+  margin: 8px 8px;
   display: flex;
   align-items: center;
   box-sizing: border-box;
