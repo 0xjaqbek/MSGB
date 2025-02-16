@@ -59,7 +59,7 @@ bot.onText(/\/start(.+)?/, async (msg, match) => {
       await bot.sendMessage(chatId, '🎮 Welcome! Open the game to claim your bonus ticket:', {
         reply_markup: {
           inline_keyboard: [[{
-            text: '🎮 Play MoonStones',
+            text: '🎮 Claim bonus ticket',
             web_app: { url: webAppUrl }
           }]]
         }
@@ -174,7 +174,7 @@ bot.on('web_app_data', async (msg) => {
             `👋 ${data.removerName} has removed you from their friends list.`
           );
           break;
-          
+
         case 'pendingRequests':
           await bot.sendMessage(data.userId, 
             `🔔 You have ${data.count} pending friend ${data.count === 1 ? 'request' : 'requests'}!\n\nOpen the game to respond.`,

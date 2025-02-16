@@ -107,29 +107,54 @@ export const processInviteLink = async (userId: string, startParam: string) => {
   
       const userData = snapshot.val();
       const referralData = userData.referrals || { ticketsFromInvites: 0 };
-      const ticketsFromFriends = userData.ticketsFromFriends || 0;
       
+      // Base tickets every user gets
       const baseTickets = 5;
+  
+      // Streak bonus: current streak minus 1 (no bonus for first day)
       const streakBonus = Math.max(0, (userData.visits?.currentStreak || 1) - 1);
+  
+      // Bonus tickets from inviting other players
       const referralBonus = referralData.ticketsFromInvites || 0;
-      
-      const totalTickets = baseTickets + streakBonus + referralBonus + ticketsFromFriends;
+  
+      // Calculate friends bonus (1 ticket per 2 friends)
+      const friendsCount = userData.friends ? Object.keys(userData.friends).length : 0;
+      const friendsBonus = Math.floor(friendsCount / 2);  // Integer division to get full tickets only
+  
+      // Total up all ticket sources
+      const totalTickets = baseTickets + streakBonus + referralBonus + friendsBonus;
       
       console.log(`Ticket Breakdown for ${userId}:`, {
         baseTickets,
         streakBonus,
         referralBonus,
-        ticketsFromFriends,
+        friendsCount,
+        friendsBonus,
         totalTickets
       });
   
       return totalTickets;
     } catch (error) {
       console.error(`Error calculating tickets for ${userId}:`, error);
-      return 5;
+      return 5; // Return base tickets on error
     }
   };
   
+  // This function can be used to get how many friends are needed for next bonus ticket
+  export const getNextFriendBonusInfo = (friendsCount: number): { 
+    friendsForNextBonus: number,
+    currentBonusTickets: number 
+  } => {
+    const currentBonusTickets = Math.floor(friendsCount / 2);
+    const friendsForNextBonus = (currentBonusTickets + 1) * 2 - friendsCount;
+    
+    return {
+      friendsForNextBonus,
+      currentBonusTickets
+    };
+  };
+  
+  // This function updates play count after each game
   export const updatePlayCount = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const userRef = ref(db, `users/${userId}`);
@@ -141,7 +166,7 @@ export const processInviteLink = async (userId: string, startParam: string) => {
           throw new Error('User not found');
         }
         const visits = currentUserData.visits || {};
-        const maxTickets = await calculateAvailableTickets(userId); // Add await here
+        const maxTickets = await calculateAvailableTickets(userId);
         const currentPlays = visits.playsToday || 0;
         
         // HARD STOP: Prevent any plays beyond max tickets
@@ -152,6 +177,7 @@ export const processInviteLink = async (userId: string, startParam: string) => {
             playAttemptBlocked: true 
           };
         }
+  
         const newPlaysCount = currentPlays + 1;
         
         // Enforce strict ticket limit
@@ -159,6 +185,7 @@ export const processInviteLink = async (userId: string, startParam: string) => {
           console.error(`CRITICAL: Attempted to exceed max ticket limit for user ${userId}`);
           return currentUserData; // Reject the update
         }
+  
         // Update play tracking with additional safeguards
         return {
           ...currentUserData,
@@ -182,7 +209,6 @@ export const processInviteLink = async (userId: string, startParam: string) => {
       }
     } catch (error) {
       console.error('CRITICAL ERROR in updatePlayCount:', error);
-      // Prevent any plays on error
-      return -1;
+      return -1; // Prevent any plays on error
     }
   };
