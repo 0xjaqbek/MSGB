@@ -156,7 +156,7 @@ useEffect(() => {
 
 const getTotalPoints = async (playerId: string) => {
   const db = getDatabase();
-  const playerScoresRef = ref(db, `/${playerId}/scores`);
+  const playerScoresRef = ref(db, `users/${playerId}/scores`);  // Changed path
   
   try {
     const snapshot = await get(playerScoresRef);
@@ -436,12 +436,19 @@ const database = getDatabase(app);
 // Function to update the score in Realtime Database
 const updateScore = useCallback(async () => {
   try {
-    const playerId = telegramUser?.id.toString() || 'anonymous'; 
-    const userName = telegramUser?.first_name.toString() || 'anonymous'; 
+    const playerId = telegramUser?.id.toString();
+    if (!playerId) {
+      console.error('No player ID available');
+      return;
+    }
+
+    const userName = telegramUser?.first_name;
+    console.log('Updating score for:', { playerId, userName, score });
     
-    // Update score in a separate scores collection
-    const playerScoresRef = ref(database, `/${playerId}/scores`);
+    // Change the path to match your database structure
+    const playerScoresRef = ref(database, `users/${playerId}/scores`);  // Changed path
     const timestamp = Date.now();
+    
     await update(playerScoresRef, {
       [timestamp]: {
         userName,
@@ -451,7 +458,7 @@ const updateScore = useCallback(async () => {
       }
     });
 
-    // Update tickets separately
+    // Update user's play count
     const userRef = ref(database, `users/${playerId}`);
     const userSnapshot = await get(userRef);
     if (!userSnapshot.exists()) return;
@@ -461,7 +468,7 @@ const updateScore = useCallback(async () => {
     const currentPlays = userData.plays?.today || 0;
     const newPlaysCount = currentPlays + 1;
 
-    // Update plays in a separate 'plays' node
+    // Update plays
     await update(userRef, {
       'plays': {
         today: newPlaysCount,
@@ -474,16 +481,13 @@ const updateScore = useCallback(async () => {
     // Update local state
     setPlaysRemaining(Math.max(0, maxTickets - newPlaysCount));
 
-    // Update total points
-    const newTotal = await getTotalPoints(playerId);
-    setTotalPoints(newTotal);
-
-    console.log('Score and plays updated:', {
+    console.log('Score updated successfully:', {
       score,
       newPlaysCount,
       maxTickets,
       remaining: maxTickets - newPlaysCount
     });
+
   } catch (error) {
     console.error('Error updating score:', error);
   }
