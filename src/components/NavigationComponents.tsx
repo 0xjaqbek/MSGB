@@ -480,26 +480,29 @@ interface UserData {
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
   const db = getDatabase();
-  const usersRef = ref(db, '/users');
+  const rootRef = ref(db, '/');
   
   try {
-    const snapshot = await get(usersRef);
+    const snapshot = await get(rootRef);
     if (!snapshot.exists()) return 1;
     
-    const users = snapshot.val() as { [userId: string]: UserData };
+    const users = snapshot.val();
     const userScores: { userId: string; totalPoints: number }[] = [];
 
     // Calculate total points for each user
-    for (const [id, userData] of Object.entries(users)) {
-      if (userData && userData.scores) {
-        const totalPoints = Object.values(userData.scores).reduce((sum, entry) => {
+    Object.entries(users).forEach(([id, userData]) => {
+      // Add null check and type guard
+      if (userData && typeof userData === 'object' && 'scores' in userData) {
+        const scores = userData.scores as Record<string, { score: number }>;
+        const totalPoints = Object.values(scores).reduce((sum, entry) => {
           return sum + (entry.score || 0);
         }, 0);
-        userScores.push({ userId: id, totalPoints });
-      } else {
-        userScores.push({ userId: id, totalPoints: 0 });
+        
+        if (totalPoints > 0) {
+          userScores.push({ userId: id, totalPoints });
+        }
       }
-    }
+    });
 
     // Sort users by score in descending order
     userScores.sort((a, b) => b.totalPoints - a.totalPoints);
@@ -507,14 +510,14 @@ const calculateLeaderboardPosition = async (userId: string): Promise<number> => 
     // Find position of current user
     const position = userScores.findIndex(user => user.userId === userId) + 1;
     
-    console.log('Leaderboard data:', {
+    console.log('Leaderboard calculation:', {
       totalUsers: userScores.length,
       userPosition: position,
-      allScores: userScores
+      allScores: userScores,
+      currentUserId: userId
     });
-    
-    return position || 1;
 
+    return position || 1;
   } catch (error) {
     console.error('Error calculating leaderboard position:', error);
     return 1;
