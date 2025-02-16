@@ -484,8 +484,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
   const [invitesCount, setInvitesCount] = useState<number>(0);
   const [friendsCount, setFriendsCount] = useState<number>(0);
 
-  // Move the function inside the component
-  const calculateTotalPoints = (scores: {
+  const calculateTotalPoints = (scores?: {
     [key: string]: {
       score: number;
       userName: string;
@@ -495,9 +494,14 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
   }): number => {
     if (!scores) return 0;
     
-    return Object.values(scores).reduce((sum, entry) => {
-      return sum + (typeof entry.score === 'number' ? entry.score : 0);
+    const points = Object.values(scores).reduce((sum, entry) => {
+      const score = typeof entry.score === 'number' ? entry.score : 0;
+      console.log(`Individual score: ${score}, Timestamp: ${entry.timestamp}`);
+      return sum + score;
     }, 0);
+  
+    console.log(`Total points calculation: ${points}`);
+    return points;
   };
 
   // Keep calculateLeaderboardPosition as is but still use calculateTotalPoints
