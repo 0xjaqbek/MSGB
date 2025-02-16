@@ -7,7 +7,7 @@ import stone3 from './assets/stone3.svg';
 import stone4 from './assets/stone4.svg';
 import blastImage0 from './assets/blast0.svg'; 
 import blastImage1 from './assets/blast1.svg'; 
-import { getDatabase, ref, set, onValue, push, update, get } from 'firebase/database';
+import { getDatabase, ref, set, onValue, push, update, get, increment } from 'firebase/database';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import { trackUserVisit, updatePlayCount, type VisitStats } from './userTracking';
@@ -138,56 +138,6 @@ const Content: React.FC<ContentProps> = ({
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [isStartAnimating, setIsStartAnimating] = useState(false);
 
-// Add this useEffect to fetch and update total points
-useEffect(() => {
-  const fetchTotalPoints = async () => {
-    if (telegramUser) {
-      try {
-        const points = await getTotalPoints(telegramUser.id.toString());
-        setTotalPoints(points);
-      } catch (error) {
-        console.error('Error fetching total points:', error);
-      }
-    }
-  };
-
-  fetchTotalPoints();
-}, [telegramUser]);
-
-const getTotalPoints = async (playerId: string) => {
-  const db = getDatabase();
-  // Correct path for scores
-  const playerRef = ref(db, `users/${playerId}`);
-  
-  try {
-    const snapshot = await get(playerRef);
-    if (!snapshot.exists()) return 0;
-    
-    const userData = snapshot.val();
-    if (!userData.scores) return 0;
-
-    const total = calculateTotalPoints(userData.scores);
-
-    console.log('Total points calculation:', {
-      playerId,
-      totalPoints: total,
-      scoresCount: Object.keys(userData.scores).length
-    });
-
-    return total;
-  } catch (error) {
-    console.error('Error getting total points:', error);
-    return 0;
-  }
-};
-
-const calculateTotalPoints = (scores: Record<string, { score: number }>) => {
-  if (!scores) return 0;
-  return Object.values(scores).reduce((sum, entry) => {
-    return sum + (entry.score || 0);
-  }, 0);
-};
-
   useEffect(() => {
     const initApp = async () => {
       const tg = window.Telegram?.WebApp;
@@ -205,14 +155,19 @@ const calculateTotalPoints = (scores: Record<string, { score: number }>) => {
         if (user) {
           setTelegramUser(user);
           try {
+            const db = getDatabase();
+            const userRef = ref(db, `users/${user.id}`);
+            const userSnapshot = await get(userRef);
+            const userData = userSnapshot.val() || {};
+    
             const maxTickets = await calculateAvailableTickets(user.id.toString());
             const stats = await trackUserVisit(user.id.toString(), user.first_name);
+            
             setVisitStats(stats);
             setMaxPlaysToday(maxTickets);
             setPlaysRemaining(maxTickets - (stats.playsToday || 0));
             setUserStreak(stats.currentStreak);
-            const points = await getTotalPoints(user.id.toString());
-            setTotalPoints(points);
+            setTotalPoints(userData.totalScore || 0); // Directly use totalScore field
           } catch (error) {
             console.error('Error loading user stats:', error);
           }
@@ -470,52 +425,29 @@ useEffect(() => {
         const playerRef = ref(db, `users/${playerId}`);
         const timestamp = Date.now();
 
-        // Get current total score
-        const snapshot = await get(playerRef);
-        const currentData = snapshot.val() || {};
-        const currentTotal = currentData.totalScore || 0;
-        const newTotal = currentTotal + score;
-
-        // Get current plays count
-        const visits = currentData.visits || {};
-        const currentPlays = visits.playsToday || 0;
-        const newPlaysCount = currentPlays + 1;
-
-        // Prepare updates object
-        const updates: { [key: string]: any } = {
-          // Update individual game score
+        // Single atomic update for all changes
+        const updates = {
+          // Single score entry
           [`scores/${timestamp}`]: {
             userName,
             score,
             remainingTime,
             timestamp: formatDate(timestamp)
           },
-          // Update total score
-          totalScore: newTotal,
-          // Update last played info
+          // Atomic updates using increment()
+          totalScore: increment(score),
           lastPlayed: timestamp,
           lastScore: score,
-          // Update plays count
-          'visits/playsToday': newPlaysCount
+          'visits/playsToday': increment(1),
+          'plays/remaining': increment(-1)
         };
 
         // Apply all updates atomically
         await update(playerRef, updates);
 
-        // Update play count in state
+        // Update local states
         setPlaysRemaining(prev => Math.max(0, (prev || 0) - 1));
-        
-        // Log updates
-        console.log('Game stats updated:', {
-          roundScore: score,
-          newTotalScore: newTotal,
-          playsToday: newPlaysCount,
-          playsRemaining: Math.max(0, (playsRemaining || 0) - 1),
-          timestamp: formatDate(timestamp)
-        });
-
-        // Update local state
-        setTotalPoints(newTotal);
+        setTotalPoints(prev => prev + score);
 
         // Handle Telegram updates
         const tg = window.Telegram?.WebApp;
@@ -525,13 +457,15 @@ useEffect(() => {
           tg.sendData(JSON.stringify({ action: 'gameOver', score }));
         }
 
-        // Call onGameOver callback
+        // Call callbacks
         onGameOver?.(score);
         
         // Navigate to friends if no plays remaining
-        if (newPlaysCount >= maxPlaysToday) {
+        const updatedPlaysToday = (visitStats?.playsToday || 0) + 1;
+        if (updatedPlaysToday >= maxPlaysToday) {
           onNavigateToFriends?.();
         }
+
       } catch (error) {
         console.error('Error updating game stats:', error);
       }
@@ -539,7 +473,7 @@ useEffect(() => {
 
     handleGameOver();
   }
-}, [gameOver, score, telegramUser, remainingTime, onGameOver, onNavigateToFriends, maxPlaysToday, playsRemaining]);
+}, [gameOver, score, telegramUser, remainingTime, onGameOver, onNavigateToFriends, maxPlaysToday, visitStats?.playsToday]);
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
