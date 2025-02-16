@@ -480,46 +480,44 @@ interface UserData {
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
   const db = getDatabase();
-  const usersRef = ref(db, '/users');  // Changed to look in /users path
+  const usersRef = ref(db, '/users');
   
   try {
     const snapshot = await get(usersRef);
     if (!snapshot.exists()) return 1;
     
     const users = snapshot.val();
-    const userScores: { userId: string; totalPoints: number }[] = [];
+    const userScores: { userId: string; totalPoints: number; userName: string }[] = [];
 
-    // Calculate total points for each user
-    Object.entries(users).forEach(([id, userData]) => {
-      if (userData && typeof userData === 'object' && 'scores' in userData) {
-        const scores = userData.scores as Record<string, { score: number }>;
+    Object.entries(users).forEach(([id, userData]: [string, any]) => {
+      if (userData?.scores) {
+        // Sum ALL scores for this user
+        const allScores = Object.values(userData.scores)
+          .map((entry: any) => entry.score || 0);
+        const totalPoints = allScores.reduce((sum, score) => sum + score, 0);
         
-        // Sum up all scores for this user
-        const totalPoints = Object.values(scores).reduce((sum, entry) => {
-          return sum + (typeof entry.score === 'number' ? entry.score : 0);
-        }, 0);
+        userScores.push({
+          userId: id,
+          totalPoints,
+          userName: userData.userName || 'Unknown'
+        });
         
-        if (totalPoints > 0) {
-          userScores.push({ userId: id, totalPoints });
-          console.log(`User ${id} has ${totalPoints} points`);
-        }
+        // Detailed logging
+        console.log(`User ${userData.userName} (${id}):`);
+        console.log('Individual scores:', allScores);
+        console.log('Total points:', totalPoints);
       }
     });
 
-    // Sort users by score in descending order
+    // Sort by total points, highest first
     userScores.sort((a, b) => b.totalPoints - a.totalPoints);
 
-    // Find position of current user
-    const position = userScores.findIndex(user => user.userId === userId) + 1;
-    
-    console.log('Leaderboard calculation:', {
-      totalUsers: userScores.length,
-      userPosition: position,
-      allScores: userScores,
-      currentUserId: userId
-    });
+    console.log('Sorted leaderboard:', userScores.map(user => 
+      `${user.userName}: ${user.totalPoints} points`
+    ));
 
-    return position || 1;
+    const position = userScores.findIndex(user => user.userId === userId) + 1;
+    return position;
   } catch (error) {
     console.error('Error calculating leaderboard position:', error);
     return 1;
