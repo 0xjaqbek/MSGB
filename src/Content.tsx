@@ -447,65 +447,6 @@ const formatDate = (timestamp: string | number | Date) => {
 };
 
 const database = getDatabase(app);
-// Function to update the score in Realtime Database
-const updateScore = useCallback(async () => {
-  try {
-    const playerId = telegramUser?.id.toString();
-    if (!playerId) {
-      console.error('No player ID available');
-      return;
-    }
-
-    const userName = telegramUser?.first_name;
-    console.log('Updating score for:', { playerId, userName, score });
-    
-    // Change the path to match your database structure
-    const playerScoresRef = ref(database, `users/${playerId}/scores`);  // Changed path
-    const timestamp = Date.now();
-    
-    await update(playerScoresRef, {
-      [timestamp]: {
-        userName,
-        score,
-        remainingTime,
-        timestamp: formatDate(timestamp),
-      }
-    });
-
-    // Update user's play count
-    const userRef = ref(database, `users/${playerId}`);
-    const userSnapshot = await get(userRef);
-    if (!userSnapshot.exists()) return;
-
-    const userData = userSnapshot.val();
-    const maxTickets = await calculateAvailableTickets(playerId);
-    const currentPlays = userData.plays?.today || 0;
-    const newPlaysCount = currentPlays + 1;
-
-    // Update plays
-    await update(userRef, {
-      'plays': {
-        today: newPlaysCount,
-        max: maxTickets,
-        remaining: Math.max(0, maxTickets - newPlaysCount),
-        lastPlayed: Date.now()
-      }
-    });
-
-    // Update local state
-    setPlaysRemaining(Math.max(0, maxTickets - newPlaysCount));
-
-    console.log('Score updated successfully:', {
-      score,
-      newPlaysCount,
-      maxTickets,
-      remaining: maxTickets - newPlaysCount
-    });
-
-  } catch (error) {
-    console.error('Error updating score:', error);
-  }
-}, [score, remainingTime, telegramUser, database]);
 
 // Single consolidated gameOver effect
 useEffect(() => {
@@ -515,14 +456,55 @@ useEffect(() => {
       setEndGameReason('game-over');
       setShowEndGame(true);
       
-      // Update score once
-      await updateScore();
-      
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.MainButton.text = "Play Again";
-        tg.MainButton.hide();
-        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+      try {
+        const playerId = telegramUser?.id.toString();
+        if (!playerId) {
+          console.error('No player ID available');
+          return;
+        }
+
+        const userName = telegramUser?.first_name;
+        console.log('Updating score for:', { playerId, userName, score });
+        
+        const db = getDatabase();
+        const playerRef = ref(db, `users/${playerId}`);
+        const timestamp = Date.now();
+
+        // Get current total score
+        const snapshot = await get(playerRef);
+        const currentData = snapshot.val() || {};
+        const currentTotal = currentData.totalScore || 0;
+        const newTotal = currentTotal + score;
+
+        // Prepare updates object
+        const updates: { [key: string]: any } = {
+          // Update individual game score
+          [`scores/${timestamp}`]: {
+            userName,
+            score,
+            remainingTime,
+            timestamp: formatDate(timestamp)
+          },
+          // Update total score
+          totalScore: newTotal,
+          // Update last played info
+          lastPlayed: timestamp,
+          lastScore: score
+        };
+
+        // Apply all updates atomically
+        await update(playerRef, updates);
+
+        console.log('Score updated successfully:', {
+          roundScore: score,
+          newTotalScore: newTotal,
+          timestamp: formatDate(timestamp)
+        });
+
+        // Update local total points state
+        setTotalPoints(newTotal);
+      } catch (error) {
+        console.error('Error updating score:', error);
       }
 
       // Call onGameOver callback
@@ -536,8 +518,7 @@ useEffect(() => {
 
     handleGameOver();
   }
-}, [gameOver, score, updateScore, onGameOver, onNavigateToFriends, userStats?.playsRemaining]);
-
+}, [gameOver, score, telegramUser, remainingTime, onGameOver, onNavigateToFriends, userStats?.playsRemaining]);
 
 const PlaysInfoContainer = styled.div`
   position: absolute;

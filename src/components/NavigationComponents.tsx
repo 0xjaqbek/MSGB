@@ -484,33 +484,6 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
   const [invitesCount, setInvitesCount] = useState<number>(0);
   const [friendsCount, setFriendsCount] = useState<number>(0);
 
-  const calculateTotalPoints = (scores?: {
-    [key: string]: {
-      score: number;
-      userName: string;
-      remainingTime: number;
-      timestamp: string;
-    }
-  }): number => {
-    if (!scores) return 0;
-    
-    const points = Object.values(scores).reduce((sum, entry) => {
-      const score = typeof entry.score === 'number' ? entry.score : 0;
-      console.log(`Individual score: ${score}, Timestamp: ${entry.timestamp}`);
-      return sum + score;
-    }, 0);
-  
-    console.log(`Total points calculation: ${points}`);
-    return points;
-  };
-
-  interface ScoreEntry {
-    score?: number | string;
-    userName?: string;
-    remainingTime?: number;
-    timestamp?: string;
-  }
-  
   const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
     const db = getDatabase();
     const usersRef = ref(db, '/users');
@@ -520,40 +493,25 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
       if (!snapshot.exists()) return 1;
       
       const users = snapshot.val();
-      const userScores: { userId: string; totalPoints: number; userName: string }[] = [];
-  
+      const userScores: { userId: string; totalScore: number; userName: string }[] = [];
+
       Object.entries(users).forEach(([id, userData]: [string, any]) => {
-        if (userData?.scores) {
-          let totalPoints = 0;
-          const scoresArray = Object.values(userData.scores) as ScoreEntry[];
-          
-          for (const entry of scoresArray) {
-            // Explicit type checking and conversion
-            const score = entry?.score != null 
-              ? Number(entry.score) 
-              : 0;
-            
-            if (!isNaN(score)) {
-              totalPoints += score;
-            }
-          }
-  
-          userScores.push({
-            userId: id,
-            totalPoints: totalPoints,
-            userName: userData.userName || 'Unknown'
-          });
-        }
+        // Now using totalScore directly instead of calculating from scores
+        userScores.push({
+          userId: id,
+          totalScore: userData.totalScore || 0,
+          userName: userData.userName || 'Unknown'
+        });
       });
-  
-      // Sort users by total points in descending order
-      userScores.sort((a, b) => b.totalPoints - a.totalPoints);
-  
+
+      // Sort users by total score in descending order
+      userScores.sort((a, b) => b.totalScore - a.totalScore);
+
       // Log the sorted leaderboard for debugging
       console.log('Sorted Leaderboard:', userScores.map(user => 
-        `${user.userName}: ${user.totalPoints}`
+        `${user.userName}: ${user.totalScore}`
       ));
-  
+
       // Find the user's position (index + 1)
       const position = userScores.findIndex(user => user.userId === userId) + 1;
       
@@ -570,16 +528,14 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
         try {
           const db = getDatabase();
           
-          // Fetch user data including scores
+          // Fetch user data including totalScore
           const userRef = ref(db, `users/${telegramUser.id}`);
           const userSnapshot = await get(userRef);
           
           if (userSnapshot.exists()) {
             const userData = userSnapshot.val();
-            if (userData.scores) {
-              const total = calculateTotalPoints(userData.scores);
-              setTotalPoints(total);
-            }
+            // Use totalScore directly instead of calculating from scores
+            setTotalPoints(userData.totalScore || 0);
           }
 
           // Calculate leaderboard position
@@ -611,6 +567,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
     fetchData();
   }, [telegramUser]);
 
+  // Update leaderboard position when totalPoints changes
   useEffect(() => {
     const updateLeaderboardPosition = async () => {
       if (telegramUser) {
@@ -650,6 +607,10 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
             <span className="text-value">#{leaderboardPosition}</span>
           </div>
           <div className="stat-row">
+            <span className="text-info">Total Points:</span>
+            <span className="text-value">{totalPoints}</span>
+          </div>
+          <div className="stat-row">
             <span className="text-info">Invites:</span>
             <span className="text-value">{invitesCount}</span>
           </div>
@@ -666,10 +627,6 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
               <div className="stat-row">
                 <span className="text-info">Highest Streak:</span>
                 <span className="text-value">{userStats.highestStreak} days</span>
-              </div>
-              <div className="stat-row">
-                <span className="text-info">Total Points:</span>
-                <span className="text-value">{totalPoints}</span>
               </div>
             </>
           )}
