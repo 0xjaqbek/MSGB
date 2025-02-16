@@ -1,5 +1,5 @@
 // ticketManagement.ts
-import { getDatabase, ref, get, set, update } from 'firebase/database';
+import { getDatabase, ref, get, set, update, runTransaction } from 'firebase/database';
 import { VisitStats } from './userTracking';
 
 interface InviteData {
@@ -101,21 +101,31 @@ export const processInviteLink = async (userId: string, startParam: string) => {
     try {
       const snapshot = await get(userRef);
       if (!snapshot.exists()) {
-        return 5; // Base tickets
+        console.log(`No user found, returning default 5 tickets for ${userId}`);
+        return 5;
       }
   
       const userData = snapshot.val();
       const referralData = userData.referrals || { ticketsFromInvites: 0 };
       const ticketsFromFriends = userData.ticketsFromFriends || 0;
       
-      // Base tickets (5) + streak bonus + referral bonus + friends bonus
       const baseTickets = 5;
       const streakBonus = Math.max(0, (userData.visits?.currentStreak || 1) - 1);
       const referralBonus = referralData.ticketsFromInvites || 0;
       
-      return baseTickets + streakBonus + referralBonus + ticketsFromFriends;
+      const totalTickets = baseTickets + streakBonus + referralBonus + ticketsFromFriends;
+      
+      console.log(`Ticket Breakdown for ${userId}:`, {
+        baseTickets,
+        streakBonus,
+        referralBonus,
+        ticketsFromFriends,
+        totalTickets
+      });
+  
+      return totalTickets;
     } catch (error) {
-      console.error('Error calculating tickets:', error);
+      console.error(`Error calculating tickets for ${userId}:`, error);
       return 5;
     }
   };
@@ -125,40 +135,54 @@ export const processInviteLink = async (userId: string, startParam: string) => {
     const userRef = ref(db, `users/${userId}`);
     
     try {
-      const snapshot = await get(userRef);
-      if (!snapshot.exists()) {
-        throw new Error('User not found');
-      }
-      
-      const userData = snapshot.val();
-      const visits = userData.visits || {};
-      const maxTickets = await calculateAvailableTickets(userId);
-      const currentPlays = visits.playsToday || 0;
-      const newPlaysCount = currentPlays + 1;
-      
-      console.log('Play count update:', {
-        userId,
-        currentPlays,
-        newPlaysCount,
-        maxTickets,
-        permanentBonus: userData.permanentBonusTickets
+      // Start a transaction to ensure atomic updates
+      const result = await runTransaction(userRef, async (currentUserData) => {
+        if (!currentUserData) {
+          throw new Error('User not found');
+        }
+        const visits = currentUserData.visits || {};
+        const maxTickets = await calculateAvailableTickets(userId); // Add await here
+        const currentPlays = visits.playsToday || 0;
+        
+        // HARD STOP: Prevent any plays beyond max tickets
+        if (currentPlays >= maxTickets) {
+          console.error(`TICKET LIMIT EXCEEDED: User ${userId} attempted to play beyond max tickets`);
+          return { 
+            ...currentUserData, 
+            playAttemptBlocked: true 
+          };
+        }
+        const newPlaysCount = currentPlays + 1;
+        
+        // Enforce strict ticket limit
+        if (newPlaysCount > maxTickets) {
+          console.error(`CRITICAL: Attempted to exceed max ticket limit for user ${userId}`);
+          return currentUserData; // Reject the update
+        }
+        // Update play tracking with additional safeguards
+        return {
+          ...currentUserData,
+          visits: {
+            ...visits,
+            playsToday: newPlaysCount,
+            maxPlaysToday: maxTickets,
+            playsRemaining: Math.max(0, maxTickets - newPlaysCount),
+            lastPlayed: Date.now()
+          }
+        };
       });
-      
-      if (newPlaysCount > maxTickets) {
-        return -1; // No plays remaining
+  
+      // Analyze transaction result
+      if (result.committed) {
+        const remainingPlays = result.snapshot.val()?.visits?.playsRemaining || 0;
+        return remainingPlays;
+      } else {
+        console.error('Play count update transaction failed');
+        return -1;
       }
-      
-      // Update the plays count
-      await update(userRef, {
-        'visits/playsToday': newPlaysCount,
-        'visits/maxPlaysToday': maxTickets,
-        'visits/playsRemaining': maxTickets - newPlaysCount,
-        'visits/lastPlayed': Date.now()
-      });
-      
-      return maxTickets - newPlaysCount;
     } catch (error) {
-      console.error('Error updating play count:', error);
-      throw error;
+      console.error('CRITICAL ERROR in updatePlayCount:', error);
+      // Prevent any plays on error
+      return -1;
     }
   };
