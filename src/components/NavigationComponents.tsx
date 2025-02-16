@@ -480,10 +480,10 @@ interface UserData {
 
 const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
   const db = getDatabase();
-  const rootRef = ref(db, '/');
+  const usersRef = ref(db, '/users');  // Changed to look in /users path
   
   try {
-    const snapshot = await get(rootRef);
+    const snapshot = await get(usersRef);
     if (!snapshot.exists()) return 1;
     
     const users = snapshot.val();
@@ -491,15 +491,17 @@ const calculateLeaderboardPosition = async (userId: string): Promise<number> => 
 
     // Calculate total points for each user
     Object.entries(users).forEach(([id, userData]) => {
-      // Add null check and type guard
       if (userData && typeof userData === 'object' && 'scores' in userData) {
         const scores = userData.scores as Record<string, { score: number }>;
+        
+        // Sum up all scores for this user
         const totalPoints = Object.values(scores).reduce((sum, entry) => {
-          return sum + (entry.score || 0);
+          return sum + (typeof entry.score === 'number' ? entry.score : 0);
         }, 0);
         
         if (totalPoints > 0) {
           userScores.push({ userId: id, totalPoints });
+          console.log(`User ${id} has ${totalPoints} points`);
         }
       }
     });

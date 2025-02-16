@@ -156,8 +156,7 @@ useEffect(() => {
 
 const getTotalPoints = async (playerId: string) => {
   const db = getDatabase();
-  // Remove /users from the path
-  const playerScoresRef = ref(db, `/${playerId}/scores`);
+  const playerScoresRef = ref(db, `users/${playerId}/scores`);  // Updated path
   
   try {
     const snapshot = await get(playerScoresRef);
@@ -167,13 +166,13 @@ const getTotalPoints = async (playerId: string) => {
     
     const scores = snapshot.val();
     const total = Object.values(scores).reduce((sum: number, entry: any) => {
-      return sum + (entry.score || 0);
+      return sum + (typeof entry.score === 'number' ? entry.score : 0);
     }, 0);
 
     console.log('Total points calculation:', {
       playerId,
       totalPoints: total,
-      scores: scores
+      scoresCount: Object.keys(scores).length
     });
 
     return total;
