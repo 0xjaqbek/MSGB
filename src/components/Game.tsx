@@ -103,7 +103,6 @@ const Game: React.FC = () => {
       if (tg) {
         tg.MainButton.text = "Play Again";
         tg.MainButton.hide();
-        updateScore();
         tg.sendData(JSON.stringify({ action: 'gameOver', score }));
       }
     }

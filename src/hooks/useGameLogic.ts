@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Stone, TelegramUser } from '../types/types';
 import { GAME_DURATION, BLAST_IMAGES } from '../constants/constants';
 import { database } from '../config/firebaseConfig';
-import { ref, update } from 'firebase/database';
+import { increment, ref, update } from 'firebase/database';
 import { formatDate } from '../config/firebaseConfig';
 
 export const useGameLogic = () => {
@@ -67,17 +67,28 @@ export const useGameLogic = () => {
     try {
       const playerId = telegramUser?.id.toString() || 'anonymous';
       const userName = telegramUser?.first_name.toString() || 'anonymous';
-      const playerScoresRef = ref(database, `/${playerId}/scores`);
+      const playerRef = ref(database, `/users/${playerId}`);
       const timestamp = Date.now();
       
-      await update(playerScoresRef, {
-        [timestamp]: {
+      // Update both individual game score and total score
+      await update(playerRef, {
+        [`scores/${timestamp}`]: {
           userName,
           score,
           remainingTime,
           timestamp: formatDate(timestamp),
-        }
+        },
+        // Update total score directly
+        totalScore: increment(score)
       });
+
+      // Handle Telegram UI updates
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.MainButton.text = "Play Again";
+        tg.MainButton.hide();
+        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+      }
     } catch (error) {
       console.error('Error updating score:', error);
     }
