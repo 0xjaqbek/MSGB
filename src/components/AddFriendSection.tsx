@@ -96,6 +96,14 @@ const AddButton = styled.button<{ $variant?: 'accept' | 'reject' | 'send' }>`
   }
 `;
 
+const ErrorText = styled.div`
+  color: #FF4444;
+  font-family: 'REM', sans-serif;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+  text-align: center;
+`;
+
 const RequestContainer = styled.div`
   width: 100%;
   display: flex;
@@ -118,23 +126,6 @@ const ButtonGroup = styled.div`
   gap: 10px;
 `;
 
-const TabContainer = styled.div`
-  display: flex;
-  width: 100%;
-  margin-bottom: 10px;
-`;
-
-const Tab = styled.button<{ $active: boolean }>`
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 10px;
-  color: ${props => props.$active ? '#0FF' : 'rgba(255,255,255,0.5)'};
-  border-bottom: 2px solid ${props => props.$active ? '#0FF' : 'transparent'};
-  font-family: 'REM', sans-serif;
-  transition: all 0.3s ease;
-`;
-
 interface AddFriendSectionProps {
   pendingRequests?: FriendRequest[];
   sentRequests?: FriendRequest[];
@@ -154,7 +145,6 @@ export const AddFriendSection: React.FC<AddFriendSectionProps> = ({
   isProcessing = false,
   error
 }) => {
-  const [activeTab, setActiveTab] = useState<'receive' | 'send'>('receive');
   const [friendId, setFriendId] = useState('');
 
   const handleSubmit = async () => {
@@ -169,95 +159,64 @@ export const AddFriendSection: React.FC<AddFriendSectionProps> = ({
     }
   };
 
+  // If there are pending requests, show request confirmation
+  if (pendingRequests.length > 0) {
+    return (
+      <RamkaContainer>
+        <InfoText>
+          Friend Requests
+        </InfoText>
+        {pendingRequests.map((request) => (
+          <RequestContainer key={request.fromUserId}>
+            <RequestInfo>
+              {request.fromUserName} wants to be your friend
+            </RequestInfo>
+            <ButtonGroup>
+              <AddButton 
+                $variant="accept"
+                onClick={() => onAcceptRequest?.(request.fromUserId, 'accept')}
+              >
+                Accept
+              </AddButton>
+              <AddButton 
+                $variant="reject"
+                onClick={() => onRejectRequest?.(request.fromUserId, 'reject')}
+              >
+                Reject
+              </AddButton>
+            </ButtonGroup>
+          </RequestContainer>
+        ))}
+      </RamkaContainer>
+    );
+  }
+
+  // Default send request view
   return (
     <RamkaContainer>
       <InfoText>
         Get extra ticket<br/>
         for every 2 friends added
       </InfoText>
-
-      <TabContainer>
-        <Tab 
-          $active={activeTab === 'receive'}
-          onClick={() => setActiveTab('receive')}
-        >
-          Receive
-        </Tab>
-        <Tab 
-          $active={activeTab === 'send'}
-          onClick={() => setActiveTab('send')}
-        >
-          Send
-        </Tab>
-      </TabContainer>
-
-      {activeTab === 'receive' ? (
-        pendingRequests.length > 0 ? (
-          pendingRequests.map((request) => (
-            <RequestContainer key={request.fromUserId}>
-              <RequestInfo>
-                {request.fromUserName} wants to be your friend
-              </RequestInfo>
-              <ButtonGroup>
-                <AddButton 
-                    $variant="accept"
-                    onClick={() => onAcceptRequest?.(request.fromUserId, 'accept')}
-                >
-                    Accept
-                </AddButton>
-                <AddButton 
-                    $variant="reject"
-                    onClick={() => onRejectRequest?.(request.fromUserId, 'reject')}
-                >
-                    Reject
-                </AddButton>
-                </ButtonGroup>
-            </RequestContainer>
-          ))
-        ) : (
-          <InfoText style={{ color: 'rgba(255,255,255,0.7)' }}>
-            No pending friend requests
-          </InfoText>
-        )
-      ) : (
-        <>
-          <InputContainer>
-            <StyledInput
-              type="text"
-              placeholder="Enter User ID"
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-              disabled={isProcessing}
-              onKeyPress={handleKeyPress}
-            />
-            <ButtonWrapper>
-              <AddButton
-                onClick={handleSubmit}
-                disabled={isProcessing || !friendId.trim()}
-              >
-                Add Friend
-              </AddButton>
-            </ButtonWrapper>
-          </InputContainer>
-
-          {sentRequests.length > 0 && (
-            <>
-              {sentRequests.map((request) => (
-                <RequestContainer key={request.fromUserId}>
-                  <RequestInfo>
-                    Request sent to {request.fromUserName}
-                  </RequestInfo>
-                  <ButtonGroup>
-                    <AddButton $variant="reject">
-                      Cancel
-                    </AddButton>
-                  </ButtonGroup>
-                </RequestContainer>
-              ))}
-            </>
-          )}
-        </>
-      )}
+      {error && <ErrorText>{error}</ErrorText>}
+      <InputContainer>
+        <StyledInput
+          type="text"
+          placeholder="Enter User ID"
+          value={friendId}
+          onChange={(e) => setFriendId(e.target.value)}
+          disabled={isProcessing}
+          onKeyPress={handleKeyPress}
+        />
+        <ButtonWrapper>
+          <AddButton
+            onClick={handleSubmit}
+            disabled={isProcessing || !friendId.trim()}
+          >
+            Add Friend
+          </AddButton>
+        </ButtonWrapper>
+      </InputContainer>
     </RamkaContainer>
   );
 };
