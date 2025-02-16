@@ -476,6 +476,11 @@ useEffect(() => {
         const currentTotal = currentData.totalScore || 0;
         const newTotal = currentTotal + score;
 
+        // Get current plays count
+        const visits = currentData.visits || {};
+        const currentPlays = visits.playsToday || 0;
+        const newPlaysCount = currentPlays + 1;
+
         // Prepare updates object
         const updates: { [key: string]: any } = {
           // Update individual game score
@@ -489,36 +494,52 @@ useEffect(() => {
           totalScore: newTotal,
           // Update last played info
           lastPlayed: timestamp,
-          lastScore: score
+          lastScore: score,
+          // Update plays count
+          'visits/playsToday': newPlaysCount
         };
 
         // Apply all updates atomically
         await update(playerRef, updates);
 
-        console.log('Score updated successfully:', {
+        // Update play count in state
+        setPlaysRemaining(prev => Math.max(0, (prev || 0) - 1));
+        
+        // Log updates
+        console.log('Game stats updated:', {
           roundScore: score,
           newTotalScore: newTotal,
+          playsToday: newPlaysCount,
+          playsRemaining: Math.max(0, (playsRemaining || 0) - 1),
           timestamp: formatDate(timestamp)
         });
 
-        // Update local total points state
+        // Update local state
         setTotalPoints(newTotal);
-      } catch (error) {
-        console.error('Error updating score:', error);
-      }
 
-      // Call onGameOver callback
-      onGameOver?.(score);
-      
-      // Navigate to friends if no plays remaining
-      if (userStats?.playsRemaining === 0) {
-        onNavigateToFriends?.();
+        // Handle Telegram updates
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+          tg.MainButton.text = "Play Again";
+          tg.MainButton.hide();
+          tg.sendData(JSON.stringify({ action: 'gameOver', score }));
+        }
+
+        // Call onGameOver callback
+        onGameOver?.(score);
+        
+        // Navigate to friends if no plays remaining
+        if (newPlaysCount >= maxPlaysToday) {
+          onNavigateToFriends?.();
+        }
+      } catch (error) {
+        console.error('Error updating game stats:', error);
       }
     };
 
     handleGameOver();
   }
-}, [gameOver, score, telegramUser, remainingTime, onGameOver, onNavigateToFriends, userStats?.playsRemaining]);
+}, [gameOver, score, telegramUser, remainingTime, onGameOver, onNavigateToFriends, maxPlaysToday, playsRemaining]);
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
