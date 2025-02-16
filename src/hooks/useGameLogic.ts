@@ -63,37 +63,6 @@ export const useGameLogic = () => {
     return newStone;
   }, [difficulty, stoneIdCounter]);
 
-  const updateScore = useCallback(async () => {
-    try {
-      const playerId = telegramUser?.id.toString() || 'anonymous';
-      const userName = telegramUser?.first_name.toString() || 'anonymous';
-      const playerRef = ref(database, `/users/${playerId}`);
-      const timestamp = Date.now();
-      
-      // Update both individual game score and total score
-      await update(playerRef, {
-        [`scores/${timestamp}`]: {
-          userName,
-          score,
-          remainingTime,
-          timestamp: formatDate(timestamp),
-        },
-        // Update total score directly
-        totalScore: increment(score)
-      });
-
-      // Handle Telegram UI updates
-      const tg = window.Telegram?.WebApp;
-      if (tg) {
-        tg.MainButton.text = "Play Again";
-        tg.MainButton.hide();
-        tg.sendData(JSON.stringify({ action: 'gameOver', score }));
-      }
-    } catch (error) {
-      console.error('Error updating score:', error);
-    }
-  }, [score, remainingTime, telegramUser]);
-
   const handleStartClick = () => {
     setIsPlaying(true);
     setScore(0);
@@ -165,7 +134,6 @@ export const useGameLogic = () => {
     spawnStone,
     setCurrentStones,
     setGameOver,
-    updateScore,
     setIsPlaying,
     setRemainingTime 
   };

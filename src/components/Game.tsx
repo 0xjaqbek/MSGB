@@ -41,7 +41,6 @@ const Game: React.FC = () => {
     spawnStone,
     setCurrentStones,
     setGameOver,
-    updateScore,
     setIsPlaying,
     setRemainingTime 
   } = useGameLogic();
@@ -106,7 +105,7 @@ const Game: React.FC = () => {
         tg.sendData(JSON.stringify({ action: 'gameOver', score }));
       }
     }
-  }, [gameOver, score, updateScore]);
+  }, [gameOver, score]);
 
   return (
     <StyledContent>
