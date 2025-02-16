@@ -478,57 +478,66 @@ interface UserData {
   [key: string]: any; // For other user data properties
 }
 
-const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
-  const db = getDatabase();
-  const usersRef = ref(db, '/users');
-  
-  try {
-    const snapshot = await get(usersRef);
-    if (!snapshot.exists()) return 1;
-    
-    const users = snapshot.val();
-    const userScores: { userId: string; totalPoints: number; userName: string }[] = [];
-
-    Object.entries(users).forEach(([id, userData]: [string, any]) => {
-      if (userData?.scores) {
-        // Sum ALL scores for this user
-        const allScores = Object.values(userData.scores)
-          .map((entry: any) => entry.score || 0);
-        const totalPoints = allScores.reduce((sum, score) => sum + score, 0);
-        
-        userScores.push({
-          userId: id,
-          totalPoints,
-          userName: userData.userName || 'Unknown'
-        });
-        
-        // Detailed logging
-        console.log(`User ${userData.userName} (${id}):`);
-        console.log('Individual scores:', allScores);
-        console.log('Total points:', totalPoints);
-      }
-    });
-
-    // Sort by total points, highest first
-    userScores.sort((a, b) => b.totalPoints - a.totalPoints);
-
-    console.log('Sorted leaderboard:', userScores.map(user => 
-      `${user.userName}: ${user.totalPoints} points`
-    ));
-
-    const position = userScores.findIndex(user => user.userId === userId) + 1;
-    return position;
-  } catch (error) {
-    console.error('Error calculating leaderboard position:', error);
-    return 1;
-  }
-};
-
 const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) => {
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [leaderboardPosition, setLeaderboardPosition] = useState<number>(0);
   const [invitesCount, setInvitesCount] = useState<number>(0);
   const [friendsCount, setFriendsCount] = useState<number>(0);
+
+  // Move the function inside the component
+  const calculateTotalPoints = (scores: {
+    [key: string]: {
+      score: number;
+      userName: string;
+      remainingTime: number;
+      timestamp: string;
+    }
+  }): number => {
+    if (!scores) return 0;
+    
+    return Object.values(scores).reduce((sum, entry) => {
+      return sum + (typeof entry.score === 'number' ? entry.score : 0);
+    }, 0);
+  };
+
+  // Keep calculateLeaderboardPosition as is but still use calculateTotalPoints
+  const calculateLeaderboardPosition = async (userId: string): Promise<number> => {
+    const db = getDatabase();
+    const usersRef = ref(db, '/users');
+    
+    try {
+      const snapshot = await get(usersRef);
+      if (!snapshot.exists()) return 1;
+      
+      const users = snapshot.val();
+      const userScores: { userId: string; totalPoints: number; userName: string }[] = [];
+  
+      Object.entries(users).forEach(([id, userData]: [string, any]) => {
+        if (userData?.scores) {
+          const totalPoints = calculateTotalPoints(userData.scores);
+          userScores.push({
+            userId: id,
+            totalPoints,
+            userName: userData.userName || 'Unknown'
+          });
+          
+          console.log(`User ${userData.userName} (${id}) total:`, totalPoints);
+        }
+      });
+  
+      userScores.sort((a, b) => b.totalPoints - a.totalPoints);
+  
+      console.log('Leaderboard:', userScores.map(user => 
+        `${user.userName}: ${user.totalPoints}`
+      ));
+  
+      const position = userScores.findIndex(user => user.userId === userId) + 1;
+      return position || 1;
+    } catch (error) {
+      console.error('Error calculating leaderboard position:', error);
+      return 1;
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -536,16 +545,16 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
         try {
           const db = getDatabase();
           
-          // Fetch total points
-          const playerScoresRef = ref(db, `/${telegramUser.id}/scores`);
-          const scoresSnapshot = await get(playerScoresRef);
+          // Fetch user data including scores
+          const userRef = ref(db, `users/${telegramUser.id}`);
+          const userSnapshot = await get(userRef);
           
-          if (scoresSnapshot.exists()) {
-            const scores = scoresSnapshot.val();
-            const total = Object.values(scores).reduce((sum: number, entry: any) => {
-              return sum + (entry.score || 0);
-            }, 0);
-            setTotalPoints(total);
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.val();
+            if (userData.scores) {
+              const total = calculateTotalPoints(userData.scores);
+              setTotalPoints(total);
+            }
           }
 
           // Calculate leaderboard position
@@ -576,6 +585,21 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
 
     fetchData();
   }, [telegramUser]);
+
+  useEffect(() => {
+    const updateLeaderboardPosition = async () => {
+      if (telegramUser) {
+        try {
+          const position = await calculateLeaderboardPosition(telegramUser.id.toString());
+          setLeaderboardPosition(position);
+        } catch (error) {
+          console.error('Error updating leaderboard position:', error);
+        }
+      }
+    };
+  
+    updateLeaderboardPosition();
+  }, [telegramUser, totalPoints]);
 
   if (!telegramUser) {
     return <div className="page-container">
