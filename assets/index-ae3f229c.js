@@ -3471,7 +3471,7 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   margin-bottom: 10px;
   text-align: center;
 `,Wz=We.div`
-  width: 100%;
+  width: min(80%, 280px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -3481,14 +3481,19 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   padding: 10px;
   margin-bottom: 10px;
 `,Hz=We.div` 
-  font-size:0.9rem;
-  line-height:0.9;
+  font-size: 0.8rem;  // Smaller base font size
+  line-height: 0.9;
   color: white;
   font-family: 'REM', sans-serif;
+
+  span {
+    font-size: 1rem;  // Bigger font size for username
+    color: #0FF;      // Optional: make username cyan to stand out
+  }
 `,Vz=We.div`
   display: flex;
   gap: 10px;
-`,Kz=({pendingRequests:e=[],sentRequests:t=[],onSendRequest:r,onAcceptRequest:n,onRejectRequest:o,isProcessing:i=!1,error:s})=>{const[a,l]=$e.useState(""),f=async()=>{!a.trim()||i||(await(r==null?void 0:r(a)),l(""))},c=h=>{h.key==="Enter"&&f()};return e.length>0?Ue(iw,{children:[ge(ow,{children:"Friend Requests"}),e.map(h=>Ue(Wz,{children:[Ue(Hz,{children:[h.fromUserName," wants to be your friend"]}),Ue(Vz,{children:[ge(cv,{$variant:"accept",onClick:()=>n==null?void 0:n(h.fromUserId,"accept"),children:"Accept"}),ge(cv,{$variant:"reject",onClick:()=>o==null?void 0:o(h.fromUserId,"reject"),children:"Reject"})]})]},h.fromUserId))]}):Ue(iw,{children:[Ue(ow,{children:["Get extra ticket",ge("br",{}),"for every 2 friends added"]}),s&&ge(zz,{children:s}),Ue(Uz,{children:[ge(jz,{type:"text",placeholder:"Enter User ID",value:a,onChange:h=>l(h.target.value),disabled:i,onKeyPress:c}),ge(qz,{children:ge(cv,{onClick:f,disabled:i||!a.trim(),children:"Add Friend"})})]})]})},Gz=({currentPage:e,onNavigate:t})=>ge("div",{style:{position:"fixed",bottom:"0",left:0,right:0,zIndex:9999,display:"flex",justifyContent:"space-around",alignItems:"flex-start",background:`url(${Sz}) no-repeat center bottom`,backgroundSize:"100% 100%",maxWidth:"100vw",overflow:"hidden",padding:"15px 10px 0"},children:[{page:"main",activeImg:vz,defaultImg:gz},{page:"friends",activeImg:mz,defaultImg:yz},{page:"account",activeImg:bz,defaultImg:wz},{page:"tasks",activeImg:_z,defaultImg:xz}].map(({page:r,activeImg:n,defaultImg:o})=>ge("button",{onClick:()=>t(r),style:{display:"flex",alignItems:"center",justifyContent:"center",background:"transparent",border:"none",padding:0,margin:0,marginTop:"5px",width:"10vh",height:"10vh",overflow:"hidden",cursor:"pointer"},children:ge("img",{src:e===r?n:o,alt:r,style:{width:"100%",height:"100%",objectFit:"contain",maxWidth:"100%",maxHeight:"100%"}})},r))}),Yz=We.div`
+`,Kz=({pendingRequests:e=[],sentRequests:t=[],onSendRequest:r,onAcceptRequest:n,onRejectRequest:o,isProcessing:i=!1,error:s})=>{const[a,l]=$e.useState(""),f=async()=>{!a.trim()||i||(await(r==null?void 0:r(a)),l(""))},c=h=>{h.key==="Enter"&&f()};return e.length>0?Ue(iw,{children:[ge(ow,{children:"Friend Requests"}),e.map(h=>Ue(Wz,{children:[Ue(Hz,{children:["Add ",ge("span",{children:h.fromUserName})," to friends?"]}),Ue(Vz,{children:[ge(cv,{$variant:"accept",onClick:()=>n==null?void 0:n(h.fromUserId,"accept"),children:"Accept"}),ge(cv,{$variant:"reject",onClick:()=>o==null?void 0:o(h.fromUserId,"reject"),children:"Reject"})]})]},h.fromUserId))]}):Ue(iw,{children:[Ue(ow,{children:["Get extra ticket",ge("br",{}),"for every 2 friends added"]}),s&&ge(zz,{children:s}),Ue(Uz,{children:[ge(jz,{type:"text",placeholder:"Enter User ID",value:a,onChange:h=>l(h.target.value),disabled:i,onKeyPress:c}),ge(qz,{children:ge(cv,{onClick:f,disabled:i||!a.trim(),children:"Add Friend"})})]})]})},Gz=({currentPage:e,onNavigate:t})=>ge("div",{style:{position:"fixed",bottom:"0",left:0,right:0,zIndex:9999,display:"flex",justifyContent:"space-around",alignItems:"flex-start",background:`url(${Sz}) no-repeat center bottom`,backgroundSize:"100% 100%",maxWidth:"100vw",overflow:"hidden",padding:"15px 10px 0"},children:[{page:"main",activeImg:vz,defaultImg:gz},{page:"friends",activeImg:mz,defaultImg:yz},{page:"account",activeImg:bz,defaultImg:wz},{page:"tasks",activeImg:_z,defaultImg:xz}].map(({page:r,activeImg:n,defaultImg:o})=>ge("button",{onClick:()=>t(r),style:{display:"flex",alignItems:"center",justifyContent:"center",background:"transparent",border:"none",padding:0,margin:0,marginTop:"5px",width:"10vh",height:"10vh",overflow:"hidden",cursor:"pointer"},children:ge("img",{src:e===r?n:o,alt:r,style:{width:"100%",height:"100%",objectFit:"contain",maxWidth:"100%",maxHeight:"100%"}})},r))}),Yz=We.div`
   margin-top: 20px;
   width: 100%;
   display: flex;
