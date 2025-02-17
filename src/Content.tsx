@@ -19,6 +19,7 @@ import hudTop from './assets/HUDtop.svg';
 import ProgressBar from './ProgressBar';
 import pointsBg from './assets/points.svg';
 import { calculateAvailableTickets } from './ticketManagement';
+import { handleGameOver } from "./gameOverHandler";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -406,74 +407,29 @@ const database = getDatabase(app);
 // Single consolidated gameOver effect
 useEffect(() => {
   if (gameOver) {
-    const handleGameOver = async () => {
+    const processGameOver = async () => {
       setIsPlaying(false);
       setEndGameReason('game-over');
       setShowEndGame(true);
       
-      try {
-        const playerId = telegramUser?.id.toString();
-        if (!playerId) {
-          console.error('No player ID available');
-          return;
+      await handleGameOver(
+        {
+          score,
+          remainingTime,
+          telegramUser,
+          visitStats,
+          maxPlaysToday
+        },
+        {
+          onGameOver,
+          onNavigateToFriends
         }
-
-        const userName = telegramUser?.first_name;
-        console.log('Updating score for:', { playerId, userName, score });
-        
-        const db = getDatabase();
-        const playerRef = ref(db, `users/${playerId}`);
-        const timestamp = Date.now();
-
-        // Single atomic update for all changes
-        const updates = {
-          // Single score entry
-          [`scores/${timestamp}`]: {
-            userName,
-            score,
-            remainingTime,
-            timestamp: formatDate(timestamp)
-          },
-          // Atomic updates using increment()
-          totalScore: increment(score),
-          lastPlayed: timestamp,
-          lastScore: score,
-          'visits/playsToday': increment(1),
-          'plays/remaining': increment(-1)
-        };
-
-        // Apply all updates atomically
-        await update(playerRef, updates);
-
-        // Update local states
-        setPlaysRemaining(prev => Math.max(0, (prev || 0) - 1));
-        setTotalPoints(prev => prev + score);
-
-        // Handle Telegram updates
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-          tg.MainButton.text = "Play Again";
-          tg.MainButton.hide();
-          tg.sendData(JSON.stringify({ action: 'gameOver', score }));
-        }
-
-        // Call callbacks
-        onGameOver?.(score);
-        
-        // Navigate to friends if no plays remaining
-        const updatedPlaysToday = (visitStats?.playsToday || 0) + 1;
-        if (updatedPlaysToday >= maxPlaysToday) {
-          onNavigateToFriends?.();
-        }
-
-      } catch (error) {
-        console.error('Error updating game stats:', error);
-      }
+      );
     };
 
-    handleGameOver();
+    processGameOver();
   }
-}, [gameOver, score, telegramUser, remainingTime, onGameOver, onNavigateToFriends, maxPlaysToday, visitStats?.playsToday]);
+}, [gameOver]); // Only gameOver as dependency
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
