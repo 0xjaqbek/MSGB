@@ -529,20 +529,19 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
       if (telegramUser) {
         try {
           const db = getDatabase();
-          
+        
           // Fetch user data including totalScore
           const userRef = ref(db, `users/${telegramUser.id}`);
           const userSnapshot = await get(userRef);
           
           if (userSnapshot.exists()) {
             const userData = userSnapshot.val();
-            // Use totalScore directly instead of calculating from scores
             setTotalPoints(userData.totalScore || 0);
+            
+            // Calculate position
+            const position = await calculateLeaderboardPosition(telegramUser.id.toString());
+            setLeaderboardPosition(position);
           }
-
-          // Calculate leaderboard position
-          const position = await calculateLeaderboardPosition(telegramUser.id.toString());
-          setLeaderboardPosition(position);
 
           // Fetch invites count
           const invitesRef = ref(db, `users/${telegramUser.id}/referrals/invitedUsers`);
