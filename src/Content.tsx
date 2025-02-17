@@ -410,26 +410,37 @@ useEffect(() => {
     const processGameOver = async () => {
       setIsPlaying(false);
       setEndGameReason('game-over');
-      setShowEndGame(true);
       
-      await handleGameOver(
-        {
+      try {
+        await handleGameOver({
           score,
           remainingTime,
           telegramUser,
           visitStats,
           maxPlaysToday
-        },
-        {
+        }, {
           onGameOver,
           onNavigateToFriends
+        });
+
+        // Fetch updated play count after game over update
+        if (telegramUser) {
+          const db = getDatabase();
+          const userRef = ref(db, `users/${telegramUser.id}`);
+          const snapshot = await get(userRef);
+          const updatedData = snapshot.val();
+          const updatedTickets = updatedData.plays.remaining;
+          setShowEndGame(true);
+          setPlaysRemaining(updatedTickets);
         }
-      );
+      } catch (error) {
+        console.error('Error in game over process:', error);
+      }
     };
 
     processGameOver();
   }
-}, [gameOver]); // Only gameOver as dependency
+}, [gameOver]);
 
 const PlaysInfoContainer = styled.div`
   position: absolute;
