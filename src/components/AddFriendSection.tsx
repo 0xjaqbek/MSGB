@@ -105,7 +105,8 @@ const ErrorText = styled.div`
 `;
 
 const RequestContainer = styled.div`
-  width: min(80%, 280px);
+  width: 85%;  // Instead of 100% or min(80%, 280px)
+  margin: 8px auto;  // Center it and add some vertical spacing
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -113,18 +114,18 @@ const RequestContainer = styled.div`
   border: 1px solid rgba(0, 255, 255, 0.2);
   border-radius: 12px;
   padding: 10px;
-  margin-bottom: 10px;
 `;
 
 const RequestInfo = styled.div` 
-  font-size: 0.8rem;  // Smaller base font size
-  line-height: 0.9;
+  font-size: 0.8rem;
+  line-height: 1.2;
   color: white;
   font-family: 'REM', sans-serif;
+  margin-right: 8px;  // Add some space between text and buttons
 
   span {
-    font-size: 1rem;  // Bigger font size for username
-    color: #0FF;      // Optional: make username cyan to stand out
+    font-size: 1rem;
+    color: #0FF;
   }
 `;
 
