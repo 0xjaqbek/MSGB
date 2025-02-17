@@ -408,12 +408,13 @@ const database = getDatabase(app);
 useEffect(() => {
   if (gameOver) {
     const processGameOver = async () => {
+      const finalScore = score;
       setIsPlaying(false);
       setEndGameReason('game-over');
       
       try {
         await handleGameOver({
-          score,
+          score: finalScore,
           remainingTime,
           telegramUser,
           visitStats,
@@ -423,15 +424,16 @@ useEffect(() => {
           onNavigateToFriends
         });
 
-        // Fetch updated play count after game over update
+        // Get remaining tickets from the correct path
         if (telegramUser) {
           const db = getDatabase();
-          const userRef = ref(db, `users/${telegramUser.id}`);
-          const snapshot = await get(userRef);
-          const updatedData = snapshot.val();
-          const updatedTickets = updatedData.plays.remaining;
+          const playsRef = ref(db, `users/${telegramUser.id}/plays/remaining`);
+          const snapshot = await get(playsRef);
+          const remainingTickets = snapshot.val() || 0;
+          
+          setPlaysRemaining(remainingTickets); // Update local state
+          
           setShowEndGame(true);
-          setPlaysRemaining(updatedTickets);
         }
       } catch (error) {
         console.error('Error in game over process:', error);

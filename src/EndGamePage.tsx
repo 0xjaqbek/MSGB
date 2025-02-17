@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import hero from '../src/assets/hero.png';
 import welcomeBox from '../src/assets/welcomeBox.svg';
+import { get, getDatabase, ref } from 'firebase/database';
 
 interface EndGamePageProps {
   reason: 'no-plays' | 'game-over';
@@ -115,16 +116,36 @@ const LoginText = styled.p`
   font-size: 1rem;
 `;
 
-
 const EndGamePage: React.FC<EndGamePageProps> = ({ 
   reason, 
   score,
-  ticketsLeft,
   onPlayAgain,
   onNavigateToFriends
 }) => {
+  const [remainingTickets, setRemainingTickets] = useState(0);
+
+  useEffect(() => {
+    const fetchRemainingTickets = async () => {
+      try {
+        const tg = window.Telegram?.WebApp;
+        if (!tg?.initDataUnsafe?.user?.id) return;
+
+        const userId = tg.initDataUnsafe.user.id;
+        const db = getDatabase();
+        const playsRef = ref(db, `users/${userId}/plays/remaining`);
+        const snapshot = await get(playsRef);
+        const tickets = snapshot.val() || 0;
+        setRemainingTickets(tickets);
+      } catch (error) {
+        console.error('Error fetching remaining tickets:', error);
+        setRemainingTickets(0);
+      }
+    };
+
+    fetchRemainingTickets();
+  }, []);
+
   return (
-    
     <Container>
       <HeroImage src={hero} alt="Hero" />
       <BoxContainer>
@@ -141,15 +162,15 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
                 </div>
               )}
               <div className="text">
-                YOU HAVE <span className="highlight">{ticketsLeft}</span>
-                {ticketsLeft === 1 ? ' TICKET' : ' TICKETS'} LEFT!
+                YOU HAVE <span className="highlight">{remainingTickets}</span>
+                {remainingTickets === 1 ? ' TICKET' : ' TICKETS'} LEFT!
               </div>
             </>
           )}
         </BoxContent>
       </BoxContainer>
 
-      {ticketsLeft > 0 ? (
+      {remainingTickets > 0 ? (
         <PlayAgainButton onClick={onPlayAgain}>
           <span>PLAY AGAIN</span>
         </PlayAgainButton>
@@ -162,7 +183,6 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
         </>
       )}
     </Container>
-    
   );
 };
 
