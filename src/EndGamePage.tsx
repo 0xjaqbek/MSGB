@@ -123,27 +123,38 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
   onNavigateToFriends
 }) => {
   const [remainingTickets, setRemainingTickets] = useState(0);
+  const [finalScore, setFinalScore] = useState<number | undefined>(score);
 
   useEffect(() => {
-    const fetchRemainingTickets = async () => {
+    const fetchData = async () => {
       try {
         const tg = window.Telegram?.WebApp;
         if (!tg?.initDataUnsafe?.user?.id) return;
 
         const userId = tg.initDataUnsafe.user.id;
         const db = getDatabase();
+        
+        // Fetch remaining tickets
         const playsRef = ref(db, `users/${userId}/plays/remaining`);
-        const snapshot = await get(playsRef);
-        const tickets = snapshot.val() || 0;
+        const playsSnapshot = await get(playsRef);
+        const tickets = playsSnapshot.val() || 0;
         setRemainingTickets(tickets);
+
+        // Fetch latest score if game over
+        if (reason === 'game-over') {
+          const scoreRef = ref(db, `users/${userId}/lastScore`);
+          const scoreSnapshot = await get(scoreRef);
+          if (scoreSnapshot.exists()) {
+            setFinalScore(scoreSnapshot.val());
+          }
+        }
       } catch (error) {
-        console.error('Error fetching remaining tickets:', error);
-        setRemainingTickets(0);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchRemainingTickets();
-  }, []);
+    fetchData();
+  }, [reason]);
 
   return (
     <Container>
@@ -156,9 +167,9 @@ const EndGamePage: React.FC<EndGamePageProps> = ({
             <div className="text">NO TICKETS LEFT!</div>
           ) : (
             <>
-              {score !== undefined && (
+              {finalScore !== undefined && (
                 <div className="text">
-                  FINAL SCORE: <span className="highlight">{score}</span>
+                  FINAL SCORE: <span className="highlight">{finalScore}</span>
                 </div>
               )}
               <div className="text">
