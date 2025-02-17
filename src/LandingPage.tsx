@@ -197,13 +197,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
 
-  // Helper function to check if there are any bonuses
-  const hasBonuses = userStats && (
-    userStats.currentStreak > 1 ||
-    (userStats.ticketsFromInvites && userStats.ticketsFromInvites > 0) ||
-    (userStats.ticketsFromFriends && userStats.ticketsFromFriends > 0)
-  );
-
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
@@ -216,7 +209,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
   }, []);
 
   const handleGoToMainPage = () => {
-    onStart();
+    // Remove the setShow state update since we're using the parent's state
+    onStart(); // Directly call onStart without setTimeout
   };
 
   const handleStartPlaying = () => {
@@ -239,58 +233,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
           Welcome {telegramUser?.first_name}
         </StreakMessage>
       ) : (
-        userStats && (
+        userStats && userStats.currentStreak > 0 && (
           <>
             <StreakMessage>
-              {userStats.currentStreak > 0 
-                ? `It's your ${getOrdinalSuffix(userStats.currentStreak)} day straight!`
-                : `Welcome back ${telegramUser?.first_name}!`
-              }
+              It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
             </StreakMessage>
-            
-            {hasBonuses ? (
-              // Show existing bonus information
-              <>
-                {userStats.currentStreak > 1 && (
-                  <BonusInfo>
-                    +{Math.min(69, userStats.currentStreak - 1)} bonus tickets from streak!
-                  </BonusInfo>
-                )}
-                {userStats.ticketsFromInvites && userStats.ticketsFromInvites > 0 && (
-                  <BonusInfo style={{ color: '#0FF' }}>
-                    +{userStats.ticketsFromInvites} permanent tickets from invites!
-                  </BonusInfo>
-                )}
-                {userStats.ticketsFromFriends && userStats.ticketsFromFriends > 0 && (
-                  <BonusInfo style={{ color: '#FFD700' }}>
-                    +{userStats.ticketsFromFriends} bonus tickets from friends!
-                  </BonusInfo>
-                )}
-              </>
-            ) : (
-              // Show information about getting bonuses
-              <>
-                <InfoMessage>
-                  Get <span className="highlight">permanent tickets</span> by:
-                </InfoMessage>
-                <InfoMessage>
-                  • Inviting friends (<span className="highlight">+1 ticket</span> each)
-                </InfoMessage>
-                <InfoMessage>
-                  • Adding friends (<span className="highlight-gold">+1 ticket</span> per 2 friends)
-                </InfoMessage>
-                <InfoMessage>
-                  • Daily streak (<span className="highlight-gold">+1 ticket</span> per day)
-                </InfoMessage>
-              </>
+            {userStats.currentStreak > 1 && (
+              <BonusInfo>
+                +{Math.min(69, userStats.currentStreak - 1)} bonus tickets from streak!
+              </BonusInfo>
+            )}
+            {userStats.ticketsFromInvites && userStats.ticketsFromInvites > 0 && (
+              <BonusInfo style={{ color: '#0FF' }}>
+                +{userStats.ticketsFromInvites} permanent tickets from invites!
+              </BonusInfo>
+            )}
+            {userStats.ticketsFromFriends && userStats.ticketsFromFriends > 0 && (
+              <BonusInfo style={{ color: '#FFD700' }}>
+                +{userStats.ticketsFromFriends} bonus tickets from friends!
+              </BonusInfo>
             )}
           </>
         )
       )}
       
-      {/* Rest of the component remains the same */}
       <HeroContainer>
-        {isFirstVisit ? <WelcomeText /> : null}
+        {isFirstVisit ? (
+          <WelcomeText>
+          </WelcomeText>
+        ) : null}
       </HeroContainer>
 
       <WelcomeContainer>
@@ -298,7 +269,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
           <WelcomeSection 
             userName={telegramUser?.first_name || ''}
             ticketsLeft={userStats?.playsRemaining || 0}
-            isFirstVisit={true}
+            isFirstVisit={true}  // Add this prop
           />
         ) : (
           <>
