@@ -618,54 +618,72 @@ return (
         {!isPlaying && telegramUser && visitStats && (
 
 
-          <PlaysInfoContainer>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {/* Tickets Section */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <div style={{ 
-                  color: 'white', 
-                  fontSize: '0.9rem'  // Smaller white text
-                }}>
-                  Tickets left
-                </div>
-                <div style={{ 
-                  color: '#0FF',      // Original cyan color
-                  fontSize: '1.6rem'  // Slightly bigger than label
-                }}>
-                  {playsRemaining}/{maxPlaysToday}
-                </div>
+        <PlaysInfoContainer>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Tickets Section */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <div style={{ 
+                color: 'white', 
+                fontSize: '0.9rem'
+              }}>
+                Tickets left
               </div>
-
-              {/* Coin Balance Section */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <div style={{ 
-                  color: 'white', 
-                  fontSize: '0.9rem'  // Smaller white text
-                }}>
-                  Coin Balance
-                </div>
-                <div style={{ 
-                  color: '#FFD700',   // Gold color
-                  fontSize: '2rem'  // Bigger than tickets value
-                }}>
-                  {totalPoints}
-                </div>
+              <div style={{ 
+                color: '#0FF',
+                fontSize: '1.6rem'
+              }}>
+                {playsRemaining}/{maxPlaysToday}
               </div>
-
-              {/* Streak Bonus if applicable */}
-              {userStreak > 1 && (
-                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
-                  +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
-                </div>
-              )}
-              {/* Invite Bonus if applicable */}
-              {visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0 && (
-                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
-                  +{visitStats.ticketsFromInvites} permanent {visitStats.ticketsFromInvites === 1 ? 'ticket' : 'tickets'} from invites!
-                </div>
-              )}
             </div>
-          </PlaysInfoContainer>
+
+            {/* Coin Balance Section */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <div style={{ 
+                color: 'white', 
+                fontSize: '0.9rem'
+              }}>
+                Coin Balance
+              </div>
+              <div style={{ 
+                color: '#FFD700',
+                fontSize: '2rem'
+              }}>
+                {totalPoints}
+              </div>
+            </div>
+
+            {/* Bonuses or How to Get More Tickets */}
+            {userStreak > 1 || (visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0) ? (
+              <>
+                {userStreak > 1 && (
+                  <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
+                    +{userStreak - 1} bonus {userStreak - 1 === 1 ? 'ticket' : 'tickets'} from streak!
+                  </div>
+                )}
+                {visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0 && (
+                  <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
+                    +{visitStats.ticketsFromInvites} permanent {visitStats.ticketsFromInvites === 1 ? 'ticket' : 'tickets'} from invites!
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#fff' }}>
+                  Get more tickets:
+                </div>
+                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#0FF' }}>
+                  • Invite friends (+1 permanent)
+                </div>
+                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
+                  • Daily streak (+1 per day)
+                </div>
+                <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
+                  • Add friends (+1 per 2 friends)
+                </div>
+              </>
+            )}
+          </div>
+        </PlaysInfoContainer>
         )}
 
         {!isPlaying && !isStartAnimating && (
