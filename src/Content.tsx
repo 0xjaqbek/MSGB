@@ -274,22 +274,18 @@ useEffect(() => {
     const timer = setInterval(() => {
       setRemainingTime((prevTime) => {
         if (prevTime <= 1) {
-          setGameOver(true); // End game if time is up
+          setGameOver(true);
           return 0;
         }
         return prevTime - 1;
       });
 
-      // Increase difficulty over time
-      setDifficulty((prevDifficulty) => prevDifficulty + 0.03); // Gradually increase difficulty
-    }, 1000); // Reduce time every second
+      setDifficulty((prevDifficulty) => prevDifficulty + 0.03);
+    }, 1000);
 
     return () => clearInterval(timer);
   }
 }, [isPlaying, gameOver]);
-
-
-
 
   const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
@@ -408,12 +404,15 @@ const database = getDatabase(app);
 useEffect(() => {
   if (gameOver) {
     const processGameOver = async () => {
+      // Keep the game state and score until the end game screen is ready
+      const finalScore = score; // Capture the current score
+      
       setIsPlaying(false);
       setEndGameReason('game-over');
       
       try {
         await handleGameOver({
-          score,
+          score: finalScore, // Use captured score
           remainingTime,
           telegramUser,
           visitStats,
@@ -423,19 +422,15 @@ useEffect(() => {
           onNavigateToFriends
         });
 
-        // Fetch updated play count after game over update
         if (telegramUser) {
           const db = getDatabase();
-          const userRef = ref(db, `users/${telegramUser.id}/plays/remaining`); // Get remaining plays directly
+          const userRef = ref(db, `users/${telegramUser.id}/plays/remaining`);
           const snapshot = await get(userRef);
           const updatedTickets = snapshot.val();
           
-          // Set plays remaining first
           setPlaysRemaining(updatedTickets);
-          // Then show end game screen after state is updated
-          setTimeout(() => {
-            setShowEndGame(true);
-          }, 0);
+          // Show end game screen with the preserved score
+          setShowEndGame(true);
         }
       } catch (error) {
         console.error('Error in game over process:', error);
