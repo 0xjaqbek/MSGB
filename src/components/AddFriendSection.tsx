@@ -105,7 +105,7 @@ const ErrorText = styled.div`
 `;
 
 const RequestContainer = styled.div`
-  width: 100%;
+  width: min(80%, 280px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -117,10 +117,15 @@ const RequestContainer = styled.div`
 `;
 
 const RequestInfo = styled.div` 
-  font-size:0.9rem;
-  line-height:0.9;
+  font-size: 0.8rem;  // Smaller base font size
+  line-height: 0.9;
   color: white;
   font-family: 'REM', sans-serif;
+
+  span {
+    font-size: 1rem;  // Bigger font size for username
+    color: #0FF;      // Optional: make username cyan to stand out
+  }
 `;
 
 const ButtonGroup = styled.div`
@@ -171,7 +176,7 @@ export const AddFriendSection: React.FC<AddFriendSectionProps> = ({
         {pendingRequests.map((request) => (
           <RequestContainer key={request.fromUserId}>
             <RequestInfo>
-              {request.fromUserName} wants to be your friend
+            Add <span>{request.fromUserName}</span> to friends?
             </RequestInfo>
             <ButtonGroup>
               <AddButton 
