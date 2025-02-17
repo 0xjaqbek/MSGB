@@ -426,12 +426,16 @@ useEffect(() => {
         // Fetch updated play count after game over update
         if (telegramUser) {
           const db = getDatabase();
-          const userRef = ref(db, `users/${telegramUser.id}`);
+          const userRef = ref(db, `users/${telegramUser.id}/plays/remaining`); // Get remaining plays directly
           const snapshot = await get(userRef);
-          const updatedData = snapshot.val();
-          const updatedTickets = updatedData.plays.remaining;
-          setShowEndGame(true);
+          const updatedTickets = snapshot.val();
+          
+          // Set plays remaining first
           setPlaysRemaining(updatedTickets);
+          // Then show end game screen after state is updated
+          setTimeout(() => {
+            setShowEndGame(true);
+          }, 0);
         }
       } catch (error) {
         console.error('Error in game over process:', error);
