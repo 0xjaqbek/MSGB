@@ -495,11 +495,12 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
       const users = snapshot.val();
       const userScores: { userId: string; totalScore: number; userName: string }[] = [];
   
-      // Get totalScore directly from each user's data
+      // Get totalScore from each user and ensure it's a number
       Object.entries(users).forEach(([id, userData]: [string, any]) => {
+        const score = Number(userData.totalScore) || 0;
         userScores.push({
           userId: id,
-          totalScore: userData.totalScore || 0,
+          totalScore: score,
           userName: userData.userName || 'Unknown'
         });
       });
@@ -507,15 +508,16 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
       // Sort users by total score in descending order
       userScores.sort((a, b) => b.totalScore - a.totalScore);
       
-      // Log the sorted leaderboard for debugging
+      // For debugging
       console.log('Sorted Leaderboard:', userScores.map(user => 
         `${user.userName}: ${user.totalScore}`
       ));
   
-      // Find the user's position (index + 1)
+      // Find user's position (using findIndex and adding 1 for human-readable position)
       const position = userScores.findIndex(user => user.userId === userId) + 1;
       
-      return position || 1;
+      console.log(`User ${userId} position: ${position}`);
+      return position;
     } catch (error) {
       console.error('Error calculating leaderboard position:', error);
       return 1;
