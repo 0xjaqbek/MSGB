@@ -18,6 +18,7 @@ import ramka from '../assets/ramka.svg';
 import styled from 'styled-components';
 import FriendsModal from './FriendsModal';
 import { AddFriendSection } from './AddFriendSection'; 
+import LeaderboardPosition from './LeaderboardPosition';
 
 interface NavigationBarProps {
   currentPage: NavigationPage;
@@ -605,7 +606,9 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
           </div>
           <div className="stat-row">
             <span className="text-info">Leaderboard Position:</span>
-            <span className="text-value">#{leaderboardPosition}</span>
+            <span className="text-value">
+              #<LeaderboardPosition userId={telegramUser.id.toString()} />
+            </span>
           </div>
           <div className="stat-row">
             <span className="text-info">Total Points:</span>
