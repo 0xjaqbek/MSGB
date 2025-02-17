@@ -116,7 +116,9 @@ const RequestContainer = styled.div`
   margin-bottom: 10px;
 `;
 
-const RequestInfo = styled.div`
+const RequestInfo = styled.div` 
+  font-size:0.9rem;
+  line-height:0.9;
   color: white;
   font-family: 'REM', sans-serif;
 `;
