@@ -3467,7 +3467,9 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const t of t
   border-radius: 12px;
   padding: 10px;
   margin-bottom: 10px;
-`,Hz=We.div`
+`,Hz=We.div` 
+  font-size:0.9rem;
+  line-height:0.9;
   color: white;
   font-family: 'REM', sans-serif;
 `,Vz=We.div`
