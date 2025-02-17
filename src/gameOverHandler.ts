@@ -47,7 +47,9 @@ export const handleGameOver = async (
       lastPlayed: timestamp,
       lastScore: score,
       'visits/playsToday': increment(1),
-      'plays/remaining': increment(-1)
+      'visits/playsRemaining': increment(-1),
+      'plays/remaining': increment(-1),
+      'plays/today': increment(1)
     };
 
     // Perform atomic update
