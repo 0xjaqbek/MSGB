@@ -110,7 +110,7 @@ const RequestContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.78);
   border: 1px solid rgba(0, 255, 255, 0.2);
   border-radius: 12px;
   padding: 10px;
