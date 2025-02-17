@@ -657,7 +657,7 @@ return (
                 </div>
               )}
               {/* Invite Bonus if applicable */}
-              {visitStats?.ticketsFromInvites && visitStats?.ticketsFromInvites > 0 && (
+              {visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0 && (
                 <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
                   +{visitStats.ticketsFromInvites} permanent {visitStats.ticketsFromInvites === 1 ? 'ticket' : 'tickets'} from invites!
                 </div>
