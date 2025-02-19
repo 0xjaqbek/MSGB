@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { TelegramUser } from './types';
 import WelcomeSection from './components/WelcomeSection';
+import { getNextFriendBonusInfo } from './ticketManagement';
+import { get, getDatabase, ref } from 'firebase/database';
 
 interface LandingPageProps {
   telegramUser: TelegramUser | null;
@@ -248,9 +250,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
                 +{userStats.ticketsFromInvites} permanent tickets from invites!
               </BonusInfo>
             )}
-            {userStats.ticketsFromFriends && userStats.ticketsFromFriends > 0 && (
+            {telegramUser && (
               <BonusInfo style={{ color: '#FFD700' }}>
-                +{userStats.ticketsFromFriends} bonus tickets from friends!
+                {(() => {
+                  // Get friends count from database snapshot
+                  const friendsRef = ref(getDatabase(), `users/${telegramUser.id}/friends`);
+                  const [friendsCount, setFriendsCount] = useState(0);
+  
+                  useEffect(() => {
+                    const fetchFriendsCount = async () => {
+                      try {
+                        const snapshot = await get(friendsRef);
+                        if (snapshot.exists()) {
+                          setFriendsCount(Object.keys(snapshot.val()).length);
+                        }
+                      } catch (error) {
+                        console.error('Error fetching friends count:', error);
+                      }
+                    };
+  
+                    fetchFriendsCount();
+                  }, [telegramUser]);
+  
+                  const friendBonusInfo = getNextFriendBonusInfo(friendsCount);
+                  
+                  if (friendBonusInfo.currentBonusTickets > 0) {
+                    return `+${friendBonusInfo.currentBonusTickets} bonus ticket${friendBonusInfo.currentBonusTickets !== 1 ? 's' : ''} from friends!`;
+                  } else {
+                    return `${friendBonusInfo.friendsForNextBonus} more friend${friendBonusInfo.friendsForNextBonus !== 1 ? 's' : ''} for first bonus ticket!`;
+                  }
+                })()}
               </BonusInfo>
             )}
           </>
