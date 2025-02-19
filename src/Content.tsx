@@ -20,6 +20,9 @@ import ProgressBar from './ProgressBar';
 import pointsBg from './assets/points.svg';
 import { calculateAvailableTickets } from './ticketManagement';
 import { handleGameOver } from "./gameOverHandler";
+import { getNextFriendBonusInfo } from './ticketManagement';
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyCKp8N8YnO81Vns0PIlVPGg-tBGjnlYcxE",
@@ -138,6 +141,27 @@ const Content: React.FC<ContentProps> = ({
   const [endGameReason, setEndGameReason] = useState<'no-plays' | 'game-over'>('game-over');
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [isStartAnimating, setIsStartAnimating] = useState(false);
+  const [friendsCount, setFriendsCount] = useState(0);
+
+    useEffect(() => {
+    const fetchFriendsCount = async () => {
+      if (!telegramUser) return;
+
+      try {
+        const db = getDatabase();
+        const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+        const snapshot = await get(friendsRef);
+        
+        if (snapshot.exists()) {
+          setFriendsCount(Object.keys(snapshot.val()).length);
+        }
+      } catch (error) {
+        console.error('Error fetching friends count:', error);
+      }
+    };
+
+    fetchFriendsCount();
+  }, [telegramUser]);
 
   useEffect(() => {
     const initApp = async () => {
@@ -653,7 +677,9 @@ return (
             </div>
 
             {/* Bonuses or How to Get More Tickets */}
-            {userStreak > 1 || (visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0) ? (
+            {userStreak > 1 || 
+            (visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0) || 
+            (telegramUser && friendsCount > 0) ? (
               <>
                 {userStreak > 1 && (
                   <div style={{ fontSize: '0.9rem', marginTop: '0.3rem' }}>
@@ -663,6 +689,16 @@ return (
                 {visitStats?.ticketsFromInvites && visitStats.ticketsFromInvites > 0 && (
                   <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
                     +{visitStats.ticketsFromInvites} permanent {visitStats.ticketsFromInvites === 1 ? 'ticket' : 'tickets'} from invites!
+                  </div>
+                )}
+                {telegramUser && friendsCount > 0 && (
+                  <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#0FF' }}>
+                    {(() => {
+                      const friendBonusInfo = getNextFriendBonusInfo(friendsCount);
+                      return friendBonusInfo.currentBonusTickets > 0
+                        ? `+${friendBonusInfo.currentBonusTickets} bonus ticket${friendBonusInfo.currentBonusTickets !== 1 ? 's' : ''} from friends!`
+                        : `${friendBonusInfo.friendsForNextBonus} more friend${friendBonusInfo.friendsForNextBonus !== 1 ? 's' : ''} for first bonus ticket!`;
+                    })()}
                   </div>
                 )}
               </>
