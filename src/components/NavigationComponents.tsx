@@ -545,11 +545,11 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
           }
 
           // Fetch invites count
-          const invitesRef = ref(db, `users/${telegramUser.id}/referrals/invitedUsers`);
-          const invitesSnapshot = await get(invitesRef);
-          if (invitesSnapshot.exists()) {
-            const invites = invitesSnapshot.val();
-            setInvitesCount(Array.isArray(invites) ? invites.length : 0);
+          const referralsRef = ref(db, `users/${telegramUser.id}/referrals`);
+          const referralsSnapshot = await get(referralsRef);
+          if (referralsSnapshot.exists()) {
+            const referralsData = referralsSnapshot.val();
+            setInvitesCount(referralsData.ticketsFromInvites || 0);
           }
 
           // Fetch friends count
