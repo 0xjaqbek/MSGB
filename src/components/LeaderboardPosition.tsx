@@ -3,48 +3,67 @@ import { getDatabase, ref, get } from 'firebase/database';
 
 const LeaderboardPosition = ({ userId }: { userId: string }) => {
   const [position, setPosition] = useState<number>(1);
-  const [debugInfo, setDebugInfo] = useState<{userName: string, score: number}[]>([]);
+  const [debugInfo, setDebugInfo] = useState<string>('Loading...');
 
   useEffect(() => {
     const calculatePosition = async () => {
       try {
         const db = getDatabase();
+        
+        // First try to get current user's data
+        const currentUserRef = ref(db, `/users/${userId}`);
+        const currentUserSnap = await get(currentUserRef);
+        
+        if (!currentUserSnap.exists()) {
+          setDebugInfo('Current user not found');
+          return;
+        }
+
+        const currentUser = currentUserSnap.val();
+        setDebugInfo(`Your score: ${currentUser.totalScore || 0}\n`);
+
+        // Now try to get all users
         const usersRef = ref(db, '/users');
         const snapshot = await get(usersRef);
         
-        if (!snapshot.exists()) return;
+        if (!snapshot.exists()) {
+          setDebugInfo(prev => prev + '\nNo users found');
+          return;
+        }
 
-        // Get all users with their scores and names
-        const userScores = Object.entries(snapshot.val())
+        const users = snapshot.val();
+        const userScores = Object.entries(users)
           .map(([id, data]: [string, any]) => ({
             userId: id,
             userName: data.userName || 'Unknown',
             score: Number(data.totalScore || 0)
           }))
-          .filter(user => !isNaN(user.score));
+          .filter(user => !isNaN(user.score))
+          .sort((a, b) => b.score - a.score);
 
-        // Store debug info
-        setDebugInfo(userScores.map(user => ({
-          userName: user.userName,
-          score: user.score
-        })));
+        // Update debug info with the sorted scores
+        setDebugInfo(prev => prev + '\n\nAll scores:\n' + 
+          userScores.map((user, index) => 
+            `#${index + 1}. ${user.userName}: ${user.score}`
+          ).join('\n')
+        );
 
-        // Sort by score in descending order
-        userScores.sort((a, b) => b.score - a.score);
-
-        // Find user's position
         const userIndex = userScores.findIndex(user => user.userId === userId);
         if (userIndex !== -1) {
           setPosition(userIndex + 1);
+          setDebugInfo(prev => prev + `\n\nYour position: ${userIndex + 1}`);
         }
-      } catch (error) {
-        setDebugInfo([{userName: 'Error loading data', score: 0}]);
+      } catch (error: any) {
+        setDebugInfo(
+          'Error details:\n' +
+          `Message: ${error.message}\n` +
+          `Code: ${error.code}\n` +
+          `Path: ${error.path || 'unknown'}`
+        );
       }
     };
 
-    if (userId) {
-      calculatePosition();
-    }
+    calculatePosition();
   }, [userId]);
 
   return (
@@ -59,14 +78,13 @@ const LeaderboardPosition = ({ userId }: { userId: string }) => {
         padding: '20px',
         borderRadius: '10px',
         color: '#0FF',
-        zIndex: 9999
+        zIndex: 9999,
+        whiteSpace: 'pre-wrap',
+        maxWidth: '80vw',
+        maxHeight: '80vh',
+        overflow: 'auto'
       }}>
-        <div style={{ marginBottom: '10px' }}>User Scores:</div>
-        {debugInfo.sort((a, b) => b.score - a.score).map((user, index) => (
-          <div key={index}>
-            #{index + 1}. {user.userName}: {user.score}
-          </div>
-        ))}
+        {debugInfo}
       </div>
     </div>
   );
