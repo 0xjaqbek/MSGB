@@ -198,6 +198,7 @@ const getOrdinalSuffix = (number: number): string => {
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDirectStart, userStats }) => {
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
+  const [friendsCount, setFriendsCount] = useState(0);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -228,6 +229,28 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   if (!show) return null;
 
+  useEffect(() => {
+    const fetchFriendsCount = async () => {
+      if (!telegramUser) return;
+
+      try {
+        const db = getDatabase();
+        const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
+        const snapshot = await get(friendsRef);
+        
+        if (snapshot.exists()) {
+          setFriendsCount(Object.keys(snapshot.val()).length);
+        }
+      } catch (error) {
+        console.error('Error fetching friends count:', error);
+      }
+    };
+
+    fetchFriendsCount();
+  }, [telegramUser]);
+
+  const friendBonusInfo = telegramUser ? getNextFriendBonusInfo(friendsCount) : null;
+
   return (
     <StyledLanding $show={show}>
       {isFirstVisit ? (
@@ -250,36 +273,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
                 +{userStats.ticketsFromInvites} permanent tickets from invites!
               </BonusInfo>
             )}
-            {telegramUser && (
+            {friendBonusInfo && (
               <BonusInfo style={{ color: '#FFD700' }}>
-                {(() => {
-                  // Get friends count from database snapshot
-                  const friendsRef = ref(getDatabase(), `users/${telegramUser.id}/friends`);
-                  const [friendsCount, setFriendsCount] = useState(0);
-  
-                  useEffect(() => {
-                    const fetchFriendsCount = async () => {
-                      try {
-                        const snapshot = await get(friendsRef);
-                        if (snapshot.exists()) {
-                          setFriendsCount(Object.keys(snapshot.val()).length);
-                        }
-                      } catch (error) {
-                        console.error('Error fetching friends count:', error);
-                      }
-                    };
-  
-                    fetchFriendsCount();
-                  }, [telegramUser]);
-  
-                  const friendBonusInfo = getNextFriendBonusInfo(friendsCount);
-                  
-                  if (friendBonusInfo.currentBonusTickets > 0) {
-                    return `+${friendBonusInfo.currentBonusTickets} bonus ticket${friendBonusInfo.currentBonusTickets !== 1 ? 's' : ''} from friends!`;
-                  } else {
-                    return `${friendBonusInfo.friendsForNextBonus} more friend${friendBonusInfo.friendsForNextBonus !== 1 ? 's' : ''} for first bonus ticket!`;
-                  }
-                })()}
+                {friendBonusInfo.currentBonusTickets > 0
+                  ? `+${friendBonusInfo.currentBonusTickets} bonus ticket${friendBonusInfo.currentBonusTickets !== 1 ? 's' : ''} from friends!`
+                  : `${friendBonusInfo.friendsForNextBonus} more friend${friendBonusInfo.friendsForNextBonus !== 1 ? 's' : ''} for first bonus ticket!`}
               </BonusInfo>
             )}
           </>
