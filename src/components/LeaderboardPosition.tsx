@@ -3,91 +3,57 @@ import { getDatabase, ref, get } from 'firebase/database';
 
 const LeaderboardPosition = ({ userId }: { userId: string }) => {
   const [position, setPosition] = useState<number>(1);
-  const [debugInfo, setDebugInfo] = useState<string>('Loading...');
 
   useEffect(() => {
     const calculatePosition = async () => {
       try {
         const db = getDatabase();
         
-        // First try to get current user's data
+        // First get your own data
         const currentUserRef = ref(db, `/users/${userId}`);
         const currentUserSnap = await get(currentUserRef);
         
         if (!currentUserSnap.exists()) {
-          setDebugInfo('Current user not found');
           return;
         }
 
-        const currentUser = currentUserSnap.val();
-        setDebugInfo(`Your score: ${currentUser.totalScore || 0}\n`);
+        const currentUserScore = Number(currentUserSnap.val().totalScore || 0);
+        let higherScores = 0;
 
-        // Now try to get all users
-        const usersRef = ref(db, '/users');
-        const snapshot = await get(usersRef);
+        // Get Mawenka's score (we know they exist)
+        const mawenkaRef = ref(db, '/users/7347127444');
+        const mawenkaSnap = await get(mawenkaRef);
+        if (mawenkaSnap.exists()) {
+          const mawenkaScore = Number(mawenkaSnap.val().totalScore || 0);
+          if (mawenkaScore > currentUserScore) {
+            higherScores++;
+          }
+        }
+
+        // Get Jaqbek's score
+        const jaqbekRef = ref(db, '/users/955686659');
+        const jaqbekSnap = await get(jaqbekRef);
+        if (jaqbekSnap.exists()) {
+          const jaqbekScore = Number(jaqbekSnap.val().totalScore || 0);
+          if (jaqbekScore > currentUserScore) {
+            higherScores++;
+          }
+        }
+
+        // Calculate position (add 1 because positions start at 1)
+        setPosition(higherScores + 1);
         
-        if (!snapshot.exists()) {
-          setDebugInfo(prev => prev + '\nNo users found');
-          return;
-        }
-
-        const users = snapshot.val();
-        const userScores = Object.entries(users)
-          .map(([id, data]: [string, any]) => ({
-            userId: id,
-            userName: data.userName || 'Unknown',
-            score: Number(data.totalScore || 0)
-          }))
-          .filter(user => !isNaN(user.score))
-          .sort((a, b) => b.score - a.score);
-
-        // Update debug info with the sorted scores
-        setDebugInfo(prev => prev + '\n\nAll scores:\n' + 
-          userScores.map((user, index) => 
-            `#${index + 1}. ${user.userName}: ${user.score}`
-          ).join('\n')
-        );
-
-        const userIndex = userScores.findIndex(user => user.userId === userId);
-        if (userIndex !== -1) {
-          setPosition(userIndex + 1);
-          setDebugInfo(prev => prev + `\n\nYour position: ${userIndex + 1}`);
-        }
       } catch (error: any) {
-        setDebugInfo(
-          'Error details:\n' +
-          `Message: ${error.message}\n` +
-          `Code: ${error.code}\n` +
-          `Path: ${error.path || 'unknown'}`
-        );
+        console.error('Error calculating position:', error);
       }
     };
 
-    calculatePosition();
+    if (userId) {
+      calculatePosition();
+    }
   }, [userId]);
 
-  return (
-    <div style={{ position: 'relative' }}>
-      <span>{position}</span>
-      <div style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        background: 'rgba(0,0,0,0.9)',
-        padding: '20px',
-        borderRadius: '10px',
-        color: '#0FF',
-        zIndex: 9999,
-        whiteSpace: 'pre-wrap',
-        maxWidth: '80vw',
-        maxHeight: '80vh',
-        overflow: 'auto'
-      }}>
-        {debugInfo}
-      </div>
-    </div>
-  );
+  return <span>{position}</span>;
 };
 
 export default LeaderboardPosition;
