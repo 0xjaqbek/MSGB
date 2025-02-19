@@ -211,24 +211,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
     }
   }, []);
 
-  const handleGoToMainPage = () => {
-    // Remove the setShow state update since we're using the parent's state
-    onStart(); // Directly call onStart without setTimeout
-  };
-
-  const handleStartPlaying = () => {
-    if (userStats?.playsRemaining === 0) {
-      onDirectStart();
-    } else {
-      setShow(false);
-      setTimeout(() => {
-        onDirectStart();
-      }, 100);
-    }
-  };
-
-  if (!show) return null;
-
   useEffect(() => {
     const fetchFriendsCount = async () => {
       if (!telegramUser) return;
@@ -248,6 +230,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
     fetchFriendsCount();
   }, [telegramUser]);
+
+  const handleGoToMainPage = () => {
+    // Remove the setShow state update since we're using the parent's state
+    onStart(); // Directly call onStart without setTimeout
+  };
+
+  const handleStartPlaying = () => {
+    if (userStats?.playsRemaining === 0) {
+      onDirectStart();
+    } else {
+      setShow(false);
+      setTimeout(() => {
+        onDirectStart();
+      }, 100);
+    }
+  };
+
+  if (!show) return null;
+
+
 
   const friendBonusInfo = telegramUser ? getNextFriendBonusInfo(friendsCount) : null;
 
