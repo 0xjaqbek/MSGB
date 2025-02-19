@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getDatabase, ref, query, orderByChild, get } from 'firebase/database';
 
 const LeaderboardPosition = ({ userId }: { userId: string }) => {
   const [position, setPosition] = useState<number>(1);
@@ -8,42 +8,29 @@ const LeaderboardPosition = ({ userId }: { userId: string }) => {
     const calculatePosition = async () => {
       try {
         const db = getDatabase();
+        const scoresRef = ref(db, '/users');
         
-        // First get your own data
-        const currentUserRef = ref(db, `/users/${userId}`);
-        const currentUserSnap = await get(currentUserRef);
+        // Get all users sorted by totalScore
+        const usersQuery = query(scoresRef, orderByChild('totalScore'));
+        const snapshot = await get(usersQuery);
         
-        if (!currentUserSnap.exists()) {
-          return;
+        if (!snapshot.exists()) return;
+
+        // Convert to array and sort in descending order (highest score first)
+        const sortedScores = Object.entries(snapshot.val())
+          .map(([id, data]: [string, any]) => ({
+            userId: id,
+            score: Number(data.totalScore || 0)
+          }))
+          .filter(user => !isNaN(user.score))
+          .sort((a, b) => b.score - a.score);
+
+        // Find position (add 1 because array indices start at 0)
+        const userPosition = sortedScores.findIndex(user => user.userId === userId) + 1;
+        if (userPosition > 0) {
+          setPosition(userPosition);
         }
-
-        const currentUserScore = Number(currentUserSnap.val().totalScore || 0);
-        let higherScores = 0;
-
-        // Get Mawenka's score (we know they exist)
-        const mawenkaRef = ref(db, '/users/7347127444');
-        const mawenkaSnap = await get(mawenkaRef);
-        if (mawenkaSnap.exists()) {
-          const mawenkaScore = Number(mawenkaSnap.val().totalScore || 0);
-          if (mawenkaScore > currentUserScore) {
-            higherScores++;
-          }
-        }
-
-        // Get Jaqbek's score
-        const jaqbekRef = ref(db, '/users/955686659');
-        const jaqbekSnap = await get(jaqbekRef);
-        if (jaqbekSnap.exists()) {
-          const jaqbekScore = Number(jaqbekSnap.val().totalScore || 0);
-          if (jaqbekScore > currentUserScore) {
-            higherScores++;
-          }
-        }
-
-        // Calculate position (add 1 because positions start at 1)
-        setPosition(higherScores + 1);
-        
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error calculating position:', error);
       }
     };
