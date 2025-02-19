@@ -47,11 +47,7 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
     const snapshot = await get(userRef);
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    
-    // Use username if available, otherwise use first name
     const displayName = username || userFirstName;
-    
-    // Get max tickets available
     const maxTickets = await calculateAvailableTickets(userId);
     
     // If user doesn't exist, create initial user data
@@ -93,12 +89,7 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
         }
       });
       
-      return {
-        ...initialVisit,
-        playsRemaining: maxTickets,
-        playsToday: 0,
-        maxPlaysToday: maxTickets
-      };
+      return initialVisit;
     }
     
     // For existing users, update their name info if changed
@@ -113,19 +104,29 @@ export const trackUserVisit = async (userId: string, userFirstName: string, user
         displayName: `${displayName} (${userId})`
       });
     }
+    
     const existingVisits = userData.visits || {};
     const ticketsFromInvites = userData.referrals?.ticketsFromInvites || 0;
     const plays = userData.plays || { today: 0, max: maxTickets, remaining: maxTickets };
     
+    // Check if this is a new day visit
+    const isNewDay = today !== existingVisits.lastVisit;
+    
+    // Important change: Set firstVisitComplete to true if this isn't their first visit of all time
+    const firstVisitComplete = existingVisits.totalVisits > 0;
+    
     const processedVisits: VisitStats = {
-      lastVisit: existingVisits.lastVisit || today,
+      lastVisit: today, // Always update to today
       currentStreak: existingVisits.currentStreak || 1,
       highestStreak: existingVisits.highestStreak || 1,
       totalVisits: (existingVisits.totalVisits || 0) + 1,
-      dailyVisits: existingVisits.dailyVisits || { [today]: 1 },
-      firstVisitComplete: existingVisits.firstVisitComplete || false,
-      isNewDay: today !== existingVisits.lastVisit,
-      isFirstVisit: !existingVisits.firstVisitComplete,
+      dailyVisits: {
+        ...existingVisits.dailyVisits,
+        [today]: (existingVisits.dailyVisits?.[today] || 0) + 1
+      },
+      firstVisitComplete, // Use our new logic
+      isNewDay,
+      isFirstVisit: !firstVisitComplete, // Only first visit if firstVisitComplete is false
       todayVisits: (existingVisits.dailyVisits?.[today] || 0) + 1,
       ticketsFromInvites,
       ticketsFromFriends: userData.ticketsFromFriends || 0, 
