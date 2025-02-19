@@ -692,7 +692,7 @@ return (
                   </div>
                 )}
                 {telegramUser && friendsCount > 0 && (
-                  <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#0FF' }}>
+                  <div style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFD700' }}>
                     {(() => {
                       const friendBonusInfo = getNextFriendBonusInfo(friendsCount);
                       return friendBonusInfo.currentBonusTickets > 0
