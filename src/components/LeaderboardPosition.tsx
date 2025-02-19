@@ -3,35 +3,45 @@ import { getDatabase, ref, query, orderByChild, get } from 'firebase/database';
 
 const LeaderboardPosition = ({ userId }: { userId: string }) => {
   const [position, setPosition] = useState<number>(1);
+  const [debugInfo, setDebugInfo] = useState<Array<{
+    userId: string,
+    userName: string,
+    score: number
+  }>>([]);
 
   useEffect(() => {
     const calculatePosition = async () => {
       try {
         const db = getDatabase();
         const scoresRef = ref(db, '/users');
-        
-        // Get all users sorted by totalScore
-        const usersQuery = query(scoresRef, orderByChild('totalScore'));
-        const snapshot = await get(usersQuery);
+        const snapshot = await get(scoresRef);
         
         if (!snapshot.exists()) return;
 
-        // Convert to array and sort in descending order (highest score first)
-        const sortedScores = Object.entries(snapshot.val())
+        // Get all users and their scores
+        const scores = Object.entries(snapshot.val())
           .map(([id, data]: [string, any]) => ({
             userId: id,
+            userName: data.userName || 'Unknown',
             score: Number(data.totalScore || 0)
           }))
-          .filter(user => !isNaN(user.score))
-          .sort((a, b) => b.score - a.score);
+          .filter(user => !isNaN(user.score));
 
-        // Find position (add 1 because array indices start at 0)
+        // Sort by score in descending order
+        const sortedScores = [...scores].sort((a, b) => b.score - a.score);
+        setDebugInfo(sortedScores);
+
+        // Find position
         const userPosition = sortedScores.findIndex(user => user.userId === userId) + 1;
         if (userPosition > 0) {
           setPosition(userPosition);
         }
       } catch (error) {
-        console.error('Error calculating position:', error);
+        setDebugInfo([{
+          userId: 'error',
+          userName: 'Error loading data',
+          score: 0
+        }]);
       }
     };
 
@@ -40,7 +50,35 @@ const LeaderboardPosition = ({ userId }: { userId: string }) => {
     }
   }, [userId]);
 
-  return <span>{position}</span>;
+  return (
+    <div style={{ position: 'relative' }}>
+      <span>{position}</span>
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        background: 'rgba(0,0,0,0.9)',
+        padding: '20px',
+        borderRadius: '10px',
+        color: '#0FF',
+        zIndex: 9999,
+        maxHeight: '80vh',
+        overflow: 'auto'
+      }}>
+        <div style={{ marginBottom: '10px', color: '#FFD700' }}>Leaderboard:</div>
+        {debugInfo.map((user, index) => (
+          <div key={user.userId} style={{ 
+            color: user.userId === userId ? '#FFD700' : '#0FF',
+            marginBottom: '8px'
+          }}>
+            #{index + 1}. {user.userName}: {user.score} points
+            {user.userId === userId ? ' (YOU)' : ''}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default LeaderboardPosition;
