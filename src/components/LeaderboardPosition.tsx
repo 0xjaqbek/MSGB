@@ -16,28 +16,21 @@ const LeaderboardPosition = ({ userId }: { userId: string }) => {
           return;
         }
 
-        const users = snapshot.val();
-        const userScores = Object.entries(users).map(([id, userData]: [string, any]) => ({
+        // Convert to array and ensure all scores are numbers
+        const userScores = Object.entries(snapshot.val()).map(([id, data]: [string, any]) => ({
           userId: id,
-          totalScore: Number(userData.totalScore) || 0,
-          userName: userData.userName
+          totalScore: Number(data.totalScore || 0)  // Convert to number, default to 0
         }));
 
         // Sort by score in descending order
         userScores.sort((a, b) => b.totalScore - a.totalScore);
         
-        console.log('Sorted Leaderboard:', userScores.map(user => 
-          `${user.userName}: ${user.totalScore}`
-        ));
-
-        // Find position (add 1 because array index starts at 0)
-        const position = userScores.findIndex(user => user.userId === userId) + 1;
+        // Find position (1-based index)
+        const userPosition = userScores.findIndex(user => user.userId === userId) + 1;
         
-        console.log(`User ${userId} position: ${position}`);
-        
-        // Only update if we found a valid position
-        if (position > 0) {
-          setPosition(position);
+        // Set position only if user was found
+        if (userPosition > 0) {
+          setPosition(userPosition);
         }
       } catch (error) {
         console.error('Error calculating leaderboard position:', error);
