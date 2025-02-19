@@ -525,49 +525,41 @@ const AccountPage: React.FC<AccountPageProps> = ({ telegramUser, userStats }) =>
     }
   };
 
-  useEffect(() => {
+    // Inside AccountPage component, update the fetchData function
     const fetchData = async () => {
       if (telegramUser) {
         try {
           const db = getDatabase();
         
-          // Fetch user data including totalScore
           const userRef = ref(db, `users/${telegramUser.id}`);
           const userSnapshot = await get(userRef);
           
           if (userSnapshot.exists()) {
             const userData = userSnapshot.val();
+            
+            // Set total points
             setTotalPoints(userData.totalScore || 0);
             
-            // Calculate position
-            const position = await calculateLeaderboardPosition(telegramUser.id.toString());
-            setLeaderboardPosition(position);
-          }
+            // Count invites - check if invitedUsers exists and is an array
+            if (userData.referrals?.invitedUsers) {
+              const invites = userData.referrals.invitedUsers;
+              setInvitesCount(Array.isArray(invites) ? invites.length : 0);
+            } else {
+              setInvitesCount(0);
+            }
 
-          // Fetch invites count
-          const invitesRef = ref(db, `users/${telegramUser.id}/referrals/invitedUsers`);
-          const invitesSnapshot = await get(invitesRef);
-          if (invitesSnapshot.exists()) {
-            const invites = invitesSnapshot.val();
-            setInvitesCount(Array.isArray(invites) ? invites.length : 0);
+            // Count friends
+            if (userData.friends) {
+              setFriendsCount(Object.keys(userData.friends).length);
+            } else {
+              setFriendsCount(0);
+            }
           }
-
-          // Fetch friends count
-          const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
-          const friendsSnapshot = await get(friendsRef);
-          if (friendsSnapshot.exists()) {
-            const friends = friendsSnapshot.val();
-            setFriendsCount(Object.keys(friends).length);
-          }
-
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       }
     };
-
-    fetchData();
-  }, [telegramUser]);
 
   // Update leaderboard position when totalPoints changes
   useEffect(() => {
