@@ -16,19 +16,39 @@ const LeaderboardPosition = ({ userId }: { userId: string }) => {
           return;
         }
 
-        // Convert to array and ensure all scores are numbers
-        const userScores = Object.entries(snapshot.val()).map(([id, data]: [string, any]) => ({
+        const users = snapshot.val();
+        
+        // Debug log to see all users and scores
+        console.log('All users and scores:', Object.entries(users).map(([id, data]: [string, any]) => ({
           userId: id,
-          totalScore: Number(data.totalScore || 0)  // Convert to number, default to 0
-        }));
+          userName: data.userName,
+          totalScore: Number(data.totalScore || 0)
+        })));
 
+        // Create array of user scores
+        const userScores = Object.entries(users).map(([id, data]: [string, any]) => ({
+          userId: id,
+          totalScore: Number(data.totalScore || 0)
+        }));
+        
         // Sort by score in descending order
         userScores.sort((a, b) => b.totalScore - a.totalScore);
         
-        // Find position (1-based index)
-        const userPosition = userScores.findIndex(user => user.userId === userId) + 1;
+        // Debug log sorted scores
+        console.log('Sorted scores:', userScores);
+
+        // Find position (add 1 because array index starts at 0)
+        const userIndex = userScores.findIndex(user => user.userId === userId);
+        const userPosition = userIndex + 1;
         
-        // Set position only if user was found
+        // Debug log position calculation
+        console.log('User position calculation:', {
+          userId,
+          userIndex,
+          userPosition,
+          userScore: userScores.find(user => user.userId === userId)?.totalScore
+        });
+
         if (userPosition > 0) {
           setPosition(userPosition);
         }
