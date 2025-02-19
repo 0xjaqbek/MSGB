@@ -198,7 +198,6 @@ const getOrdinalSuffix = (number: number): string => {
 const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDirectStart, userStats }) => {
   const [show, setShow] = useState(true);
   const isFirstVisit = userStats?.isFirstVisit;
-  const [friendsCount, setFriendsCount] = useState(0);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -219,10 +218,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
         const db = getDatabase();
         const friendsRef = ref(db, `users/${telegramUser.id}/friends`);
         const snapshot = await get(friendsRef);
-        
-        if (snapshot.exists()) {
-          setFriendsCount(Object.keys(snapshot.val()).length);
-        }
+
       } catch (error) {
         console.error('Error fetching friends count:', error);
       }
@@ -232,8 +228,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
   }, [telegramUser]);
 
   const handleGoToMainPage = () => {
-    // Remove the setShow state update since we're using the parent's state
-    onStart(); // Directly call onStart without setTimeout
+    onStart(); 
   };
 
   const handleStartPlaying = () => {
@@ -249,10 +244,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
 
   if (!show) return null;
 
-
-
-  const friendBonusInfo = telegramUser ? getNextFriendBonusInfo(friendsCount) : null;
-
   return (
     <StyledLanding $show={show}>
       {isFirstVisit ? (
@@ -265,23 +256,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ telegramUser, onStart, onDire
             <StreakMessage>
               It's your {getOrdinalSuffix(userStats.currentStreak)} day straight!
             </StreakMessage>
-            {userStats.currentStreak > 1 && (
-              <BonusInfo>
-                +{Math.min(69, userStats.currentStreak - 1)} bonus tickets from streak!
-              </BonusInfo>
-            )}
-            {userStats.ticketsFromInvites && userStats.ticketsFromInvites > 0 && (
-              <BonusInfo style={{ color: '#0FF' }}>
-                +{userStats.ticketsFromInvites} permanent tickets from invites!
-              </BonusInfo>
-            )}
-            {friendBonusInfo && (
-              <BonusInfo style={{ color: '#FFD700' }}>
-                {friendBonusInfo.currentBonusTickets > 0
-                  ? `+${friendBonusInfo.currentBonusTickets} bonus ticket${friendBonusInfo.currentBonusTickets !== 1 ? 's' : ''} from friends!`
-                  : `${friendBonusInfo.friendsForNextBonus} more friend${friendBonusInfo.friendsForNextBonus !== 1 ? 's' : ''} for first bonus ticket!`}
-              </BonusInfo>
-            )}
           </>
         )
       )}
