@@ -3,52 +3,78 @@ import { getDatabase, ref, get } from 'firebase/database';
 
 const LeaderboardPosition = ({ userId }: { userId: string }) => {
   const [position, setPosition] = useState<number>(1);
-  const [debugData, setDebugData] = useState<string[]>([]);
+  const [debugInfo, setDebugInfo] = useState<string>('Loading...');
 
   useEffect(() => {
     const calculatePosition = async () => {
       try {
+        // First verify we have a valid userId
+        setDebugInfo(`Checking userId: ${userId}`);
+
         const db = getDatabase();
         const usersRef = ref(db, '/users');
-        const snapshot = await get(usersRef);
         
-        if (!snapshot.exists()) return;
+        // Get all users data
+        const snapshot = await get(usersRef);
+        if (!snapshot.exists()) {
+          setDebugInfo('No users found in database');
+          return;
+        }
 
         const users = snapshot.val();
-        
-        // Get all users and their scores
+        setDebugInfo(`Found ${Object.keys(users).length} users\n`);
+
+        // Get current user data
+        const currentUser = users[userId];
+        if (!currentUser) {
+          setDebugInfo('Current user not found in database');
+          return;
+        }
+
+        setDebugInfo(debugInfo => debugInfo + `\nCurrent user score: ${currentUser.totalScore}`);
+
+        // Map and sort users
         const userScores = Object.entries(users)
+          .filter(([_, data]: [string, any]) => data && data.totalScore !== undefined)
           .map(([id, data]: [string, any]) => ({
             userId: id,
             userName: data.userName || 'Unknown',
             totalScore: Number(data.totalScore || 0)
-          }))
-          .sort((a, b) => b.totalScore - a.totalScore);
+          }));
 
-        // Set debug data to show scores
-        setDebugData(userScores.map(user => 
-          `${user.userName}: ${user.totalScore}`
-        ));
+        setDebugInfo(debugInfo => debugInfo + `\nFound ${userScores.length} users with scores`);
 
-        // Calculate position
+        // Sort by score
+        userScores.sort((a, b) => b.totalScore - a.totalScore);
+
+        // Find position
         const userPosition = userScores.findIndex(user => user.userId === userId) + 1;
+        
+        setDebugInfo(debugInfo => 
+          debugInfo + 
+          `\n\nTop 3 scores:${
+            userScores.slice(0, 3).map(user => 
+              `\n${user.userName}: ${user.totalScore}`
+            )
+          }`
+        );
+
         if (userPosition > 0) {
           setPosition(userPosition);
+          setDebugInfo(debugInfo => debugInfo + `\n\nYour position: ${userPosition}`);
         }
-      } catch (error) {
-        setDebugData(['Error calculating position']);
+      } catch (error: any) {
+        setDebugInfo(`Error: ${error.message}\nStack: ${error.stack}`);
       }
     };
 
-    if (userId) {
-      calculatePosition();
-    }
+    calculatePosition();
   }, [userId]);
 
   return (
     <div style={{ position: 'relative' }}>
       <span>{position}</span>
-      {/* Temporary debug overlay */}
+      {/* Debug overlay */}
       <div style={{
         position: 'fixed',
         top: '50%',
@@ -59,17 +85,12 @@ const LeaderboardPosition = ({ userId }: { userId: string }) => {
         borderRadius: '10px',
         color: '#0FF',
         zIndex: 9999,
-        minWidth: '200px'
+        whiteSpace: 'pre-wrap',
+        maxWidth: '80vw',
+        maxHeight: '80vh',
+        overflow: 'auto'
       }}>
-        <div style={{ marginBottom: '10px' }}>Leaderboard Data:</div>
-        {debugData.map((line, index) => (
-          <div key={index} style={{ 
-            color: line.includes(userId) ? '#FFD700' : '#0FF',
-            marginBottom: '5px'
-          }}>
-            #{index + 1}. {line}
-          </div>
-        ))}
+        {debugInfo}
       </div>
     </div>
   );
