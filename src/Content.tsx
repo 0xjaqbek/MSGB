@@ -5,6 +5,12 @@ import stone1 from './assets/stone1.svg';
 import stone2 from './assets/stone2.svg';
 import stone3 from './assets/stone3.svg';
 import stone4 from './assets/stone4.svg';
+import stoneA from './assets/stoneA.svg';
+import stoneB from './assets/stoneB.svg';
+import stoneC from './assets/stoneC.svg';
+import stoneD from './assets/stoneD.svg';
+import stoneE from './assets/stoneE.svg';
+import stoneF from './assets/stoneF.svg';
 import blastImage0 from './assets/blast0.svg'; 
 import blastImage1 from './assets/blast1.svg'; 
 import { getDatabase, ref, set, onValue, push, update, get, increment } from 'firebase/database';
@@ -39,7 +45,7 @@ const app = initializeApp(firebaseConfig);
 
 interface Stone {
   id: number;
-  type: number;
+  type: number | string;
   speed: number;
   startX?: number;
   endX?: number;
@@ -48,6 +54,7 @@ interface Stone {
   posX?: number;
   posY?: number;
   direction: 'horizontal' | 'vertical';
+  isDistractor?: boolean;
 }
 
 type TelegramUser = {
@@ -114,6 +121,36 @@ export const getUserVisitStats = async (userId: string): Promise<UserVisit | nul
 };
 
 const GAME_DURATION = 60; // 60 seconds for the game
+
+interface StoneConfig {
+  weight: number;
+  points: number;
+}
+
+const STONE_CONFIGS: Record<number, StoneConfig> = {
+  0: { weight: 0.7, points: 1 },   // Most common (stone1)
+  1: { weight: 0.15, points: 2 },  // ~4 times per play (stone2)
+  2: { weight: 0.1, points: 4 },   // ~2 times per play (stone3)
+  3: { weight: 0.05, points: 6 }   // Rarest (stone4)
+};
+
+const DISTRACTOR_TYPES = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+const getStoneImage = (type: number | string): string => {
+  const stoneMap: Record<string, string> = {
+    '0': stone1,
+    '1': stone2,
+    '2': stone3,
+    '3': stone4,
+    'A': stoneA,
+    'B': stoneB,
+    'C': stoneC,
+    'D': stoneD,
+    'E': stoneE,
+    'F': stoneF
+  };
+  return stoneMap[type.toString()] || stone1;
+};
 
 const Content: React.FC<ContentProps> = ({ 
   onGameStateChange, 
@@ -312,97 +349,92 @@ useEffect(() => {
   }
 }, [isPlaying, gameOver]);
 
+const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
 
+  let startX, endX, startY, endY, posX, posY;
 
+  if (direction === 'horizontal') {
+    const startLeft = Math.random() < 0.5;
+    startX = startLeft ? -500 : screenWidth;
+    endX = startLeft ? screenWidth : -screenWidth;
+    posY = Math.random() * (screenHeight - 50);
+  } else {
+    startY = -500;
+    endY = screenHeight;
+    posX = Math.random() * (screenWidth - 50);
+  }
 
-  const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+  // Determine if this should be a distractor (30% chance)
+  const isDistractor = Math.random() < 0.3;
   
-    let startX, endX, startY, endY, posX, posY;
-  
-    if (direction === 'horizontal') {
-      const startLeft = Math.random() < 0.5;
-      startX = startLeft ? -500 : screenWidth;
-      endX = startLeft ? screenWidth : -screenWidth;
-      posY = Math.random() * (screenHeight - 50);
-    } else {
-      startY = -500;
-      endY = screenHeight;
-      posX = Math.random() * (screenWidth - 50);
-    }
-  
-    const typeRandom = Math.random();
-    let type;
-    if (typeRandom < 0.3) type = 0;      
-    else if (typeRandom < 0.55) type = 1; 
-    else if (typeRandom < 0.75) type = 2; 
-    else type = 3;
-  
-    // Adjust speed calculation based on increasing difficulty
-    const baseSpeed = 4 - difficulty * 0.3;  // Increase speed as difficulty increases
-    const speed = Math.max(0.5, baseSpeed);  // Ensure minimum speed limit
-  
-    const newStone: Stone = {
-      id: stoneIdCounter,
-      type,
-      speed,
-      startX,
-      endX,
-      startY,
-      endY,
-      posX,
-      posY,
-      direction,
-    };
-  
-    setStoneIdCounter((prev) => prev + 1);
-  
-    return newStone;
-  }, [difficulty, stoneIdCounter]);
+  let type: number | string;
+  if (isDistractor) {
+    // Select random distractor type (A-F)
+    type = DISTRACTOR_TYPES[Math.floor(Math.random() * DISTRACTOR_TYPES.length)];
+  } else {
+    // Select scoring stone type based on weights
+    const random = Math.random();
+    if (random < STONE_CONFIGS[3].weight) type = 3;
+    else if (random < STONE_CONFIGS[3].weight + STONE_CONFIGS[2].weight) type = 2;
+    else if (random < STONE_CONFIGS[3].weight + STONE_CONFIGS[2].weight + STONE_CONFIGS[1].weight) type = 1;
+    else type = 0;
+  }
 
-  const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
-    // Handle vibration only for non-iOS devices
-    if (navigator.vibrate && !isIOS()) {
-      if (type === 3) {
-        navigator.vibrate([100, 50, 100]); // Penalty vibration
-      } else {
-        navigator.vibrate(50); // Normal vibration
-      }
-    }
-  
-    if (type === 3) {
-      setScore(prev => prev - 10); // Subtract 10 points
-      setBlastPosition({ posX, posY });
-      setCurrentBlastImage(blastImage0);
-      setShowBlast(true);
-  
-      setTimeout(() => {
-        setCurrentBlastImage(blastImage1);
-      }, 100);
-  
-      setTimeout(() => {
-        setShowBlast(false);
-      }, 200);
-    } else {
-      setBlastPosition({ posX, posY });
-      setCurrentBlastImage(blastImage0);
-      setShowBlast(true);
-  
-      setTimeout(() => {
-        setCurrentBlastImage(blastImage1);
-      }, 100);
-  
-      setTimeout(() => {
-        setShowBlast(false);
-      }, 200);
-  
-      setScore(prev => prev + 1);
-    }
-    
-    // Always remove the stone, regardless of device type
+  const baseSpeed = 4 - difficulty * 0.3;
+  const speed = Math.max(0.5, baseSpeed);
+
+  const newStone: Stone = {
+    id: stoneIdCounter,
+    type,
+    speed,
+    startX,
+    endX,
+    startY,
+    endY,
+    posX,
+    posY,
+    direction,
+    isDistractor
+  };
+
+  setStoneIdCounter((prev) => prev + 1);
+  return newStone;
+}, [difficulty, stoneIdCounter]);
+
+const handleStoneTap = useCallback((id: number, type: number | string, posX: number, posY: number) => {
+  // Ignore taps on distractor stones (A-F)
+  if (typeof type === 'string') {
     setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
-  }, []);
+    return;
+  }
+
+  // Handle scoring stones
+  if (navigator.vibrate && !isIOS()) {
+    navigator.vibrate(50);
+  }
+
+  // Calculate points based on stone type
+  const points = STONE_CONFIGS[type]?.points || 1;
+  setScore(prev => prev + points);
+  
+  // Visual feedback
+  setBlastPosition({ posX, posY });
+  setCurrentBlastImage(blastImage0);
+  setShowBlast(true);
+
+  setTimeout(() => {
+    setCurrentBlastImage(blastImage1);
+  }, 100);
+
+  setTimeout(() => {
+    setShowBlast(false);
+  }, 200);
+  
+  // Remove the stone
+  setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
+}, []);
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
@@ -797,25 +829,24 @@ return (
               </>
             )}
 
-        {isPlaying && !gameOver && currentStones.map((stone) => (
-          <Stone
-            key={`stone-${stone.id}`}
-            id={`stone-${stone.id}`}
-            src={[stone1, stone2, stone3, stone4][stone.type]}
-            alt={`Stone ${stone.type + 1}`}
-            speed={stone.speed}
-            startX={stone.startX}
-            endX={stone.endX}
-            startY={stone.startY}
-            endY={stone.endY}
-            posX={stone.posX}
-            posY={stone.posY}
-            direction={stone.direction}
-            onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
-            onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-          />
-        ))}
-
+            {isPlaying && !gameOver && currentStones.map((stone) => (
+              <Stone
+                key={`stone-${stone.id}`}
+                id={`stone-${stone.id}`}
+                src={getStoneImage(stone.type)}
+                alt={`Stone ${typeof stone.type === 'string' ? stone.type : stone.type + 1}`}
+                speed={stone.speed}
+                startX={stone.startX}
+                endX={stone.endX}
+                startY={stone.startY}
+                endY={stone.endY}
+                posX={stone.posX}
+                posY={stone.posY}
+                direction={stone.direction}
+                onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+                onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+              />
+            ))}
         {gameOver && (
           <GameOverScreen className="scoreboard1">
             <h2>Game Over</h2>

@@ -1,7 +1,7 @@
 // types.ts
-export type Stone = {
+export interface Stone {
   id: number;
-  type: number;
+  type: number | string;  
   speed: number;
   startX?: number;
   endX?: number;
@@ -10,7 +10,8 @@ export type Stone = {
   posX?: number;
   posY?: number;
   direction: 'horizontal' | 'vertical';
-};
+  isDistractor?: boolean;
+}
 
 export type TelegramUser = {
   id: number;
