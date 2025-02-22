@@ -5,19 +5,44 @@ import { database } from '../config/firebaseConfig';
 import { increment, ref, update } from 'firebase/database';
 import { formatDate } from '../config/firebaseConfig';
 
+// Add iOS detection
+const isIOS = () => {
+  return (
+    ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+};
+
+// Stone configuration for scoring
+interface StoneConfig {
+  weight: number;
+  points: number;
+}
+
+const STONE_CONFIGS: Record<number, StoneConfig> = {
+  0: { weight: 0.7, points: 1 },   // Most common (stone1)
+  1: { weight: 0.15, points: 2 },  // ~4 times per play (stone2)
+  2: { weight: 0.1, points: 4 },   // ~2 times per play (stone3)
+  3: { weight: 0.05, points: 6 }   // Rarest (stone4)
+};
+
 export const useGameLogic = () => {
-    const [showBlink, setShowBlink] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [score, setScore] = useState(0);
-    const [gameOver, setGameOver] = useState(false);
-    const [currentStones, setCurrentStones] = useState<Stone[]>([]);
-    const [difficulty, setDifficulty] = useState(1);
-    const [stoneIdCounter, setStoneIdCounter] = useState(0);
-    const [remainingTime, setRemainingTime] = useState(GAME_DURATION);
-    const [showBlast, setShowBlast] = useState(false);
-    const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
-    const [currentBlastImage, setCurrentBlastImage] = useState<string>(BLAST_IMAGES.blast0);
-    const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const [showBlink, setShowBlink] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [score, setScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [currentStones, setCurrentStones] = useState<Stone[]>([]);
+  const [difficulty, setDifficulty] = useState(1);
+  const [stoneIdCounter, setStoneIdCounter] = useState(0);
+  const [remainingTime, setRemainingTime] = useState(GAME_DURATION);
+  const [showBlast, setShowBlast] = useState(false);
+  const [blastPosition, setBlastPosition] = useState<{ posX: number; posY: number } | null>(null);
+  const [currentBlastImage, setCurrentBlastImage] = useState<string>(BLAST_IMAGES.blast0);
+  const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+
+  // Add constants for blast images
+  const { blast0, blast1 } = BLAST_IMAGES;
 
   const spawnStone = useCallback((direction: 'horizontal' | 'vertical'): Stone => {
     const screenWidth = window.innerWidth;
@@ -75,46 +100,38 @@ export const useGameLogic = () => {
     window.Telegram?.WebApp?.sendData(JSON.stringify({ action: 'gameStarted' }));
   };
 
-  const handleStoneTap = useCallback((id: number, type: number, posX: number, posY: number) => {
-    if (navigator.vibrate) {
+  const handleStoneTap = useCallback((id: number, type: number | string, posX: number, posY: number) => {
+    // Ignore taps on distractor stones (A-F)
+    if (typeof type === 'string') {
+      setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
+      return;
+    }
+  
+    // Handle scoring stones
+    if (navigator.vibrate && !isIOS()) {
       navigator.vibrate(50);
     }
   
-    if (type === 3) { // Stone type 4 (index 3)
-      setScore((prev) => prev - 10); // Allow negative points
-      setBlastPosition({ posX, posY });
-      setCurrentBlastImage(BLAST_IMAGES.blast0);
-      setShowBlast(true);
-      
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
-      }
-
-      setTimeout(() => {
-        setCurrentBlastImage(BLAST_IMAGES.blast1);
-      }, 100);
-
-      setTimeout(() => {
-        setShowBlast(false);
-      }, 200);
-    } else {
-      setBlastPosition({ posX, posY });
-      setCurrentBlastImage(BLAST_IMAGES.blast0);
-      setShowBlast(true);
-
-      setTimeout(() => {
-        setCurrentBlastImage(BLAST_IMAGES.blast1);
-      }, 100);
-
-      setTimeout(() => {
-        setShowBlast(false);
-      }, 200);
-
-      setScore((prev) => prev + 1);
-    }
+    // Calculate points based on stone type
+    const points = STONE_CONFIGS[type]?.points || 1;
+    setScore(prev => prev + points);
     
+    // Visual feedback
+    setBlastPosition({ posX, posY });
+    setCurrentBlastImage(blast0);
+    setShowBlast(true);
+  
+    setTimeout(() => {
+      setCurrentBlastImage(blast1);
+    }, 100);
+  
+    setTimeout(() => {
+      setShowBlast(false);
+    }, 200);
+    
+    // Remove the stone
     setCurrentStones((prevStones) => prevStones.filter((stone) => stone.id !== id));
-}, []);
+  }, []);
 
   return {
     showBlink,

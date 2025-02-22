@@ -5,6 +5,12 @@ import { StyledContent, BlinkScreen, StartButton, Stone, Blast, ScoreBoard, Welc
 import { Stone as StoneType, TelegramUser } from '../types/types';
 import hudTop from '../assets/HUDtop.svg';
 import styled from 'styled-components';
+import stoneA from '../assets/stoneA.svg';
+import stoneB from '../assets/stoneB.svg';
+import stoneC from '../assets/stoneC.svg';
+import stoneD from '../assets/stoneD.svg';
+import stoneE from '../assets/stoneE.svg';
+import stoneF from '../assets/stoneF.svg';
 
 const HUDTop = styled.div`
   position: fixed;
@@ -21,6 +27,18 @@ const HUDTop = styled.div`
   height: 100px;
   pointer-events: none;
 `;
+
+const getStoneImage = (type: string): string => {
+  const stoneMap: Record<string, string> = {
+    'A': stoneA,
+    'B': stoneB,
+    'C': stoneC,
+    'D': stoneD,
+    'E': stoneE,
+    'F': stoneF
+  };
+  return stoneMap[type];
+};
 
 const Game: React.FC = () => {
   const {
@@ -149,24 +167,28 @@ const Game: React.FC = () => {
         </>
       )}
 
-      {isPlaying && !gameOver && currentStones.map((stone) => (
-        <Stone
-          key={`stone-${stone.id}`}
-          id={`stone-${stone.id}`}
-          src={STONE_IMAGES[`stone${stone.type + 1}` as keyof typeof STONE_IMAGES]}
-          alt={`Stone ${stone.type + 1}`}
-          speed={stone.speed}
-          startX={stone.startX}
-          endX={stone.endX}
-          startY={stone.startY}
-          endY={stone.endY}
-          posX={stone.posX}
-          posY={stone.posY}
-          direction={stone.direction}
-          onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
-          onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
-        />
-      ))}
+{isPlaying && !gameOver && currentStones.map((stone) => (
+  <Stone
+    key={`stone-${stone.id}`}
+    id={`stone-${stone.id}`}
+    src={
+      typeof stone.type === 'string' 
+        ? getStoneImage(stone.type) 
+        : STONE_IMAGES[`stone${stone.type + 1}` as keyof typeof STONE_IMAGES]
+    }
+    alt={`Stone ${typeof stone.type === 'string' ? stone.type : stone.type + 1}`}
+    speed={stone.speed}
+    startX={stone.startX}
+    endX={stone.endX}
+    startY={stone.startY}
+    endY={stone.endY}
+    posX={stone.posX}
+    posY={stone.posY}
+    direction={stone.direction}
+    onClick={() => handleStoneTap(stone.id, stone.type, stone.posX!, stone.posY!)}
+    onAnimationEnd={() => setCurrentStones((prev) => prev.filter((s) => s.id !== stone.id))}
+  />
+))}
 
       {gameOver && (
         <GameOverScreen>
